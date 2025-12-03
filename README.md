@@ -23,11 +23,9 @@ Ziel ist es für die AP2, ein **praxisnahes**, **strukturiertes** und **übersic
 |--------|--------------|
 | 📦 **Artikelmanagement** | Verwaltung von Produkten, Attributen und Kategorien |
 | 📊 **Bestandsverwaltung** | Lagerbestände prüfen, aktualisieren & protokollieren |
-| 🧾 **Bestellprozesse** | Verwaltung von Warenausgängen, Spenden & Rückständen |
+| 🧾 **Bestellprozesse** | Verwaltung von Spenden |
 | 🌐 **Synchronisation** | Tägliches Backup mit dem Mainserver |
 | 👥 **Benutzerverwaltung** | Rollen & Rechte |
-
-✅ *Die Liste wird fortlaufend erweitert.*
 
 ---
 
@@ -46,37 +44,6 @@ Ziel ist es für die AP2, ein **praxisnahes**, **strukturiertes** und **übersic
 
 ---
 
-## 📂 Projektstruktur (⚠️ VORLÄUFIGES BEISPIEL ⚠️)
-
-```plaintext
-albbw-agens-project/
-│
-├── src/
-│   ├── modules/
-│   ├── services/
-│   ├── database/
-│   └── utils/
-│
-├── docs/
-├── tests/
-└── README.md
-```
-
----
-
-## 💬 Kommunikation & Zusammenarbeit
-
-Zur Zusammenarbeit verwenden wir den GitHub Discussions Thread.
-Dort dokumentieren wir:
-
-- 📅 Meeting-Notizen
-- 🔧 Strategische Entscheidungen
-- 📏 Code-Konventionen
-- ✅ Fortschritts-Updates
-- 💡 Fragen & Antworten (optional)
-
----
-
 ## 📏 Code-Konventionen
 
 - Stehen im GitHub Discussion Thread.
@@ -85,27 +52,32 @@ Dort dokumentieren wir:
 - Einheitliche Code-Formatierung (zB Einrückungen)
 - Klare Benennungen (zB CamelCase, snake_case oder was wir auch immer verwenden wollen)
 
-### 📌 Git-Conventions
+### 📌 Git-Conventions (sollte jeder um Seineswillen beachten)
 - Aussagekräftige Commit-Messages
 - Feature-Branches (feature/...)
 - Dokumentation relevanter Änderungen
-
-### 📦 Architektur
-- Saubere Modulstruktur
-- Trennung von Logik, Datenbank & UI
-- Wiederverwendbare Komponenten
 
 ---
 
 ## ⚙️ Installation & Setup
 
 Konkrete Schritte folgen, sobald das System lauffähig ist.
+ 
 
 ```plaintext
 git clone https://github.com/albbw-agens-project.git
 cd albbw-agens-project
 ```
-### Weitere Setup-Schritte folgen
+
+### ⚠️⚠️⚠️ WICHTIG  ⚠️⚠️⚠️
+##### JEDER ERSTELLT SICH DEINE EIGENE BRANCH MIT FOLGENDEN CODE:
+
+```plaintext
+git branch 'DEIN_BRANCH_NAME'
+git checkout 'DEIN_BRANCH_NAME'
+```
+##### IN DIE MAIN ODER DEV BRANCH WIRD NUR NACH ABSPRACHE GEPUSHT
+##### DERJENIGE, DER IN DIE BRANCH PUSHT, IST FÜR DAS RICHTIGE ZURÜCKSETZEN VERANTWORTLICH!
 
 ---
 
