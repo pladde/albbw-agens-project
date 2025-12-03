@@ -1,4 +1,5 @@
 import { Fahrrad } from "../Models/Fahrrad";
+import { IFahrrad } from "../Interfaces/IFahrrad";
 import { FahrradRepository } from "../Repository/FahrradRepository";
 
 export class FahrradService 
