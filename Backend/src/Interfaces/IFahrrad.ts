@@ -1,4 +1,4 @@
-export class Fahrrad 
+export interface IFahrrad 
 {
     // Attribute
     id: number;
