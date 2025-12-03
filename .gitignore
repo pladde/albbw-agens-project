@@ -1,0 +1,35 @@
+# ==================================
+# I. Dependencies & Build Artifacts
+# ==================================
+node_modules
+/dist
+/build
+/out
+
+# ==================================
+# II. Secrets & Config
+# ==================================
+# Wichtig: Ignoriert die Datei mit allen Passwörtern und Keys
+.env
+.env.local
+
+# ==================================
+# III. TypeScript & Logs
+# ==================================
+*.tsbuildinfo
+*.log
+npm-debug.log*
+yarn-error.log*
+
+# ==================================
+# IV. Editor & OS Files
+# ==================================
+# VS Code
+.vscode/settings.json
+.vscode/tasks.json
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
