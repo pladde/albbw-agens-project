@@ -31,9 +31,10 @@ export class FahrradService
 
     public async readFahrradById(id: number) : Promise<Fahrrad | null>
     {
-        if(!id) 
+        if(id == null || id <= 0)
         {
-            throw new Error (`Service: Die Id darf nicht null sein!`);
+            console.log("HIER IST DIE ID: " + id);
+            throw new Error ('Service: Die Id darf nicht null sein!');
         }
 
         let result: Fahrrad | null;
