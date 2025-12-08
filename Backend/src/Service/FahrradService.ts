@@ -29,11 +29,12 @@ export class FahrradService
         return result;
     }
 
-    public readFahrradById(id: number) : Fahrrad | null
+    public async readFahrradById(id: number) : Promise<Fahrrad | null>
     {
-        if(!id) 
+        if(id == null || id <= 0)
         {
-            throw new Error (`Service: Die Id darf nicht null sein!`);
+            console.log("HIER IST DIE ID: " + id);
+            throw new Error ('Service: Die Id darf nicht null sein!');
         }
 
         let result: Fahrrad | null;
@@ -42,9 +43,9 @@ export class FahrradService
         {
             const repo = new FahrradRepository;
 
-            result = repo.findFahrradById(id);
+            result = await repo.findFahrradById(id);
 
-        } catch (Error)
+        } catch (error)
         {
             throw new Error("Service: Fehler beim Aufrufen des Fahrrads anhand der Id!");
         }

@@ -1,0 +1,22 @@
+// Backend/tsconfig.json
+
+{
+    "compilerOptions": {
+        // Allgemeine Einstellungen
+        "target": "es2020",
+        "module": "commonjs",
+        "rootDir": "./src",
+        "outDir": "./dist",
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "skipLibCheck": true,
+        
+        // **WICHTIG:** Jest-Typen laden
+        "types": ["jest", "node"]
+    },
+    "include": [
+        "src/**/*",
+        "jest.config.js" // Damit TS die Jest-Konfigurationsdatei ignorieren kann (falls benötigt)
+    ]
+}
