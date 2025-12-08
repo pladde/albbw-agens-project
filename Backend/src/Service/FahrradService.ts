@@ -29,7 +29,7 @@ export class FahrradService
         return result;
     }
 
-    public readFahrradById(id: number) : Fahrrad | null
+    public async readFahrradById(id: number) : Promise<Fahrrad | null>
     {
         if(!id) 
         {
@@ -42,9 +42,9 @@ export class FahrradService
         {
             const repo = new FahrradRepository;
 
-            result = repo.findFahrradById(id);
+            result = await repo.findFahrradById(id);
 
-        } catch (Error)
+        } catch (error)
         {
             throw new Error("Service: Fehler beim Aufrufen des Fahrrads anhand der Id!");
         }
