@@ -41,4 +41,31 @@ export class FahrradRepository
             throw new Error("Fehler beim Speichern des Fahrrads in der Datenbank.");
         }
     }
+
+    public async findFahrradById(id: number): Promise<Fahrrad | null>
+    {
+        if(!id)
+        {
+            throw new Error(`Repository: Die Id darf nicht null sein!`);
+        }
+
+        try 
+        {
+            const stmt = 
+            "SELECT * FROM fahrraeder WHERE `fahrrad_id` = ?"
+            [id];            
+
+            const [result, fields] = await dbPool.execute<ResultSetHeader>(stmt);            
+
+            console.log(fields);
+
+            //weiter hier
+
+        } catch (Error)
+        {
+            throw new Error("Fehler bei der Abfrage des Fahrrads in der Datenbank!");
+        }
+
+        return null;
+    }
 }

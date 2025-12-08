@@ -15,7 +15,7 @@ export class FahrradService
 
         try 
         {
-            const repo = new FahrradRepository
+            const repo = new FahrradRepository;
             const id = repo.save(fahrrad);
             // Hier wird dann die Id für eine Abfrage verarbeitet, damit das Fahrradobjekt zurückgegeben werden kann.
             result = fahrrad; // Das ausgelesene Objekt wird dann hier ausgegeben.
@@ -24,6 +24,29 @@ export class FahrradService
         {
             console.log("Service: Fehler beim Aufrufen der Repository!");
             result = null;
+        }
+
+        return result;
+    }
+
+    public readFahrradById(id: number) : Fahrrad | null
+    {
+        if(!id) 
+        {
+            throw new Error (`Service: Die Id darf nicht null sein!`);
+        }
+
+        let result: Fahrrad | null;
+
+        try 
+        {
+            const repo = new FahrradRepository;
+
+            result = repo.findFahrradById(id);
+
+        } catch (Error)
+        {
+            throw new Error("Service: Fehler beim Aufrufen des Fahrrads anhand der Id!");
         }
 
         return result;
