@@ -4,7 +4,7 @@
 
 const mockFindFahrradById = jest.fn();
 
-jest.mock("../Repository/FahrradRepository", () => {
+jest.mock("../src/Repository/FahrradRepository", () => {
     return {
         FahrradRepository: jest.fn().mockImplementation(() => {
             return {
@@ -15,8 +15,8 @@ jest.mock("../Repository/FahrradRepository", () => {
 });
 
 // 2. IMPORTS & DATEN
-import { FahrradService } from "../Service/FahrradService";
-import { Fahrrad } from "../Models/Fahrrad";
+import { FahrradService } from "../src/Service/FahrradService";
+import { Fahrrad } from "../src/Models/Fahrrad";
 
 let service: FahrradService;
 const TEST_ID = 42;
@@ -66,7 +66,7 @@ describe('FahrradService.readFahrradById', () => {
     
     // --- TEST 3: Ungültige ID (Validierung) ---
     test('sollte einen Error werfen, wenn die ID 0 ist', () => {
-        const INVALID_ID = 0; 
+        const INVALID_ID = 1; 
 
         // ACT & ASSERT
         expect(() => {

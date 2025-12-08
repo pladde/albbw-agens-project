@@ -5,7 +5,7 @@
         // Allgemeine Einstellungen
         "target": "es2020",
         "module": "commonjs",
-        "rootDir": "./src",
+        "rootDir": "./",
         "outDir": "./dist",
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,
@@ -18,5 +18,5 @@
     "include": [
         "src/**/*",
         "jest.config.js" // Damit TS die Jest-Konfigurationsdatei ignorieren kann (falls benötigt)
-    ]
+, "tests"    ]
 }
