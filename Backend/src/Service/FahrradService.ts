@@ -4,7 +4,15 @@ import { FahrradRepository } from "../Repository/FahrradRepository";
 
 export class FahrradService 
 {
-    public createNewFahrrad(fahrrad: Fahrrad): Fahrrad | null
+    /**
+     * Diese Methode prüft ob das Fahrrad gültige Werte hat, übergibt das Fahrrad-Objekt
+     * zur weiteren Verarbeitung an die Repository und gibt das erfolgreich gespeicherte Objekt zurück. 
+     * @param fahrrad - Nimmt das Fahrrad-Objekt entgegen.
+     * @returns Promise<Fahrrad | null> - Gibt entweder das gespeicherte Fahrrad-Objekt oder null zurück.
+     * @throws Service: Das Objekt ${fahrrad} darf nicht null oder leer sein! - Wenn das Objekt ungültig ist wird durch den Guard ein Error geworfen.
+     * @throws "Service: Fehler beim Aufrufen der Repository!" - wird geworfen wenn es einen Fehler beim speichern in dem Repositorylayer gab.
+     */
+    public async createNewFahrrad(fahrrad: Fahrrad): Promise<Fahrrad | null>
     {
         if(!fahrrad)
         {
@@ -16,9 +24,17 @@ export class FahrradService
         try 
         {
             const repo = new FahrradRepository;
-            const id = repo.save(fahrrad);
-            // Hier wird dann die Id für eine Abfrage verarbeitet, damit das Fahrradobjekt zurückgegeben werden kann.
-            result = fahrrad; // Das ausgelesene Objekt wird dann hier ausgegeben.
+            const id = await repo.save(fahrrad);
+
+            if(id != null)
+            {
+                // Ließt das Objekt anhand der Id aus und speichert es in die Variable zur Rückgabe.
+                result = await this.readFahrradById(id);
+            }
+            else
+            {
+                result = null;
+            }  
 
         } catch (error) 
         {
@@ -29,11 +45,18 @@ export class FahrradService
         return result;
     }
 
+    /**
+     * Diese Methode nimmt eine ID entgegen, ruft den Repository-Layer auf und übergibt diesen die ID zur Suche nach dem gewünschten Objekt.
+     * @param id - Die ID mit der das Objekt in der Datenbank gesucht wird.
+     * @returns Promise<Fahrrad | null> - Wenn ein Objekt gefunden wurde wird es zurückgegeben. Wenn nicht wird NULL zurückgegeben. 
+     * @throws "Service: Die Id darf nicht null sein!" - Wenn eine ungültige ID übergeben wird die entweder NULL, 0 oder negativ ist wird dieser Error vom Guard geworfen.
+     * @throws "Service: Fehler beim Aufrufen des Fahrrads anhand der Id!" - Wenn es einen Fehler beim aufrufen des Repository-Layers gibt, wird dieser Error geworfen.
+     */
     public async readFahrradById(id: number) : Promise<Fahrrad | null>
     {
         if(id == null || id <= 0)
         {
-            console.log("HIER IST DIE ID: " + id);
+            //console.log("DEBUG_SERVICE: ID: " + id);
             throw new Error ('Service: Die Id darf nicht null sein!');
         }
 

@@ -1,3 +1,4 @@
+import { error } from "console";
 import { Fahrrad } from "../Models/Fahrrad";
 import dbPool from "../config/db"
 import { ResultSetHeader } from 'mysql2/promise';
@@ -5,9 +6,9 @@ import { ResultSetHeader } from 'mysql2/promise';
 export class FahrradRepository 
 {
     /**
-     * Diese Methode erstellt über eine SQL-Query ein neues Fahrrad in die Datenbank. 
+     * Diese Methode erstellt über eine SQL-Query ein neues Fahrrad in die Datenbank.
      * @param fahrrad Das Objekt vom Typ Fahrrad.
-     * @returns Ein Fahrradobjekt oder null. 
+     * @returns Promise<number | null> Ein Fahrradobjekt oder null. 
      * @throws Wenn das Fahrradobjekt null oder leer ist wird ein Error geworfen.
      */
     public async save(fahrrad: Fahrrad): Promise<number | null>
@@ -42,6 +43,13 @@ export class FahrradRepository
         }
     }
 
+    /**
+     * Diese Methode nimmt eine ID entgegen, baut eine Verbindung zur Datenbank auf, sucht ein Objekt anhand der ID und gibt dieses zurück.
+     * @param id - Die ID mir der das Objekt gesucht werden soll. 
+     * @returns Promise<Fahrrad | null> - Gibt entweder das gespeicherte Fahrrad-Objekt oder null zurück.
+     * @throws "Repository: Die Id darf nicht null sein!" - Wenn die ID ungültig ist wird durch den Guard ein Error geworfen.
+     * @throws "Fehler bei der Abfrage des Fahrrads in der Datenbank!" - Wird geworfen wenn es einen Fehler beim speichern in die Datenbank gab.
+     */
     public async findFahrradById(id: number): Promise<Fahrrad | null>
     {
         if(!id)
@@ -53,15 +61,17 @@ export class FahrradRepository
         {
             const stmt = 
             "SELECT * FROM fahrraeder WHERE `fahrrad_id` = ?"
-            [id];            
+            [id];
+            
+            const [result, fields] = await dbPool.execute(stmt, (err: any, rows: any) => {
+                console.log(rows);
+            }); 
 
-            const [result, fields] = await dbPool.execute<ResultSetHeader>(stmt);            
-
+            // Auslesen was zurück kommt | Docu lesen https://sidorares.github.io/node-mysql2/docs/documentation/prepared-statements
+            console.log(result);
             console.log(fields);
 
-            //weiter hier
-
-        } catch (Error)
+        } catch (error)
         {
             throw new Error("Fehler bei der Abfrage des Fahrrads in der Datenbank!");
         }
