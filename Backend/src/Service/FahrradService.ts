@@ -1,5 +1,4 @@
 import { Fahrrad } from "../Models/Fahrrad";
-import { IFahrrad } from "../Interfaces/IFahrrad";
 import { FahrradRepository } from "../Repository/FahrradRepository";
 
 export class FahrradService 
@@ -74,5 +73,43 @@ export class FahrradService
         }
 
         return result;
+    }
+
+    /**
+     * Diese Methode übergibt dem Repository-Layer zwei Strings zum dynamsichen durchsuchen der Datenbank wie zB Zeile und Wert in kombination.
+     * @param searchRow - Die zu durchsuchende Zeile (zB Marke, Rahmenummer etc.)
+     * @param searchValue - Die zu suchenden Datenwerte (zB "CANYON, CUBE, DIAMANT, etc.")
+     * @returns Promise<Fahrrad | null> - Gibt das gefundene Fahrrad-Objekt zurück. NULL falls keins gefunden wurde.
+     * @throws "Service.Guard: Ungültige Zeile übergeben!" - Wenn keine gültige Zeile übergeben wurde, wirft der Guard einen Error.
+     * @throws "Service.Guard: Ungültigen Wert übergeben!" - Wenn kein gültiger Wert übergeben wurde, wirft der Guard einen Error.
+     * @throws "Service: Fehler beim Aufrufen des Fahrrads anhand der Zeile und des Wertes!" - Wenn es zu einem unerwareteten Fehler beim 
+     * aufrufen der Repository kommt, wird ein Error geworfen.
+     */
+    public async readFahrradByString(searchRow: string, searchValue: string): Promise<Fahrrad | null>
+    {
+        //#region Guard
+        if(!searchRow)
+            {
+                throw new Error("Service.Guard: Ungültige Zeile übergeben!");
+            }
+        if(!searchValue)
+        {
+            throw new Error("Service.Guard: Ungültigen Wert übergeben!");
+        }
+        //#endregion
+
+        let result: Fahrrad | null;
+
+        try 
+        {
+            const repo = new FahrradRepository();
+            result = await repo.readByString(searchRow, searchValue);
+
+            return result;
+
+        } catch (error)
+        {
+            throw new Error("Service: Fehler beim Aufrufen des Fahrrads anhand der Zeile und des Wertes!");
+        }
     }
 }
