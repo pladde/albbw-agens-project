@@ -140,4 +140,42 @@ export class FahrradRepository
         
     }
     //#endregion
+
+    //#region findByDate
+    public async findByDate(searchRow: Date, searchDate: Date): Promise<Fahrrad | null>
+    {
+        //#region Guard
+        if(!searchDate)
+        {
+            throw new Error("Repository: Ungültiges Datum übergeben!");
+        }
+        //#endregion
+
+        try
+        {
+            const stmt = "SELECT * FROM fahrraeder WHERE ? = ?";
+            const value = [searchRow, searchDate];
+
+            const [rows, fields] = await dbPool.execute(stmt, value);
+
+            const fahrradRows = rows as any[];
+
+            if(fahrradRows.length === 0)
+            {
+                return null;
+            }
+
+            const fahrradData: any = fahrradRows[0];
+
+            const rowToFahrrad = new DbRowToObject();
+            const fahrrad = rowToFahrrad.mapDbRowToFahrrad(fahrradData);
+
+            return fahrrad;
+
+        } catch (error)
+        {
+            throw new Error("Repository: Fehler beim Abfragen der Datenbank anhand eines Datums!");
+        }
+    }
+    //#endregion
 }
