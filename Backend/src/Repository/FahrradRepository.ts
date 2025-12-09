@@ -142,9 +142,13 @@ export class FahrradRepository
     //#endregion
 
     //#region findByDate
-    public async findByDate(searchRow: Date, searchDate: Date): Promise<Fahrrad | null>
+    public async findByDate(searchRow: string, searchDate: Date): Promise<Fahrrad | null>
     {
         //#region Guard
+        if(!searchRow)
+        {
+            throw new Error("Repository: Ungültige Zeile übergeben!");
+        }
         if(!searchDate)
         {
             throw new Error("Repository: Ungültiges Datum übergeben!");
