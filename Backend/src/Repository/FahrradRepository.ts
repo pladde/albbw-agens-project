@@ -2,6 +2,7 @@ import { error } from "console";
 import { Fahrrad } from "../Models/Fahrrad";
 import dbPool from "../config/db"
 import { ResultSetHeader } from 'mysql2/promise';
+import { DbRowToObject } from "../Util/DbRowToObject";
 
 export class FahrradRepository 
 {
@@ -20,15 +21,16 @@ export class FahrradRepository
 
         const stmt = 
         `INSERT INTO fahrrader (marke, rahmennummer, besonderheiten, bearbeitungstatus, erfasstAm, erfasstVon, herausgegebenAn)
-        VALUES(?, ?, ?, ?, ?, ?, ?)`
+        VALUES(?, ?, ?, ?, ?, ?, ?)`;
+
         const values = [
-            fahrrad.marke,
-            fahrrad.rahmennummer,
-            fahrrad.besonderheiten,
-            fahrrad.bearbeitungsstatus,
-            fahrrad.erfasstAm,
-            fahrrad.erfasstVon,
-            fahrrad.herausgegebenAn
+            fahrrad.getMarke,
+            fahrrad.getRahmennummer,
+            fahrrad.getBesonderheiten,
+            fahrrad.getBearbeitungsstatus,
+            fahrrad.getErfasstAm,
+            fahrrad.getErfasstVon,
+            fahrrad.getHerausgegebenAn
         ]
 
         try 
@@ -48,34 +50,43 @@ export class FahrradRepository
      * @param id - Die ID mir der das Objekt gesucht werden soll. 
      * @returns Promise<Fahrrad | null> - Gibt entweder das gespeicherte Fahrrad-Objekt oder null zurück.
      * @throws "Repository: Die Id darf nicht null sein!" - Wenn die ID ungültig ist wird durch den Guard ein Error geworfen.
+     * @throws "Kein Fahrrad mit dieser Id gefunden!" - Wenn kein Fahrrad mit dieser ID gefunden wurde.
      * @throws "Fehler bei der Abfrage des Fahrrads in der Datenbank!" - Wird geworfen wenn es einen Fehler beim speichern in die Datenbank gab.
      */
     public async findFahrradById(id: number): Promise<Fahrrad | null>
     {
+        //#region Guard
         if(!id)
         {
             throw new Error(`Repository: Die Id darf nicht null sein!`);
         }
+        //#endregion
 
         try 
         {
             const stmt = 
-            "SELECT * FROM fahrraeder WHERE `fahrrad_id` = ?"
-            [id];
+            "SELECT * FROM fahrraeder WHERE `fahrrad_id` = ?";
             
-            const [result, fields] = await dbPool.execute(stmt, (err: any, rows: any) => {
-                console.log(rows);
-            }); 
+            const [rows, fields] = await dbPool.execute(stmt, [id]); 
 
-            // Auslesen was zurück kommt | Docu lesen https://sidorares.github.io/node-mysql2/docs/documentation/prepared-statements
-            console.log(result);
-            console.log(fields);
+            const fahrradRows = rows as any[];
+
+            if(fahrradRows.length === 0)
+            {
+                return null;
+            }        
+
+            const fahrradData: any = fahrradRows[0];
+            //console.log(fahrradData); // NUR ZUM DEBUGGEN
+
+            const rowToFahrrad = new DbRowToObject();
+            let fahrrad: Fahrrad | null = rowToFahrrad.mapDbRowToFahrrad(fahrradData);
+
+            return fahrrad;
 
         } catch (error)
         {
             throw new Error("Fehler bei der Abfrage des Fahrrads in der Datenbank!");
         }
-
-        return null;
     }
 }
