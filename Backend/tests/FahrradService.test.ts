@@ -20,20 +20,21 @@ import { Fahrrad } from "../src/Models/Fahrrad";
 
 let service: FahrradService;
 const TEST_ID = 42;
-const mockFahrrad: Fahrrad = {
-    id: TEST_ID,
-    marke: "Canyon",
-    rahmennummer: "Hallo Welt 0815",
-    besonderheiten: "Einfach ein tolles Rad!",
-    bearbeitungsstatus: "Angenommen",
-    erfasstAm: new Date("2025-12-08T10:30:00"),
-    erfasstVon: "Irgendwem",
-    herausgegebenAn: "Jemanden",
-} as Fahrrad;
+const mockFahrrad: Fahrrad = new Fahrrad (
+    TEST_ID, 
+    "Canyon",
+    "Hallo Welt 0815",
+    "Tolles Rad",
+    "In Bearbeitung",
+    new Date("2025-12-08T10:30:00"),
+    "Irgendwem",
+    "Jemanden"
+);
 
 // Test Suite
 describe('FahrradService.readFahrradById', () => {
-    beforeEach(() => {
+    beforeEach(() =>
+    {
         service = new FahrradService();
         mockFindFahrradById.mockClear();
     });
@@ -69,7 +70,8 @@ describe('FahrradService.readFahrradById', () => {
         const INVALID_ID = 1; 
 
         // ACT & ASSERT
-        expect(() => {
+        expect(() => 
+        {
             service.readFahrradById(INVALID_ID);
         }).toThrow('Service: Die Id darf nicht null sein!');
         
