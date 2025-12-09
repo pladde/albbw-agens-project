@@ -6,6 +6,7 @@ import { DbRowToObject } from "../Util/DbRowToObject";
 
 export class FahrradRepository 
 {
+    //#region save
     /**
      * Diese Methode erstellt über eine SQL-Query ein neues Fahrrad in die Datenbank.
      * @param fahrrad Das Objekt vom Typ Fahrrad.
@@ -44,7 +45,9 @@ export class FahrradRepository
             throw new Error("Fehler beim Speichern des Fahrrads in der Datenbank.");
         }
     }
+    //#endregion
 
+    //#region findFahrradById
     /**
      * Diese Methode nimmt eine ID entgegen, baut eine Verbindung zur Datenbank auf, sucht ein Objekt anhand der ID und gibt dieses zurück.
      * @param id - Die ID mir der das Objekt gesucht werden soll. 
@@ -80,7 +83,7 @@ export class FahrradRepository
             //console.log(fahrradData); // NUR ZUM DEBUGGEN
 
             const rowToFahrrad = new DbRowToObject();
-            let fahrrad: Fahrrad | null = rowToFahrrad.mapDbRowToFahrrad(fahrradData);
+            const fahrrad: Fahrrad | null = rowToFahrrad.mapDbRowToFahrrad(fahrradData);
 
             return fahrrad;
 
@@ -89,4 +92,52 @@ export class FahrradRepository
             throw new Error("Fehler bei der Abfrage des Fahrrads in der Datenbank!");
         }
     }
+    //#endregion
+
+    //#region readByString
+    public async readByString(searchRow: string, searchValue: string): Promise<Fahrrad | null> 
+    {
+        //#region Guard
+        if(!searchRow)
+        {
+            throw new Error(`Repository: Ungueltige Zeile bei der Uebergabe erkannt!`);
+        }
+        if(!searchValue)
+        {
+            throw new Error(`Repository: Ungueltigen Wert bei der Uebergabe erkannt!`);
+        }
+        //#endregion
+
+        try
+        {
+            const stmt =
+            `SELECT * FROM fahrraeder WHERE ? = ?`;
+
+            const values = [searchRow, searchValue]
+
+            const [rows, fields] = await dbPool.execute(stmt, [values]);
+
+            const fahrradRows = rows as any[];
+
+            if(fahrradRows.length === 0)
+            {
+                return null;
+            }        
+    
+            const fahrradData: any = fahrradRows[0];
+            //console.log(fahrradData); // NUR ZUM DEBUGGEN
+    
+            const rowToFahrrad = new DbRowToObject();
+            const fahrrad: Fahrrad | null = rowToFahrrad.mapDbRowToFahrrad(fahrradData);
+    
+            return fahrrad;
+
+
+        } catch (error)
+        {
+            throw new Error("Fehler bei der Abfrage des Fahrrads anhand eines Strings in der Datenbank!");
+        }
+        
+    }
+    //#endregion
 }
