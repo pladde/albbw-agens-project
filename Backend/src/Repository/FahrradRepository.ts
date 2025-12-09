@@ -6,7 +6,6 @@ import { DbRowToObject } from "../Util/DbRowToObject";
 
 export class FahrradRepository 
 {
-    //#region save
     /**
      * Diese Methode erstellt über eine SQL-Query ein neues Fahrrad in die Datenbank.
      * @param fahrrad Das Objekt vom Typ Fahrrad.
@@ -45,9 +44,7 @@ export class FahrradRepository
             throw new Error("Fehler beim Speichern des Fahrrads in der Datenbank.");
         }
     }
-    //#endregion
 
-    //#region findFahrradById
     /**
      * Diese Methode nimmt eine ID entgegen, baut eine Verbindung zur Datenbank auf, sucht ein Objekt anhand der ID und gibt dieses zurück.
      * @param id - Die ID mir der das Objekt gesucht werden soll. 
@@ -92,9 +89,15 @@ export class FahrradRepository
             throw new Error("Fehler bei der Abfrage des Fahrrads in der Datenbank!");
         }
     }
-    //#endregion
 
-    //#region readByString
+    /**
+     * Liest ein einzelnes Fahrrad-Objekt aus der Datenbank, indem es nach einem **String-Wert** in einer bestimmten **Zeile (Spalte)** sucht.
+     * * @param searchRow Die **Spalte** (der Datenbankzeile), in der gesucht werden soll (z.B. 'kennzeichen', 'id', 'modell').
+     * @param searchValue Der **String-Wert**, nach dem in der angegebenen Spalte gesucht werden soll (z.B. 'XYZ-123', '5', 'Trekking Bike').
+     * @returns Ein **Promise**, das entweder das gefundene `Fahrrad`-Objekt oder `null` zurückgibt, wenn kein Eintrag gefunden wurde.
+     * @throws {Error} Wirft einen **Error**, wenn `searchRow` oder `searchValue` ungültig (null/leer) sind.
+     * @throws {Error} Wirft einen **Error**, wenn bei der Datenbankabfrage ein Fehler auftritt.
+     */
     public async readByString(searchRow: string, searchValue: string): Promise<Fahrrad | null> 
     {
         //#region Guard
@@ -139,9 +142,15 @@ export class FahrradRepository
         }
         
     }
-    //#endregion
 
-    //#region findByDate
+    /**
+     * Sucht ein einzelnes Fahrrad-Objekt in der Datenbank, indem es nach einem **Datumswert** in einer bestimmten **Spalte** sucht.
+     * * @param searchRow Die **Spalte** (der Datenbankzeile), in der nach dem Datum gesucht werden soll (z.B. 'kaufdatum', 'letzte_wartung').
+     * @param searchDate Der **Datumswert** (`Date`-Objekt), nach dem in der angegebenen Spalte gesucht werden soll.
+     * @returns Ein **Promise**, das entweder das gefundene `Fahrrad`-Objekt oder `null` zurückgibt, wenn kein Eintrag gefunden wurde.
+     * @throws {Error} Wirft einen **Error**, wenn `searchRow` oder `searchDate` ungültig (null/leer) sind.
+     * @throws {Error} Wirft einen **Error**, wenn bei der Datenbankabfrage ein Fehler auftritt.
+     */
     public async findByDate(searchRow: string, searchDate: Date): Promise<Fahrrad | null>
     {
         //#region Guard
@@ -181,5 +190,4 @@ export class FahrradRepository
             throw new Error("Repository: Fehler beim Abfragen der Datenbank anhand eines Datums!");
         }
     }
-    //#endregion
 }
