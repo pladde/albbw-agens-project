@@ -76,13 +76,13 @@ export class FahrradService
     }
 
     /**
-     * Diese Methode übergibt dem Repository-Layer zwei Strings zum dynamsichen durchsuchen der Datenbank wie zB Zeile und Wert in kombination.
-     * @param searchRow - Die zu durchsuchende Zeile (zB Marke, Rahmenummer etc.)
-     * @param searchValue - Die zu suchenden Datenwerte (zB "CANYON, CUBE, DIAMANT, etc.")
-     * @returns Promise<Fahrrad | null> - Gibt das gefundene Fahrrad-Objekt zurück. NULL falls keins gefunden wurde.
-     * @throws "Service.Guard: Ungültige Zeile übergeben!" - Wenn keine gültige Zeile übergeben wurde, wirft der Guard einen Error.
-     * @throws "Service.Guard: Ungültigen Wert übergeben!" - Wenn kein gültiger Wert übergeben wurde, wirft der Guard einen Error.
-     * @throws "Service: Fehler beim Aufrufen des Fahrrads anhand der Zeile und des Wertes!" - Wenn es zu einem unerwareteten Fehler beim 
+     * Diese Methode übergibt dem Repository-Layer zwei Strings zum dynamischen durchsuchen der Datenbank wie zB Zeile und Wert in kombination.
+     * @param searchRow - Die zu durchsuchende **Zeile** (zB Marke, Rahmenummer etc.)
+     * @param searchValue - Die zu suchenden **Datenwerte** (zB "CANYON, CUBE, DIAMANT, etc.")
+     * @returns `Promise<Fahrrad | null>` - Gibt das gefundene `Fahrrad-Objekt` zurück. `NULL` falls keins gefunden wurde.
+     * @throws {Error} - Wenn keine gültige Zeile übergeben wurde, wirft der Guard einen Error.
+     * @throws {Error} - Wenn kein gültiger Wert übergeben wurde, wirft der Guard einen Error.
+     * @throws {Error} - Wenn es zu einem unerwareteten Fehler beim 
      * aufrufen der Repository kommt, wird ein Error geworfen.
      */
     public async readFahrradByString(searchRow: string, searchValue: string): Promise<Fahrrad | null>
@@ -105,11 +105,48 @@ export class FahrradService
             const repo = new FahrradRepository();
             result = await repo.readByString(searchRow, searchValue);
 
-            return result;
-
         } catch (error)
         {
             throw new Error("Service: Fehler beim Aufrufen des Fahrrads anhand der Zeile und des Wertes!");
         }
+
+        return result;
     }
+
+    /**
+     * Sucht ein Fahrrad-Objekt anhand der angegebenen **Suchzeile** und des **Suchdatums** in der Datenbank.
+     * @param searchRow Die **Zeile** (z.B. ein Kennzeichen oder eine ID), die für die Suche verwendet werden soll.
+     * @param searchDate Das **Datum**, das für die Suche verwendet werden soll.
+     * @returns Ein **Promise**, das entweder das gefundene `Fahrrad`-Objekt oder `null` zurückgibt, wenn kein Eintrag gefunden wurde.
+     * @throws {Error} Wirft einen **Error**, wenn `searchRow` oder `searchDate` ungültig (null/leer) sind.
+     * @throws {Error} Wirft einen **Error**, wenn bei der Datenbankabfrage ein Fehler auftritt.
+     */
+    public async findFahrradByDate(searchRow: string, searchDate: Date): Promise<Fahrrad | null>
+    {
+        //#region Guards
+        if(!searchRow) 
+        {
+            throw new Error("Service.Guard: Ungültige Zeile übergeben!");
+        }
+        if(!searchDate)
+        {
+            throw new Error("Service.Guard: Ungültiges Datum übergeben!");
+        }
+        //#endregion
+
+        let result: Fahrrad | null;
+
+        try
+        {
+            const repo = new FahrradRepository();
+            result = await repo.findByDate(searchRow, searchDate);
+
+        } catch (error)
+        {
+            throw new Error("Service: Fehler beim Aufrufen des Fahrrads anhand der Zeile und des Datums!");
+        }
+
+        return result;
+    }
+
 }
