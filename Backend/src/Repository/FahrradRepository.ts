@@ -2,7 +2,7 @@ import { error } from "console";
 import { Fahrrad } from "../Models/Fahrrad";
 import dbPool from "../config/db"
 import { ResultSetHeader } from 'mysql2/promise';
-import { DbRowToObject } from "../Util/DbRowToObject";
+import { RowToObject } from "../Util/RowToObject";
 
 export class FahrradRepository 
 {
@@ -79,8 +79,8 @@ export class FahrradRepository
             const fahrradData: any = fahrradRows[0];
             //console.log(fahrradData); // NUR ZUM DEBUGGEN
 
-            const rowToFahrrad = new DbRowToObject();
-            const fahrrad: Fahrrad | null = rowToFahrrad.mapDbRowToFahrrad(fahrradData);
+            const rowToFahrrad = new RowToObject();
+            const fahrrad: Fahrrad | null = rowToFahrrad.mapRowToFahrrad(fahrradData);
 
             return fahrrad;
 
@@ -130,8 +130,8 @@ export class FahrradRepository
             const fahrradData: any = fahrradRows[0];
             //console.log(fahrradData); // NUR ZUM DEBUGGEN
     
-            const rowToFahrrad = new DbRowToObject();
-            const fahrrad: Fahrrad | null = rowToFahrrad.mapDbRowToFahrrad(fahrradData);
+            const rowToFahrrad = new RowToObject();
+            const fahrrad: Fahrrad | null = rowToFahrrad.mapRowToFahrrad(fahrradData);
     
             return fahrrad;
 
@@ -145,7 +145,7 @@ export class FahrradRepository
 
     /**
      * Sucht ein einzelnes Fahrrad-Objekt in der Datenbank, indem es nach einem **Datumswert** in einer bestimmten **Spalte** sucht.
-     * * @param searchRow Die **Spalte** (der Datenbankzeile), in der nach dem Datum gesucht werden soll (z.B. 'kaufdatum', 'letzte_wartung').
+     * @param searchRow Die **Spalte** (der Datenbankzeile), in der nach dem Datum gesucht werden soll (z.B. 'kaufdatum', 'letzte_wartung').
      * @param searchDate Der **Datumswert** (`Date`-Objekt), nach dem in der angegebenen Spalte gesucht werden soll.
      * @returns Ein **Promise**, das entweder das gefundene `Fahrrad`-Objekt oder `null` zurückgibt, wenn kein Eintrag gefunden wurde.
      * @throws {Error} Wirft einen **Error**, wenn `searchRow` oder `searchDate` ungültig (null/leer) sind.
@@ -180,8 +180,8 @@ export class FahrradRepository
 
             const fahrradData: any = fahrradRows[0];
 
-            const rowToFahrrad = new DbRowToObject();
-            const fahrrad = rowToFahrrad.mapDbRowToFahrrad(fahrradData);
+            const rowToFahrrad = new RowToObject();
+            const fahrrad = rowToFahrrad.mapRowToFahrrad(fahrradData);
 
             return fahrrad;
 
@@ -189,5 +189,37 @@ export class FahrradRepository
         {
             throw new Error("Repository: Fehler beim Abfragen der Datenbank anhand eines Datums!");
         }
+    }
+
+    public async findAll(): Promise<Fahrrad[] | null>
+    {
+        const stmt = "SELECT * FROM fahrraeder";
+        
+        const [rows, fields] = await dbPool.execute(stmt);
+
+        //Es wird ein Array aus der generischen Rückgabe erstellt. Der ArrayTyp ist noch auf "any[]"
+        const fahrradRows = rows as any[];
+
+        //Das Array wird auf Gültigkeit geprüft
+        if(fahrradRows.length === 0)
+        {
+            return null; //Wenn kein Inhalt in der abfrage geliefert wurde.
+        }
+
+        //Das Array muss jetzt zu einem Fahrrad[] gewandelt werden.
+        //Ein Fahrrad[] muss erstellt werden
+        let fahrrad: Fahrrad[] = [];
+        const rowToFahrrad = new RowToObject();
+        let i = 0;
+
+        fahrradRows.forEach(element => {
+            fahrrad[i] = element
+            i++;
+        });
+
+        //Die Daten des Any[] muss ins das Fahrrad[] übertragen werden.
+
+        //Fahrrad[] zurückgeben
+        return fahrrad;
     }
 }
