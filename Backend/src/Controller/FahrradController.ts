@@ -14,7 +14,7 @@ export class FahrradController
         {
             const service = new FahrradService();
             service.createNewFahrrad(fahrrad);
-            
+
         } catch (error) 
         {
 
