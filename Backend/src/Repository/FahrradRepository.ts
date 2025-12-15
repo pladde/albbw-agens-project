@@ -198,7 +198,6 @@ export class FahrradRepository
             throw new Error("Repository: Fehler beim Abfragen der Datenbank anhand eines Datums!");
         }
     }
-
     
     public async findAll(): Promise<Fahrrad[] | undefined>
     {
