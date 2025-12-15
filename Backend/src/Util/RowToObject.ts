@@ -1,7 +1,7 @@
 import { Fahrrad } from "../Models/Fahrrad";
 
 /**
- * mapDbRowToFahrrad(T: any): T | null
+ * @function mapRowToFahrrad - Erwartet ein **Any-Objekt** um es in ein **Fahrrad-Objekt** zu konvertieren.
  */
 export class RowToObject
 {
