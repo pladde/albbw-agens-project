@@ -199,6 +199,10 @@ export class FahrradRepository
         }
     }
     
+    /**
+     * Sucht **alle** Fahrrad-Objekte in der Datenbank. Die Antwort der Datenbank wird ebenfalls direkt in ein Fahrrad-Objekt umgewandelt.
+     * @returns Wenn ein Eintrag gefunden wurde wird `Fahrrad[]` zurückgegeben. `undefined` wenn nichts gefunden wurde.
+     */
     public async findAll(): Promise<Fahrrad[] | undefined>
     {
         const stmt = "SELECT * FROM fahrraeder";
@@ -231,6 +235,12 @@ export class FahrradRepository
         return fahrrad;
     }
 
+    /**
+     * **Löscht** einen **Datensatz** eines Fahrrad-Objektes anhand der **ID** und gibt das gelöschte Objekt zurück.
+     * @param id Die zu suchende ID des Fahrrad-Objektes.
+     * @returns Gibt ein Fahrrad-Objekt zurück, `undefined` falls kein Fahrrad anhand der ID gefunden wurde.
+     * @throws `error` Falls die übergebene ID ungültig ist.
+     */
     public async deleteById(id: number) : Promise<Fahrrad | undefined>
     {
         if(!id) 
