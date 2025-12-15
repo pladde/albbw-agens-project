@@ -4,6 +4,14 @@ import dbPool from "../config/db"
 import { ResultSetHeader } from 'mysql2/promise';
 import { RowToObject } from "../Util/RowToObject";
 
+/** Diese Klasse stellt folgende Methoden bereit:
+ * @function `async save(Fahrrad) : Promise<number | null>`
+ * @function `async findFahrradById(number) : Promise<Fahrrad | undefined>`
+ * @function `async findByString(string, string): Promise<Fahrrad | undefined>`
+ * @function `async findByDate(string, Date): Promise<Fahrrad | undefined>`
+ * @function `async findAll(): Promise<Fahrrad[] | undefined>`
+ * @function `async deleteById(number) : Promise<Fahrrad | undefined>`
+ */
 export class FahrradRepository 
 {
     /**
@@ -12,7 +20,7 @@ export class FahrradRepository
      * @returns Promise<number | null> Ein Fahrradobjekt oder null. 
      * @throws Wenn das Fahrradobjekt null oder leer ist wird ein Error geworfen.
      */
-    public async save(fahrrad: Fahrrad): Promise<number | null>
+    public async save(fahrrad: Fahrrad) : Promise<number | null>
     {
         if(!fahrrad)
         {
@@ -53,7 +61,7 @@ export class FahrradRepository
      * @throws "Kein Fahrrad mit dieser Id gefunden!" - Wenn kein Fahrrad mit dieser ID gefunden wurde.
      * @throws "Fehler bei der Abfrage des Fahrrads in der Datenbank!" - Wird geworfen wenn es einen Fehler beim speichern in die Datenbank gab.
      */
-    public async findFahrradById(id: number): Promise<Fahrrad | null>
+    public async findFahrradById(id: number) : Promise<Fahrrad | undefined>
     {
         //#region Guard
         if(!id)
@@ -73,14 +81,14 @@ export class FahrradRepository
 
             if(fahrradRows.length === 0)
             {
-                return null;
+                return undefined;
             }        
 
             const fahrradData: any = fahrradRows[0];
             //console.log(fahrradData); // NUR ZUM DEBUGGEN
 
             const rowToFahrrad = new RowToObject();
-            const fahrrad: Fahrrad | null = rowToFahrrad.mapRowToFahrrad(fahrradData);
+            const fahrrad: Fahrrad | undefined = rowToFahrrad.mapRowToFahrrad(fahrradData);
 
             return fahrrad;
 
@@ -98,7 +106,7 @@ export class FahrradRepository
      * @throws {Error} Wirft einen **Error**, wenn `searchRow` oder `searchValue` ungültig (null/leer) sind.
      * @throws {Error} Wirft einen **Error**, wenn bei der Datenbankabfrage ein Fehler auftritt.
      */
-    public async readByString(searchRow: string, searchValue: string): Promise<Fahrrad | null> 
+    public async findByString(searchRow: string, searchValue: string): Promise<Fahrrad | undefined> 
     {
         //#region Guard
         if(!searchRow)
@@ -124,14 +132,14 @@ export class FahrradRepository
 
             if(fahrradRows.length === 0)
             {
-                return null;
+                return undefined;
             }        
     
             const fahrradData: any = fahrradRows[0];
             //console.log(fahrradData); // NUR ZUM DEBUGGEN
     
             const rowToFahrrad = new RowToObject();
-            const fahrrad: Fahrrad | null = rowToFahrrad.mapRowToFahrrad(fahrradData);
+            const fahrrad: Fahrrad | undefined = rowToFahrrad.mapRowToFahrrad(fahrradData);
     
             return fahrrad;
 
@@ -151,7 +159,7 @@ export class FahrradRepository
      * @throws {Error} Wirft einen **Error**, wenn `searchRow` oder `searchDate` ungültig (null/leer) sind.
      * @throws {Error} Wirft einen **Error**, wenn bei der Datenbankabfrage ein Fehler auftritt.
      */
-    public async findByDate(searchRow: string, searchDate: Date): Promise<Fahrrad | null>
+    public async findByDate(searchRow: string, searchDate: Date): Promise<Fahrrad | undefined>
     {
         //#region Guard
         if(!searchRow)
@@ -175,7 +183,7 @@ export class FahrradRepository
 
             if(fahrradRows.length === 0)
             {
-                return null;
+                return undefined;
             }
 
             const fahrradData: any = fahrradRows[0];
@@ -191,7 +199,8 @@ export class FahrradRepository
         }
     }
 
-    public async findAll(): Promise<Fahrrad[] | null>
+    
+    public async findAll(): Promise<Fahrrad[] | undefined>
     {
         const stmt = "SELECT * FROM fahrraeder";
         
@@ -203,7 +212,7 @@ export class FahrradRepository
         //Das Array wird auf Gültigkeit geprüft
         if(fahrradRows.length === 0)
         {
-            return null; //Wenn kein Inhalt in der abfrage geliefert wurde.
+            return undefined; //Wenn kein Inhalt in der abfrage geliefert wurde.
         }
 
         //Das Array muss jetzt zu einem Fahrrad[] gewandelt werden.
@@ -220,6 +229,33 @@ export class FahrradRepository
         //Die Daten des Any[] muss ins das Fahrrad[] übertragen werden.
 
         //Fahrrad[] zurückgeben
+        return fahrrad;
+    }
+
+    public async deleteById(id: number) : Promise<Fahrrad | undefined>
+    {
+        if(!id) 
+        {
+            throw new Error("Repository: Die übergebene ID ist ungültig!");
+        }
+
+        const stmt = "DELETE FROM fahrraeder WHERE fahrrad_id = ? ";
+        const value = [id];
+
+        const [rows, fields] = await dbPool.execute(stmt, [value]);
+
+        const fahrradRows = rows as any[];
+
+        if(fahrradRows.length === 0)
+        {
+            return undefined;
+        }
+
+        const fahrradData: any = fahrradRows[0];
+
+        const rowToFahrrad = new RowToObject();
+        const fahrrad = rowToFahrrad.mapRowToFahrrad(fahrradData);
+
         return fahrrad;
     }
 }
