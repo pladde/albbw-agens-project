@@ -11,14 +11,14 @@ export class FahrradService
      * @throws Service: Das Objekt ${fahrrad} darf nicht null oder leer sein! - Wenn das Objekt ungültig ist wird durch den Guard ein Error geworfen.
      * @throws "Service: Fehler beim Aufrufen der Repository!" - wird geworfen wenn es einen Fehler beim speichern in dem Repositorylayer gab.
      */
-    public async createNewFahrrad(fahrrad: Fahrrad): Promise<Fahrrad | null>
+    public async createNewFahrrad(fahrrad: Fahrrad): Promise<Fahrrad | undefined>
     {
         if(!fahrrad)
         {
             throw new Error(`Service: Das Objekt ${fahrrad} darf nicht null oder leer sein!`)
         }
 
-        let result: Fahrrad | null;
+        let result: Fahrrad | undefined;
 
         try 
         {
@@ -28,17 +28,17 @@ export class FahrradService
             if(id != null)
             {
                 // Ließt das Objekt anhand der Id aus und speichert es in die Variable zur Rückgabe.
-                result = await this.readFahrradById(id);
+                result = await this.findFahrradById(id);
             }
             else
             {
-                result = null;
+                result = undefined;
             }  
 
         } catch (error) 
         {
             console.log("Service: Fehler beim Aufrufen der Repository!");
-            result = null;
+            result = undefined;
         }
 
         return result;
@@ -47,11 +47,11 @@ export class FahrradService
     /**
      * Diese Methode nimmt eine ID entgegen, ruft den Repository-Layer auf und übergibt diesen die ID zur Suche nach dem gewünschten Objekt.
      * @param id - Die ID mit der das Objekt in der Datenbank gesucht wird.
-     * @returns Promise<Fahrrad | null> - Wenn ein Objekt gefunden wurde wird es zurückgegeben. Wenn nicht wird NULL zurückgegeben. 
-     * @throws "Service: Die Id darf nicht null sein!" - Wenn eine ungültige ID übergeben wird die entweder NULL, 0 oder negativ ist wird dieser Error vom Guard geworfen.
+     * @returns `Promise<Fahrrad | undefinied>` - Wenn ein Objekt gefunden wurde wird es zurückgegeben. Wenn nicht wird `undefinied` zurückgegeben. 
+     * @throws "Service: Die Id darf nicht null sein!" - Wenn eine ungültige ID übergeben wird die entweder `null`, `0` oder `negativ` ist wird dieser Error vom Guard geworfen.
      * @throws "Service: Fehler beim Aufrufen des Fahrrads anhand der Id!" - Wenn es einen Fehler beim aufrufen des Repository-Layers gibt, wird dieser Error geworfen.
      */
-    public async readFahrradById(id: number) : Promise<Fahrrad | null>
+    public async findFahrradById(id: number) : Promise<Fahrrad | undefined>
     {
         if(id == null || id <= 0)
         {
@@ -59,7 +59,7 @@ export class FahrradService
             throw new Error ('Service: Die Id darf nicht null sein!');
         }
 
-        let result: Fahrrad | null;
+        let result: Fahrrad | undefined;
 
         try 
         {
@@ -85,7 +85,7 @@ export class FahrradService
      * @throws {Error} - Wenn es zu einem unerwareteten Fehler beim 
      * aufrufen der Repository kommt, wird ein Error geworfen.
      */
-    public async readFahrradByString(searchRow: string, searchValue: string): Promise<Fahrrad | null>
+    public async findFahrradByString(searchRow: string, searchValue: string): Promise<Fahrrad | undefined>
     {
         //#region Guard
         if(!searchRow)
@@ -98,12 +98,12 @@ export class FahrradService
         }
         //#endregion
 
-        let result: Fahrrad | null;
+        let result: Fahrrad | undefined;
 
         try 
         {
             const repo = new FahrradRepository();
-            result = await repo.readByString(searchRow, searchValue);
+            result = await repo.findByString(searchRow, searchValue);
 
         } catch (error)
         {
@@ -121,7 +121,7 @@ export class FahrradService
      * @throws {Error} Wirft einen **Error**, wenn `searchRow` oder `searchDate` ungültig (null/leer) sind.
      * @throws {Error} Wirft einen **Error**, wenn bei der Datenbankabfrage ein Fehler auftritt.
      */
-    public async findFahrradByDate(searchRow: string, searchDate: Date): Promise<Fahrrad | null>
+    public async findFahrradByDate(searchRow: string, searchDate: Date): Promise<Fahrrad | undefined>
     {
         //#region Guards
         if(!searchRow) 
@@ -134,7 +134,7 @@ export class FahrradService
         }
         //#endregion
 
-        let result: Fahrrad | null;
+        let result: Fahrrad | undefined;
 
         try
         {
@@ -144,6 +144,47 @@ export class FahrradService
         } catch (error)
         {
             throw new Error("Service: Fehler beim Aufrufen des Fahrrads anhand der Zeile und des Datums!");
+        }
+
+        return result;
+    }
+
+    public async findAllFahrrader() : Promise<Fahrrad[] | undefined>
+    {
+        const repo: FahrradRepository = new FahrradRepository();
+
+        let result: Fahrrad[] | undefined = [];
+
+        try
+        {
+            const repo = new FahrradRepository();
+            result = await repo.findAll();
+
+        } catch (error)
+        {
+            throw new Error("Service: Fehler beim Aufrufen aller Fahrräder!");
+        }
+
+        return result;
+    }
+
+    public async deleteFahrradById(id: number) : Promise<Fahrrad | undefined>
+    {
+        if (!id)
+        {
+            throw new Error("Service: Fehler beim löschen eines Fahrrads!");
+        }
+
+        let result: Fahrrad | undefined = new Fahrrad();
+
+        try 
+        {
+            const repo: FahrradRepository = new FahrradRepository();
+            result = await repo.deleteById(id);
+
+        } catch (error)
+        {
+            throw new Error("Service: Fehler beim löschen eines Fahrrads!");
         }
 
         return result;
