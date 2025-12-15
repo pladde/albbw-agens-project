@@ -213,7 +213,7 @@ export class FahrradRepository
         let i = 0;
 
         fahrradRows.forEach(element => {
-            fahrrad[i] = element
+            fahrrad[i] = rowToFahrrad.mapRowToFahrrad(element);
             i++;
         });
 
