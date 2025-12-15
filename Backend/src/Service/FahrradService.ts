@@ -8,8 +8,8 @@ export class FahrradService
      * zur weiteren Verarbeitung an die Repository und gibt das erfolgreich gespeicherte Objekt zurück. 
      * @param fahrrad - Nimmt das Fahrrad-Objekt entgegen.
      * @returns Promise<Fahrrad | null> - Gibt entweder das gespeicherte Fahrrad-Objekt oder null zurück.
-     * @throws Service: Das Objekt ${fahrrad} darf nicht null oder leer sein! - Wenn das Objekt ungültig ist wird durch den Guard ein Error geworfen.
-     * @throws "Service: Fehler beim Aufrufen der Repository!" - wird geworfen wenn es einen Fehler beim speichern in dem Repositorylayer gab.
+     * @throws `error` - Service: Das Objekt ${fahrrad} darf nicht null oder leer sein! - Wenn das Objekt ungültig ist wird durch den Guard ein Error geworfen.
+     * @throws `error` - "Service: Fehler beim Aufrufen der Repository!" - wird geworfen wenn es einen Fehler beim speichern in dem Repositorylayer gab.
      */
     public async createNewFahrrad(fahrrad: Fahrrad): Promise<Fahrrad | undefined>
     {
@@ -48,8 +48,8 @@ export class FahrradService
      * Diese Methode nimmt eine ID entgegen, ruft den Repository-Layer auf und übergibt diesen die ID zur Suche nach dem gewünschten Objekt.
      * @param id - Die ID mit der das Objekt in der Datenbank gesucht wird.
      * @returns `Promise<Fahrrad | undefinied>` - Wenn ein Objekt gefunden wurde wird es zurückgegeben. Wenn nicht wird `undefinied` zurückgegeben. 
-     * @throws "Service: Die Id darf nicht null sein!" - Wenn eine ungültige ID übergeben wird die entweder `null`, `0` oder `negativ` ist wird dieser Error vom Guard geworfen.
-     * @throws "Service: Fehler beim Aufrufen des Fahrrads anhand der Id!" - Wenn es einen Fehler beim aufrufen des Repository-Layers gibt, wird dieser Error geworfen.
+     * @throws `error` - "Service: Die Id darf nicht null sein!" - Wenn eine ungültige ID übergeben wird die entweder `null`, `0` oder `negativ` ist wird dieser Error vom Guard geworfen.
+     * @throws `error` - "Service: Fehler beim Aufrufen des Fahrrads anhand der Id!" - Wenn es einen Fehler beim aufrufen des Repository-Layers gibt, wird dieser Error geworfen.
      */
     public async findFahrradById(id: number) : Promise<Fahrrad | undefined>
     {
@@ -80,9 +80,9 @@ export class FahrradService
      * @param searchRow - Die zu durchsuchende **Zeile** (zB Marke, Rahmenummer etc.)
      * @param searchValue - Die zu suchenden **Datenwerte** (zB "CANYON, CUBE, DIAMANT, etc.")
      * @returns `Promise<Fahrrad | null>` - Gibt das gefundene `Fahrrad-Objekt` zurück. `NULL` falls keins gefunden wurde.
-     * @throws {Error} - Wenn keine gültige Zeile übergeben wurde, wirft der Guard einen Error.
-     * @throws {Error} - Wenn kein gültiger Wert übergeben wurde, wirft der Guard einen Error.
-     * @throws {Error} - Wenn es zu einem unerwareteten Fehler beim 
+     * @throws `error` - Wenn keine gültige Zeile übergeben wurde, wirft der Guard einen Error.
+     * @throws `error` - Wenn kein gültiger Wert übergeben wurde, wirft der Guard einen Error.
+     * @throws `error` - Wenn es zu einem unerwareteten Fehler beim 
      * aufrufen der Repository kommt, wird ein Error geworfen.
      */
     public async findFahrradByString(searchRow: string, searchValue: string): Promise<Fahrrad | undefined>
@@ -118,8 +118,8 @@ export class FahrradService
      * @param searchRow Die **Zeile** (z.B. ein Kennzeichen oder eine ID), die für die Suche verwendet werden soll.
      * @param searchDate Das **Datum**, das für die Suche verwendet werden soll.
      * @returns Ein **Promise**, das entweder das gefundene `Fahrrad`-Objekt oder `null` zurückgibt, wenn kein Eintrag gefunden wurde.
-     * @throws {Error} Wirft einen **Error**, wenn `searchRow` oder `searchDate` ungültig (null/leer) sind.
-     * @throws {Error} Wirft einen **Error**, wenn bei der Datenbankabfrage ein Fehler auftritt.
+     * @throws `error` Wirft einen **Error**, wenn `searchRow` oder `searchDate` ungültig (null/leer) sind.
+     * @throws `error` Wirft einen **Error**, wenn bei der Datenbankabfrage ein Fehler auftritt.
      */
     public async findFahrradByDate(searchRow: string, searchDate: Date): Promise<Fahrrad | undefined>
     {
@@ -149,6 +149,11 @@ export class FahrradService
         return result;
     }
 
+    /**
+     * Sucht **alle** Fahrräder und gibt sie als `array` zurück.
+     * @returns Ein **Promise**, das entweder das gefundene `array` oder `undefinied` zurückgibt, wenn kein Eintrag gefunden wurde.
+     * @throws `error` Wirft einen **Error**, wenn bei der Datenbankabfrage ein Fehler auftritt.
+     */
     public async findAllFahrrader() : Promise<Fahrrad[] | undefined>
     {
         const repo: FahrradRepository = new FahrradRepository();
@@ -168,6 +173,13 @@ export class FahrradService
         return result;
     }
 
+    /**
+     * Nimmt eine *ID* zum **löschen** entgegen, ruft den Repository-Layer auf und übergibt diesen die *ID* zur Suche nach einem Fahrrad-Objekt.
+     * @param id - Die **ID** des Objektes das gelöscht werden soll.
+     * @returns `Promise<Fahrrad | undefinied>` - Bei Erfolg wird das gelöschte Objekt zurückgegeben. Wenn nicht `undefinied`. 
+     * @throws `error` - "Service: Die Id darf nicht null sein!" - Wenn eine ungültige ID übergeben wird die entweder `null`, `0` oder `negativ` ist wird dieser Error vom Guard geworfen.
+     * @throws `error` - "Service: Fehler beim Aufrufen des Fahrrads anhand der Id!" - Wenn es einen Fehler beim aufrufen des Repository-Layers gibt, wird dieser Error geworfen.
+     */
     public async deleteFahrradById(id: number) : Promise<Fahrrad | undefined>
     {
         if (!id)
