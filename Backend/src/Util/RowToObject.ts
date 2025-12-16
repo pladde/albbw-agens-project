@@ -1,14 +1,19 @@
 import { Fahrrad } from "../Models/Fahrrad";
 
 /**
- * @function mapRowToFahrrad - Erwartet ein **Any-Objekt** um es in ein **Fahrrad-Objekt** zu konvertieren.
+ * @class RowToObject
+ * RowToObject ist eine Utility-Klasse, die für die **Konvertierung von Rohdaten** (typischerweise
+ * Datenbankzeilen oder generische Objekte) in das spezifische **Fahrrad-Objekt** (Entity) zuständig ist.
+ * Dies wird oft als Data Mapper oder DTO-Mapper bezeichnet.
  */
 export class RowToObject
 {
     /**
-     * Diese Methode mappt die Daten aus dem übergebenen Objekt in ein **Fahrrad-Objekt** und gibt es zurück.
-     * @param fahrradData Das Objekt aus dem das **Fahrrad-Objekt** erstellt werden soll.
-     * @returns `Fahrrad` Ein Fahrrad-Objekt wird zurückgegeben. 
+     * Diese Methode mappt die Daten aus dem übergebenen generischen Objekt (`any`) 
+     * in ein **Fahrrad-Objekt** unter Verwendung des Fahrrad-Konstruktors.
+     * * @method mapRowToFahrrad
+     * @param fahrradData Das Rohdaten-Objekt (typischerweise eine Datenbankzeile), das die zu mappenden Felder enthält.
+     * @returns Das vollständig instanziierte `Fahrrad`-Objekt.
      */
     public mapRowToFahrrad(fahrradData: any): Fahrrad
     {
