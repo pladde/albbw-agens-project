@@ -3,6 +3,12 @@ import { FahrradService } from "../Service/FahrradService";
 
 export class FahrradController
 {
+    private readonly fahrradService: FahrradService;
+
+    constructor(fahrradService: FahrradService) {
+        this.fahrradService = fahrradService;
+    }
+
     /**
      * **Erstellt** aus dem **Fahrrad-Objekt** einen neuen Datensatz in der Datenbank
      * @param fahrrad Ein **Fahrrad-Objekt** welches in die Datenbank gespeichert werden soll.
@@ -16,8 +22,7 @@ export class FahrradController
         
         try 
         {
-            const service = new FahrradService();
-            await service.createNewFahrrad(fahrrad);
+            await this.fahrradService.createNewFahrrad(fahrrad);
 
             // eine Rückgabe an das Frontend könnte auch hilfreich sein
 
@@ -34,10 +39,10 @@ export class FahrradController
             throw new Error(`Controller: Die übergebene ID zum suchen eines Fahrrads darf nicht null oder leer sein!`)
         }
 
-        const service = new FahrradService();
-        const fahrrad: Fahrrad | undefined = await service.findFahrradById(id)
+        //const fahrradService = new FahrradService();
+        //const fahrrad: Fahrrad | undefined = await this.fahrradService.findFahrradById(id);
 
-        return fahrrad;
+        return this.fahrradService.findFahrradById(id);
     }
 
     public async findFahrradByString(searchRow: string, searchValue: string) : Promise<Fahrrad | undefined>
@@ -51,10 +56,7 @@ export class FahrradController
             throw new Error(`Controller: Der übergebene Wert darf nicht null oder leer sein!`)
         }      
         
-        const service = new FahrradService();
-        const fahrrad: Fahrrad | undefined = await service.findFahrradByString(searchRow, searchValue)
-
-        return fahrrad;
+        return this.fahrradService.findFahrradByString(searchRow, searchValue);
     }
 
     public async findFahrradByDate(searchRow: string, date: Date) : Promise<Fahrrad | undefined>
@@ -68,20 +70,13 @@ export class FahrradController
             throw new Error(`Controller: Das übergebene Datum darf nicht null oder leer sein!`)
         }      
     
-        const service = new FahrradService();
-        const fahrrad: Fahrrad | undefined = await service.findFahrradByDate(searchRow, date)
-    
-        return fahrrad;
+        return this.fahrradService.findFahrradByDate(searchRow, date);
     }
 
     // >>>>>>>
     public async findAllFahrraeder() : Promise<Fahrrad[] | undefined>
     {
-        const service = new FahrradService();
-        let fahrrad: Fahrrad[] | undefined = [];
-        fahrrad = await service.findAllFahrrader();
-    
-        return fahrrad;
+        return this.fahrradService.findAllFahrrader();
     }
 
     public async deleteFahrradById(id: number) : Promise<Fahrrad | undefined>
@@ -90,13 +85,8 @@ export class FahrradController
         {
             throw new Error(`Controller: Die übergebene ID zum löschen eines Datensatzes darf nicht null oder leer sein!`)
         }
-
-        let result: Fahrrad | undefined;
         
-        const service = new FahrradService();
-        result = await service.deleteFahrradById(id);
-
-        return result;
+        return this.fahrradService.deleteFahrradById(id);
     }
 
 }
