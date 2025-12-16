@@ -1,8 +1,6 @@
 import { Router } from 'express';
-import { FahrradController } from '../Controller/FahrradController';
 
 const router = Router();
-const controller = new FahrradController();
 
 router.get('/', (req, res) =>  {
     // Parsen und an Controller senden
