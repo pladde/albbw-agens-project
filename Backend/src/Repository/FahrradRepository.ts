@@ -2,8 +2,12 @@ import { Fahrrad } from "../Models/Fahrrad";
 import dbPool from "../config/db"
 import { RowToObject } from "../Util/RowToObject";
 
-/** Diese Klasse stellt folgende Methoden bereit:
- * @function `async save(Fahrrad) : Promise<number | null>`
+/**
+ * Das FahrradRepository ist die Datenzugriffsschicht (Data Access Layer - DAL).
+ * Es ist direkt für die Kommunikation mit der Datenbank (via SQL-Queries) und 
+ * die Konvertierung von Datenbankzeilen in `Fahrrad`-Objekte zuständig.
+ * * Diese Klasse stellt folgende Methoden bereit:
+ * @function `async save(Fahrrad) : Promise<Fahrrad | undefined>`
  * @function `async findFahrradById(number) : Promise<Fahrrad | undefined>`
  * @function `async findByString(string, string): Promise<Fahrrad | undefined>`
  * @function `async findByDate(string, Date): Promise<Fahrrad | undefined>`
@@ -14,9 +18,11 @@ export class FahrradRepository
 {
     /**
      * Diese Methode **erstellt** über eine SQL-Query ein **neues Fahrrad** in die Datenbank.
-     * @param fahrrad Das Objekt vom Typ `Fahrrad`.
-     * @returns Gibt über ein **Promise** entweder ein objekt vom Typ `Fahrrad` oder `undefined` zurück. 
-     * @throws Wenn das Fahrradobjekt  oder leer ist wird ein Error geworfen.
+     * Nach erfolgreicher Einfügung wird das neu erstellte Objekt zurückgegeben (mit der automatisch generierten ID).
+     * @param fahrrad Das Objekt vom Typ `Fahrrad`, das gespeichert werden soll.
+     * @returns Gibt über ein **Promise** entweder das gespeicherte `Fahrrad`-Objekt (mit ID) oder `undefined` zurück, wenn kein Datensatz verarbeitet wurde.
+     * @throws {Error} Wird geworfen, wenn das `fahrrad`-Objekt `null` oder `undefined` ist.
+     * @throws {Error} Wird geworfen, wenn bei der Datenbankoperation ein Fehler auftritt.
      */
     public async save(fahrrad: Fahrrad) : Promise<Fahrrad | undefined>
     {
@@ -65,11 +71,10 @@ export class FahrradRepository
 
     /**
      * Diese Methode nimmt eine ID entgegen, baut eine Verbindung zur Datenbank auf, sucht ein Objekt anhand der ID und gibt dieses zurück.
-     * @param id - Die ID mir der das Objekt gesucht werden soll. 
-     * @returns Promise<Fahrrad | null> - Gibt entweder das gespeicherte Fahrrad-Objekt oder null zurück.
-     * @throws "Repository: Die Id darf nicht null sein!" - Wenn die ID ungültig ist wird durch den Guard ein Error geworfen.
-     * @throws "Kein Fahrrad mit dieser Id gefunden!" - Wenn kein Fahrrad mit dieser ID gefunden wurde.
-     * @throws "Fehler bei der Abfrage des Fahrrads in der Datenbank!" - Wird geworfen wenn es einen Fehler beim speichern in die Datenbank gab.
+     * @param id Die ID, mit der das Objekt gesucht werden soll. 
+     * @returns Ein **Promise**, das entweder das gefundene `Fahrrad`-Objekt oder `undefined` zurückgibt, wenn kein Eintrag gefunden wurde.
+     * @throws {Error} Wird geworfen, wenn die ID ungültig (`null` oder `undefined`) ist.
+     * @throws {Error} Wird geworfen, wenn bei der Datenbankabfrage ein Fehler auftritt.
      */
     public async findFahrradById(id: number) : Promise<Fahrrad | undefined>
     {
@@ -108,10 +113,10 @@ export class FahrradRepository
     }
 
     /**
-     * Liest ein einzelnes Fahrrad-Objekt aus der Datenbank, indem es nach einem **String-Wert** in einer bestimmten **Zeile (Spalte)** sucht.
-     * * @param searchRow Die **Spalte** (der Datenbankzeile), in der gesucht werden soll (z.B. 'kennzeichen', 'id', 'modell').
-     * @param searchValue Der **String-Wert**, nach dem in der angegebenen Spalte gesucht werden soll (z.B. 'XYZ-123', '5', 'Trekking Bike').
-     * @returns Ein **Promise**, das entweder das gefundene `Fahrrad`-Objekt oder `null` zurückgibt, wenn kein Eintrag gefunden wurde.
+     * Liest ein einzelnes Fahrrad-Objekt aus der Datenbank, indem es nach einem **String-Wert** in einer bestimmten **Spalte** sucht.
+     * @param searchRow Die **Spalte** (der Datenbankzeile), in der gesucht werden soll (z.B. 'marke', 'rahmennummer').
+     * @param searchValue Der **String-Wert**, nach dem in der angegebenen Spalte gesucht werden soll (z.B. 'CANYON', '12345').
+     * @returns Ein **Promise**, das entweder das gefundene `Fahrrad`-Objekt oder `undefined` zurückgibt, wenn kein Eintrag gefunden wurde.
      * @throws {Error} Wirft einen **Error**, wenn `searchRow` oder `searchValue` ungültig (null/leer) sind.
      * @throws {Error} Wirft einen **Error**, wenn bei der Datenbankabfrage ein Fehler auftritt.
      */
@@ -158,9 +163,9 @@ export class FahrradRepository
 
     /**
      * Sucht ein einzelnes Fahrrad-Objekt in der Datenbank, indem es nach einem **Datumswert** in einer bestimmten **Spalte** sucht.
-     * @param searchRow Die **Spalte** (der Datenbankzeile), in der nach dem Datum gesucht werden soll (z.B. 'kaufdatum', 'letzte_wartung').
+     * @param searchRow Die **Spalte** (der Datenbankzeile), in der nach dem Datum gesucht werden soll (z.B. 'erfasstAm').
      * @param searchDate Der **Datumswert** (`Date`-Objekt), nach dem in der angegebenen Spalte gesucht werden soll.
-     * @returns Ein **Promise**, das entweder das gefundene `Fahrrad`-Objekt oder `null` zurückgibt, wenn kein Eintrag gefunden wurde.
+     * @returns Ein **Promise**, das entweder das gefundene `Fahrrad`-Objekt oder `undefined` zurückgibt, wenn kein Eintrag gefunden wurde.
      * @throws {Error} Wirft einen **Error**, wenn `searchRow` oder `searchDate` ungültig (null/leer) sind.
      * @throws {Error} Wirft einen **Error**, wenn bei der Datenbankabfrage ein Fehler auftritt.
      */
@@ -203,8 +208,9 @@ export class FahrradRepository
     }
     
     /**
-     * Sucht **alle** Fahrrad-Objekte in der Datenbank. Die Antwort der Datenbank wird ebenfalls direkt in ein Fahrrad-Objekt umgewandelt.
-     * @returns Wenn ein Eintrag gefunden wurde wird `Fahrrad[]` zurückgegeben. `undefined` wenn nichts gefunden wurde.
+     * Sucht **alle** Fahrrad-Objekte in der Datenbank und wandelt die Antwort direkt in ein Array von `Fahrrad`-Objekten um.
+     * @returns Ein **Promise**, das ein Array von `Fahrrad`-Objekten (`Fahrrad[]`) zurückgibt. `undefined` wird zurückgegeben, wenn keine Einträge gefunden wurden.
+     * @throws {Error} Wird geworfen, wenn bei der Datenbankabfrage ein Fehler auftritt.
      */
     public async findAll(): Promise<Fahrrad[] | undefined>
     {
@@ -239,10 +245,10 @@ export class FahrradRepository
     }
 
     /**
-     * **Löscht** einen **Datensatz** eines Fahrrad-Objektes anhand der **ID** und gibt das gelöschte Objekt zurück.
-     * @param id Die zu suchende ID des Fahrrad-Objektes.
-     * @returns Gibt ein Fahrrad-Objekt zurück, `undefined` falls kein Fahrrad anhand der ID gefunden wurde.
-     * @throws `error` Falls die übergebene ID ungültig ist.
+     * **Löscht** einen **Datensatz** eines Fahrrad-Objektes anhand der **ID**.
+     * @param id Die ID des zu löschenden Fahrrad-Objektes.
+     * @returns Gibt ein **Promise** zurück. Die aktuelle Implementierung gibt das Ergebnis der Datenbankoperation (z.B. betroffene Zeilen) zurück. Idealerweise sollte das *gelöschte* `Fahrrad`-Objekt oder `undefined` zurückgegeben werden.
+     * @throws {Error} Falls die übergebene ID ungültig ist.
      */
     public async deleteById(id: number) : Promise<Fahrrad | undefined>
     {
