@@ -1,7 +1,5 @@
-import { error } from "console";
 import { Fahrrad } from "../Models/Fahrrad";
 import dbPool from "../config/db"
-import { ResultSetHeader } from 'mysql2/promise';
 import { RowToObject } from "../Util/RowToObject";
 
 /** Diese Klasse stellt folgende Methoden bereit:
@@ -15,17 +13,19 @@ import { RowToObject } from "../Util/RowToObject";
 export class FahrradRepository 
 {
     /**
-     * Diese Methode erstellt über eine SQL-Query ein neues Fahrrad in die Datenbank.
-     * @param fahrrad Das Objekt vom Typ Fahrrad.
-     * @returns Promise<number | null> Ein Fahrradobjekt oder null. 
-     * @throws Wenn das Fahrradobjekt null oder leer ist wird ein Error geworfen.
+     * Diese Methode **erstellt** über eine SQL-Query ein **neues Fahrrad** in die Datenbank.
+     * @param fahrrad Das Objekt vom Typ `Fahrrad`.
+     * @returns Gibt über ein **Promise** entweder ein objekt vom Typ `Fahrrad` oder `undefined` zurück. 
+     * @throws Wenn das Fahrradobjekt  oder leer ist wird ein Error geworfen.
      */
-    public async save(fahrrad: Fahrrad) : Promise<number | null>
+    public async save(fahrrad: Fahrrad) : Promise<Fahrrad | undefined>
     {
+        //#region Guard
         if(!fahrrad)
         {
             throw new Error(`Repository: Das Objekt ${fahrrad} darf nicht null oder leer sein!`)
         }
+        //#endregion
 
         const stmt = 
         `INSERT INTO fahrrader (marke, rahmennummer, besonderheiten, bearbeitungstatus, erfasstAm, erfasstVon, herausgegebenAn)
@@ -43,9 +43,19 @@ export class FahrradRepository
 
         try 
         {
-            const [result] = await dbPool.execute<ResultSetHeader>(stmt, values);
+            const [rows, fields] = await dbPool.execute(stmt, values);
 
-            return result.insertId;
+            const fahrradRows = rows as any[];
+
+            if(fahrradRows.length === 0)
+                {
+                    return undefined;
+                }        
+    
+                const fahrradData: any = fahrradRows[0];
+                const rowToFahrrad = new RowToObject();
+    
+                return rowToFahrrad.mapRowToFahrrad(fahrradData);
             
         } catch (error)
         {
@@ -88,9 +98,8 @@ export class FahrradRepository
             //console.log(fahrradData); // NUR ZUM DEBUGGEN
 
             const rowToFahrrad = new RowToObject();
-            const fahrrad: Fahrrad | undefined = rowToFahrrad.mapRowToFahrrad(fahrradData);
 
-            return fahrrad;
+            return rowToFahrrad.mapRowToFahrrad(fahrradData);
 
         } catch (error)
         {
@@ -137,18 +146,14 @@ export class FahrradRepository
     
             const fahrradData: any = fahrradRows[0];
             //console.log(fahrradData); // NUR ZUM DEBUGGEN
-    
             const rowToFahrrad = new RowToObject();
-            const fahrrad: Fahrrad | undefined = rowToFahrrad.mapRowToFahrrad(fahrradData);
     
-            return fahrrad;
-
+            return rowToFahrrad.mapRowToFahrrad(fahrradData);
 
         } catch (error)
         {
             throw new Error("Fehler bei der Abfrage des Fahrrads anhand eines Strings in der Datenbank!");
         }
-        
     }
 
     /**
@@ -187,11 +192,9 @@ export class FahrradRepository
             }
 
             const fahrradData: any = fahrradRows[0];
-
             const rowToFahrrad = new RowToObject();
-            const fahrrad = rowToFahrrad.mapRowToFahrrad(fahrradData);
 
-            return fahrrad;
+            return rowToFahrrad.mapRowToFahrrad(fahrradData);
 
         } catch (error)
         {
@@ -252,7 +255,7 @@ export class FahrradRepository
         const value = [id];
 
         const [rows, fields] = await dbPool.execute(stmt, [value]);
-
+        
         const fahrradRows = rows as any[];
 
         if(fahrradRows.length === 0)
@@ -261,10 +264,9 @@ export class FahrradRepository
         }
 
         const fahrradData: any = fahrradRows[0];
-
         const rowToFahrrad = new RowToObject();
-        const fahrrad = rowToFahrrad.mapRowToFahrrad(fahrradData);
 
-        return fahrrad;
+        return rowToFahrrad.mapRowToFahrrad(fahrradData);
+
     }
 }
