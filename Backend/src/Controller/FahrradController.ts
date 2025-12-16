@@ -13,7 +13,7 @@ export class FahrradController
      * **Erstellt** aus dem **Fahrrad-Objekt** einen neuen Datensatz in der Datenbank
      * @param fahrrad Ein **Fahrrad-Objekt** welches in die Datenbank gespeichert werden soll.
      */
-    public async saveFahrrad(fahrrad: Fahrrad)
+    public async saveFahrrad(fahrrad: Fahrrad) : Promise<Fahrrad | undefined>
     {
         if(!fahrrad)
         {
@@ -22,9 +22,7 @@ export class FahrradController
         
         try 
         {
-            await this.fahrradService.createNewFahrrad(fahrrad);
-
-            // eine Rückgabe an das Frontend könnte auch hilfreich sein
+            return this.fahrradService.createNewFahrrad(fahrrad);
 
         } catch (error) 
         {

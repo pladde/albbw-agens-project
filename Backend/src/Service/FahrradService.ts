@@ -3,6 +3,13 @@ import { FahrradRepository } from "../Repository/FahrradRepository";
 
 export class FahrradService 
 {
+    private readonly fahrradRepository: FahrradRepository;
+
+    constructor(fahrradRepository: FahrradRepository)
+    {
+        this.fahrradRepository = fahrradRepository;
+    }
+
     /**
      * Diese Methode prüft ob das Fahrrad gültige Werte hat, übergibt das Fahrrad-Objekt
      * zur weiteren Verarbeitung an die Repository und gibt das erfolgreich gespeicherte Objekt zurück. 
@@ -18,30 +25,7 @@ export class FahrradService
             throw new Error(`Service: Das Objekt ${fahrrad} darf nicht null oder leer sein!`)
         }
 
-        let result: Fahrrad | undefined;
-
-        try 
-        {
-            const repo = new FahrradRepository;
-            const id = await repo.save(fahrrad);
-
-            if(id != null)
-            {
-                // Ließt das Objekt anhand der Id aus und speichert es in die Variable zur Rückgabe.
-                result = await this.findFahrradById(id);
-            }
-            else
-            {
-                result = undefined;
-            }  
-
-        } catch (error) 
-        {
-            console.log("Service: Fehler beim Aufrufen der Repository!");
-            result = undefined;
-        }
-
-        return result;
+        return this.fahrradRepository.save(fahrrad);
     }
 
     /**
@@ -63,9 +47,7 @@ export class FahrradService
 
         try 
         {
-            const repo = new FahrradRepository;
-
-            result = await repo.findFahrradById(id);
+            result = await this.fahrradRepository.findFahrradById(id);
 
         } catch (error)
         {
@@ -102,8 +84,7 @@ export class FahrradService
 
         try 
         {
-            const repo = new FahrradRepository();
-            result = await repo.findByString(searchRow, searchValue);
+            result = await this.fahrradRepository.findByString(searchRow, searchValue);
 
         } catch (error)
         {
@@ -138,8 +119,7 @@ export class FahrradService
 
         try
         {
-            const repo = new FahrradRepository();
-            result = await repo.findByDate(searchRow, searchDate);
+            result = await this.fahrradRepository.findByDate(searchRow, searchDate);
 
         } catch (error)
         {
@@ -162,8 +142,7 @@ export class FahrradService
 
         try
         {
-            const repo = new FahrradRepository();
-            result = await repo.findAll();
+            result = await this.fahrradRepository.findAll();
 
         } catch (error)
         {
@@ -191,8 +170,7 @@ export class FahrradService
 
         try 
         {
-            const repo: FahrradRepository = new FahrradRepository();
-            result = await repo.deleteById(id);
+            result = await this.fahrradRepository.deleteById(id);
 
         } catch (error)
         {

@@ -1,9 +1,6 @@
 import { Router } from "express";
-import { FahrradController } from "../Controller/FahrradController";
-import { Fahrrad } from "../Models/Fahrrad";
 
 const router = Router();
-const controller = new FahrradController();
 
 router.post('/fahrrad/create', (req, res) => {
     //controller.saveFahrrad(fahrrad);
