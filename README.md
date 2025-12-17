@@ -16,17 +16,9 @@ Ziel ist es für die AP2, ein **praxisnahes**, **strukturiertes** und **übersic
 
 ---
 
-## 🚀 Geplante Kernfunktionen
+## 🚀 Kernfunktion
 
-| Bereich | Beschreibung |
-|--------|--------------|
-| 📦 **Frontend** | Übersicht und einfache Benutzererfahrung |
-| 📊 **Backend** | Kommunika |
-| 🧾 **Datenbank** | Verwaltung von Spenden |
-| 🌐 **Synchronisation** | Tägliches Backup mit dem Mainserver |
-| 👥 **Benutzerverwaltung** | Rollen & Rechte |
-
----
+- Verwalten von Fahrrädern.
 
 ## 🛠️ Geplanter Tech-Stack
 
