@@ -34,7 +34,7 @@ Folgt...
 
 Anleitung um das Projekt lauffähig zu bekommen.
 
-1. Installation aller Dependencys:
+1. Installation aller Dependencies:
 ```plaintext
 npm install
 ```
