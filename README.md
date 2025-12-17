@@ -5,14 +5,7 @@
 
 ## 📘 Projektbeschreibung
 
-Dieser Branch beinhaltet die Entwicklung eines modularen und erweiterbaren **Warenwirtschaftssystems**, das im Auftrag von **Agens** von der Ausbildungsgruppe **FIAN23** erstellt wird.
-
-Ziel ist es für die AP2, ein **praxisnahes**, **strukturiertes** und **übersichtlich dokumentiertes** Softwaresystem zu entwickeln, das klassische Prozesse der Warenwirtschaft abbildet:
-
-- 📦 Artikelverwaltung  
-- 🧾 Bestellwesen  
-- 📊 Bestandskontrolle
-- 🌐 Synchronisation der Standorte
+Folgt...
 
 ---
 
@@ -49,12 +42,10 @@ npm install
 2. Einstellungen:
 ```plaintext
 .env einfügen
-```
-```plaintext
 .env konfigurieren
 ```
 
-Um diesen Branch zu aktivieren:
+3. Um diesen Branch zu aktivieren:
 
 ```plaintext
 git pull https://github.com/pladde/albbw-agens-project/tree/agens_fahrrad
@@ -62,7 +53,6 @@ git checkout agens_fahrrad
 ```
 
 ##### IN DIESE BRANCH DARF NUR NACH ABSPRACHE GEPUSHT WERDEN!
-##### DERJENIGE, DER IN DIE BRANCH PUSHT, IST FÜR DAS RICHTIGE ZURÜCKSETZEN VERANTWORTLICH!
 
 ---
 
