@@ -20,6 +20,8 @@ Ziel ist es für die AP2, ein **praxisnahes**, **strukturiertes** und **übersic
 
 - Verwalten von Fahrrädern.
 
+---
+
 ## 🛠️ Geplanter Tech-Stack
 
 #### **Backend**
