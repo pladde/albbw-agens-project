@@ -14,9 +14,9 @@ const fahrradController = new FahrradController(fahrradService);
 const app = express();
 const port = 3000;
 
-app.get('/api', (req, res) => {
-    res.send(bodyParser.json(req.body));
-    res.send('Hello from Backend!');
+app.post('/api', (req, res) => {
+    console.log(req.body);
+    res.send("hallo");
   });
   
   app.listen(port, () => {

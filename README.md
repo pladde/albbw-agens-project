@@ -51,6 +51,10 @@ npm install
 git pull https://github.com/pladde/albbw-agens-project/tree/agens_fahrrad
 git checkout agens_fahrrad
 ```
+4. Server starten
+```plaintext
+npx tsx server.ts
+```
 
 ##### IN DIESE BRANCH DARF NUR NACH ABSPRACHE GEPUSHT WERDEN!
 
