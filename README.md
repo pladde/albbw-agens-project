@@ -30,9 +30,9 @@ Folgt...
 
 ---
 
-## ⚙️ Installation & Setup
+## ⚙️ Installation
 
-Um das Projekt lauffähig zu bekommen müssen folgende Schritte beachtet werden -
+Anleitung um das Projekt lauffähig zu bekommen.
 
 1. Installation aller Dependencys:
 ```plaintext
@@ -58,6 +58,7 @@ git checkout agens_fahrrad
 
 ## 👥 Michel Poerschke
 
-Dieses Teilprojekt wird vom Auszubildenden `Michel Poerschke` des Annedore-Leber-Berufsbildungswerkes ausgeführt.
+Dieses Teilprojekt wird vom Auszubildenden `Michel Poerschke` 
+des Annedore-Leber-Berufsbildungswerkes (ALBBW) ausgeführt.
 
 Kontakt: m.poerschke@albbw.de
