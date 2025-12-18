@@ -59,6 +59,7 @@ npx tsx server.ts
 **Troubleshooting:**
 
 Folgender Fehler kann bei der Installation aufretten:
+
 ```plaintext
 npm : Die Datei "C:\Program Files\nodejs\npm.ps1" kann nicht geladen werden, da die Ausführung von Skripts auf diesem System deaktiviert ist. Weitere Informationen 
 finden Sie unter "about_Execution_Policies" (https:/go.microsoft.com/fwlink/?LinkID=135170).
@@ -68,11 +69,14 @@ In Zeile:1 Zeichen:1
     + CategoryInfo          : Sicherheitsfehler: (:) [], PSSecurityException
     + FullyQualifiedErrorId : UnauthorizedAccess
 ```
+
+
 Das ist ein sehr klassisches Problem unter Windows. Die Fehlermeldung bedeutet, dass die PowerShell-Ausführungsrichtlinie (Execution Policy) verhindert, dass Skripte (wie npm.ps1) ausgeführt werden. Das ist eine Sicherheitsmaßnahme von Windows, die standardmäßig recht streng eingestellt ist.
 Die Richtlinien des aktuellen Benutzers können mit folgendem Befehl geändert werden.
 ```plaintext
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
+
 ##### IN DIESE BRANCH DARF NUR NACH ABSPRACHE GEPUSHT WERDEN!
 
 ---
