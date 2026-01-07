@@ -1,14 +1,11 @@
 import { Router } from 'express';
+import { FahrradController } from '../Controller/FahrradController';
 
-const router = Router();
+export default function(fahrradController: FahrradController) {
 
-router.get('/', (req, res) =>  {
-    // Parsen und an Controller senden
-    res.send("GET HELLO FROM BACKEND!")
-})
+    const router = Router();
 
-router.post('/', (req, res) => {
-    res.send("POST HELLO FROM BACKEND");
-})
+    router.post('/create', (req, res) => fahrradController.saveFahrrad(req, res));
 
-export default router;
+    return router;
+}
