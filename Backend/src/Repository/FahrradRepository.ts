@@ -53,19 +53,12 @@ export class FahrradRepository
 
         try 
         {
-            const [rows, fields] = await dbPool.execute(stmt, values);
+            const [result] = await dbPool.execute(stmt, values);
+  
+            const insertResult = result as any;
 
-            const fahrradRows = rows as any[];
-
-            if(fahrradRows.length === 0)
-                {
-                    return undefined;
-                }        
-    
-                const fahrradData: any = fahrradRows[0];
-                const rowToFahrrad = new RowToObject();
-    
-                return rowToFahrrad.mapRowToFahrrad(fahrradData);
+            console.log(`Neues Fahrrad unter der ID "${insertResult.insertId}" erfolgreich gespeichert.`);
+            return fahrrad;
             
         } catch (error)
         {
@@ -95,9 +88,9 @@ export class FahrradRepository
             const stmt = 
             "SELECT * FROM fahrraeder WHERE `fahrrad_id` = ?";
             
-            const [rows, fields] = await dbPool.execute(stmt, [id]); 
+            const [result] = await dbPool.execute(stmt, [id]); 
 
-            const fahrradRows = rows as any[];
+            const fahrradRows = result as any[];
 
             if(fahrradRows.length === 0)
             {
