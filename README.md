@@ -9,6 +9,35 @@ Folgt...
 
 ---
 
+## 📬 Schnittstellen
+
+Die API für dieses Projekt liegt unter:
+```plaintext
+/api/fahrrad
+```
+
+Folgende Schnittstellen sind verfügbar:
+
+Erstellen eines neues Fahrrads.
+/create 
+liefert das erstellte Objekt mit der ID zurück.
+Hier ein Beispiel:
+```plaintext
+JSON
+{
+    "fahrrad_id" : 0,
+    "marke" : "Canyon",
+    "rahmennummer" : "0815-123ABC",
+    "besonderheiten" : "Aerolenekr-Aufsatz",
+    "bearbeitungsstatus" : "gespendet",
+    "erfasstAm" : "YYYY-MM-DD HH:MI:SS",
+    "erfasstVon" : "Mustermann, Max",
+    "herausgegebenAn:" : "Musterfrau, Maria"
+}
+```
+
+---
+
 ## 🚀 Kernfunktion
 
 - Verwalten von Fahrrädern.
