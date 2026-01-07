@@ -18,7 +18,6 @@ export class RowToObject
     public mapRowToFahrrad(fahrradData: any): Fahrrad
     {
         const fahrrad: Fahrrad = new Fahrrad(
-            fahrradData.fahrrad_id,
             fahrradData.fahrradmarke,
             fahrradData.rahmennummer,
             fahrradData.besonderheiten,
