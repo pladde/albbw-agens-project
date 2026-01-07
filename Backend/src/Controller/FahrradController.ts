@@ -38,7 +38,6 @@ export class FahrradController
         try 
         {
             const fahrrad = new Fahrrad(
-                parseInt(req.body.id),
                 req.body.marke,
                 req.body.rahmennummer,
                 req.body.besonderheiten,
@@ -50,14 +49,6 @@ export class FahrradController
             
             const newBike = this.fahrradService.createNewFahrrad(fahrrad);
             // switch case ?
-            if(newBike == undefined)
-            {
-                res.status(404).json({message: "Fahrrad konnte nicht gespeichert werden"});
-            }
-            else 
-            {
-                res.status(200).json({message: "Fahrrad erfolgreich gespeichert", newBike});
-            }
             
         } catch (error) 
         {
