@@ -1,6 +1,6 @@
 /**
  * Das FahrradModel ist eine Entitiy in der Anwendung.
- * Es sepcihert alle relevanten Eigenschaften, die ein einzelnes Fahrrad haben kann.
+ * Es specihert alle relevanten Eigenschaften, die ein einzelnes Fahrrad haben kann.
  * Es wird typischerweise zur Verwaltung eines Fahrrad-Objektes verwendet.
  */
 export class Fahrrad 
@@ -29,6 +29,7 @@ export class Fahrrad
         private erfasstVon?: string,
         private herausgegebenAn?: string)
         {
+            /* DEBUG
             console.log("\nDEBUG Fahrrad Konstruktor",        // nur zum Debuggen
                 "\nMarke: ", this.marke,
                 "\nRahmenummer: ", this.rahmennummer,
@@ -37,7 +38,7 @@ export class Fahrrad
                 "\nErfassungsdatum: ", this.erfasstAm,
                 "\nErfasst von: ", this.erfasstVon,
                 "\nHerausgabe an: ", this.herausgegebenAn
-            );
+            ); */
         }
 
     //#endregion
