@@ -21,7 +21,6 @@ export class Fahrrad
      * @param herausgegebenAn Der Name der Person, an die das Fahrrad herausgegeben wurde (oder `undefined`, falls noch nicht herausgegeben).
      */
     constructor(
-        private id?: number, 
         private marke?: string, 
         private rahmennummer?: string, 
         private besonderheiten?: string, 
@@ -30,30 +29,20 @@ export class Fahrrad
         private erfasstVon?: string,
         private herausgegebenAn?: string)
         {
+            console.log("\nDEBUG Fahrrad Konstruktor",        // nur zum Debuggen
+                "\nMarke: ", this.marke,
+                "\nRahmenummer: ", this.rahmennummer,
+                "\nBesonderheiten: ", this.besonderheiten,
+                "\nBearbeitungsstatus", this.bearbeitungsstatus,
+                "\nErfassungsdatum: ", this.erfasstAm,
+                "\nErfasst von: ", this.erfasstVon,
+                "\nHerausgabe an: ", this.herausgegebenAn
+            );
         }
 
     //#endregion
 
     //#region Getter und Setter
-    
-    // --- Getter & Setter für 'id' ---
-    /**
-     * Ruft die eindeutige ID des Fahrrads ab.
-     * @returns Die ID des Fahrrads oder `undefined`.
-     */
-    public getId(): number | undefined
-    {
-        return this.id;
-    }
-    
-    /**
-     * Setzt die eindeutige ID des Fahrrads.
-     * @param id Die zu setzende ID.
-     */
-    public setId(id: number): void
-    {
-        this.id = id;
-    }
 
     // --- Getter & Setter für 'marke' ---
     /**
