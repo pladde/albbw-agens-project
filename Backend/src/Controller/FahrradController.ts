@@ -37,6 +37,17 @@ export class FahrradController
     {
         try 
         {
+            /* Debug
+            console.log("DEBUG JSON EINTRAEGE: ",
+                req.body.marke,
+                req.body.rahmennummer,
+                req.body.besonderheiten,
+                req.body.bearbeitungstatus,
+                req.body.erfasstAm,
+                req.body.erfasstVon,
+                req.body.herausgegebenAn
+            ); */
+            
             const fahrrad = new Fahrrad(
                 req.body.marke,
                 req.body.rahmennummer,
@@ -52,6 +63,7 @@ export class FahrradController
             
         } catch (error) 
         {
+            console.log(error);
             res.status(500).json({ error: "Interner Server Fehler" });
         }
     }
