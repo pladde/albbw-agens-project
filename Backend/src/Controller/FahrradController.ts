@@ -1,4 +1,5 @@
 import { Fahrrad } from "../Models/Fahrrad";
+import { Response, Request } from "express";
 import { FahrradService } from "../Service/FahrradService";
 
 /**
@@ -32,21 +33,35 @@ export class FahrradController
      * @throws {Error} Falls das übergebene Fahrrad-Objekt `null` oder `undefined` ist, oder 
      * wenn ein Fehler während des Speichervorgangs auftritt.
      */
-    public async saveFahrrad(fahrrad: Fahrrad) : Promise<Fahrrad | undefined>
+    public async saveFahrrad(req: Request, res: Response) : Promise<void>
     {
-        if(!fahrrad)
-        {
-            throw new Error(`Controller: Das Objekt ${fahrrad} darf nicht null oder leer sein!`)
-        }
-        
         try 
         {
-            return this.fahrradService.createNewFahrrad(fahrrad);
-
+            const fahrrad = new Fahrrad(
+                parseInt(req.body.id),
+                req.body.marke,
+                req.body.rahmennummer,
+                req.body.besonderheiten,
+                req.body.bearbeitungstatus,
+                req.body.erfasstAm,
+                req.body.erfasstVon,
+                req.body.herausgegebenAn
+            );
+            
+            const newBike = this.fahrradService.createNewFahrrad(fahrrad);
+            // switch case ?
+            if(newBike == undefined)
+            {
+                res.status(404).json({message: "Fahrrad konnte nicht gespeichert werden"});
+            }
+            else 
+            {
+                res.status(200).json({message: "Fahrrad erfolgreich gespeichert", newBike});
+            }
+            
         } catch (error) 
         {
-            // Fehler vom Service abfangen und eine generische Controller-Fehlermeldung werfen
-            throw new Error("Controller: Fehler bei der Verarbeitung vom Fahrrad speichern.");
+            res.status(500).json({ error: "Interner Server Fehler" });
         }
     }
 
