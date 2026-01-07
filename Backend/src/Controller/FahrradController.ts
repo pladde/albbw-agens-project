@@ -59,7 +59,7 @@ export class FahrradController
             );
             
             const newBike = this.fahrradService.createNewFahrrad(fahrrad);
-            // switch case ?
+            res.status(200).json(newBike);
             
         } catch (error) 
         {
