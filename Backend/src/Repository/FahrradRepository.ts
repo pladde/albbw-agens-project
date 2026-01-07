@@ -1,6 +1,7 @@
 import { Fahrrad } from "../Models/Fahrrad";
 import dbPool from "../config/db"
 import { RowToObject } from "../Util/RowToObject";
+import { Pool } from 'mysql2/promise';
 
 /**
  * Das FahrradRepository ist die Datenzugriffsschicht (Data Access Layer - DAL).
@@ -16,6 +17,8 @@ import { RowToObject } from "../Util/RowToObject";
  */
 export class FahrradRepository 
 {
+    //constructor (db: Pool) {};
+
     /**
      * Diese Methode **erstellt** über eine SQL-Query ein **neues Fahrrad** in die Datenbank.
      * Nach erfolgreicher Einfügung wird das neu erstellte Objekt zurückgegeben (mit der automatisch generierten ID).
@@ -34,18 +37,19 @@ export class FahrradRepository
         //#endregion
 
         const stmt = 
-        `INSERT INTO fahrrader (marke, rahmennummer, besonderheiten, bearbeitungstatus, erfasstAm, erfasstVon, herausgegebenAn)
+        `INSERT INTO fahrrad (marke, rahmennummer, besonderheiten, bearbeitungstatus, erfasstAm, erfasstVon, herausgegebenAn)
         VALUES(?, ?, ?, ?, ?, ?, ?)`;
 
+        // Darf nicht undefined sein und wird falls der Wert nicht definiert wurde auf 'null' gesetzt.
         const values = [
-            fahrrad.getMarke,
-            fahrrad.getRahmennummer,
-            fahrrad.getBesonderheiten,
-            fahrrad.getBearbeitungsstatus,
-            fahrrad.getErfasstAm,
-            fahrrad.getErfasstVon,
-            fahrrad.getHerausgegebenAn
-        ]
+            fahrrad.getMarke(),
+            fahrrad.getRahmennummer(),
+            fahrrad.getBesonderheiten(),
+            fahrrad.getBearbeitungsstatus(),
+            fahrrad.getErfasstAm(),
+            fahrrad.getErfasstVon(),
+            fahrrad.getHerausgegebenAn()
+        ].map(val => val === undefined ? null : val);
 
         try 
         {
@@ -65,6 +69,7 @@ export class FahrradRepository
             
         } catch (error)
         {
+            console.log("Fehler: ", error)
             throw new Error("Fehler beim Speichern des Fahrrads in der Datenbank.");
         }
     }
