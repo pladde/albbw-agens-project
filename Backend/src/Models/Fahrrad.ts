@@ -21,6 +21,7 @@ export class Fahrrad
      * @param herausgegebenAn Der Name der Person, an die das Fahrrad herausgegeben wurde (oder `undefined`, falls noch nicht herausgegeben).
      */
     constructor(
+        private fahrrad_id?: number,
         private marke?: string, 
         private rahmennummer?: string, 
         private besonderheiten?: string, 
@@ -45,6 +46,24 @@ export class Fahrrad
 
     //#region Getter und Setter
 
+    // --- Getter & Setter für 'fahrrad_id' ---
+    /**
+     * Ruft die ID des Fahrrads ab.
+     * @returns Die ID des Fahrrads oder `undefined`.
+     */
+    public getFahrradId(): number | undefined
+    {
+        return this.fahrrad_id;
+    }
+    /**
+     * Setzt die ID des Fahrrads.
+     * @param id Die zu setzende ID des Fahrrads.
+     */
+    public setFahrradId(fahrrad_id: number): void
+    {
+        this.fahrrad_id = this.fahrrad_id;
+    }
+
     // --- Getter & Setter für 'marke' ---
     /**
      * Ruft die Marke des Fahrrads ab.
@@ -54,7 +73,6 @@ export class Fahrrad
     {
         return this.marke;
     }
-    
     /**
      * Setzt die Marke des Fahrrads.
      * @param marke Die zu setzende Marke.
@@ -73,7 +91,6 @@ export class Fahrrad
     {
         return this.rahmennummer;
     }
-    
     /**
      * Setzt die Rahmennummer des Fahrrads.
      * @param rahmennummer Die zu setzende Rahmennummer.
@@ -92,7 +109,6 @@ export class Fahrrad
     {
         return this.besonderheiten;
     }
-    
     /**
      * Setzt die besonderen Merkmale oder Anmerkungen.
      * @param besonderheiten Die zu setzenden Besonderheiten.
@@ -111,7 +127,6 @@ export class Fahrrad
     {
         return this.bearbeitungsstatus;
     }
-    
     /**
      * Setzt den aktuellen Bearbeitungsstatus.
      * @param bearbeitungsstatus Der zu setzende Status.
@@ -130,7 +145,6 @@ export class Fahrrad
     {
         return this.erfasstAm;
     }
-    
     /**
      * Setzt den Erfassungszeitpunkt.
      * @param erfasstAm Das zu setzende Datum.
@@ -149,7 +163,6 @@ export class Fahrrad
     {
         return this.erfasstVon;
     }
-    
     /**
      * Setzt die Kennung der erfassenden Person.
      * @param erfasstVon Die zu setzende Kennung.
@@ -168,7 +181,6 @@ export class Fahrrad
     {
         return this.herausgegebenAn;
     }
-    
     /**
      * Setzt den Namen der Person, an die das Fahrrad zurückgegeben wurde.
      * @param herausgegebenAn Der zu setzende Name.
