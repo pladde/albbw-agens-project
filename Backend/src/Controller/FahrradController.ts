@@ -48,7 +48,7 @@ export class FahrradController
                 req.body.herausgegebenAn
             ); */
             
-            const fahrrad = new Fahrrad(
+            let fahrrad = new Fahrrad(
                 req.body.marke,
                 req.body.rahmennummer,
                 req.body.besonderheiten,
@@ -58,7 +58,7 @@ export class FahrradController
                 req.body.herausgegebenAn
             );
             
-            const newBike = this.fahrradService.createNewFahrrad(fahrrad);
+            const newBike = await this.fahrradService.createNewFahrrad(fahrrad);
             res.status(200).json(newBike);
             
         } catch (error) 
