@@ -17,16 +17,16 @@ export class RowToObject
      */
     public mapRowToFahrrad(fahrradData: any): Fahrrad
     {
-        const fahrrad = new Fahrrad(
-            fahrradData.fahrrad_id,
-            fahrradData.fahrradmarke,
-            fahrradData.rahmennummer,
-            fahrradData.besonderheiten,
-            fahrradData.bearbeitungsstatus,
-            fahrradData.erfasstAm,
-            fahrradData.erfasstVon,
-            fahrradData.herausgegebenAn
-        );
+        const fahrrad = new Fahrrad({
+            fahrrad_id: fahrradData.fahrrad_id,
+            marke: fahrradData.marke,
+            rahmennummer: fahrradData.rahmennummer,
+            besonderheiten: fahrradData.besonderheiten,
+            bearbeitungsstatus: fahrradData.bearbeitungsstatus,
+            erfasstAm: fahrradData.erfasstAm,
+            erfasstVon: fahrradData.erfasstVon,
+            herausgegebenAn: fahrradData.herausgegebenAn
+    });
 
         return fahrrad;
     }
