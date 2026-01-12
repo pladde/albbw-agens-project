@@ -273,7 +273,7 @@ export class FahrradRepository
             throw new Error("Repository: Die übergebene ID ist ungültig!");
         }
 
-        const stmt = "DELETE FROM fahrraeder WHERE fahrrad_id = ? ";
+        const stmt = "DELETE FROM fahrrad WHERE fahrrad_id = ? ";
         const value = [fahrrad_id];
 
         const [rows] = await dbPool.execute(stmt, [value]);
