@@ -248,4 +248,13 @@ export class FahrradController
 
         }
     }
+
+
+    public async editFahrradById(req: Request, res: Response) 
+    {
+        if(!req.body.)
+        {
+
+        }
+    }
 }
