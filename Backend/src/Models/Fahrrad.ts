@@ -7,7 +7,7 @@ export class Fahrrad
 {
     //#region Konstruktor
 
-    private fahrrad_id? : number;
+    private fahrrad_id?: number;
 
     /**
      * Erstellt eine Instanz des Fahrrad-Objekts.
@@ -53,7 +53,7 @@ export class Fahrrad
      */
     public setFahrradId(fahrrad_id: number): void
     {
-        this.fahrrad_id = this.fahrrad_id;
+        this.fahrrad_id = fahrrad_id;
     }
 
 
