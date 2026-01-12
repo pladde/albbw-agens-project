@@ -2,6 +2,7 @@ import { Fahrrad } from "../Models/Fahrrad";
 import dbPool from "../config/db"
 import { RowToObject } from "../Util/RowToObject";
 import { Pool } from 'mysql2/promise';
+import { error } from "node:console";
 
 /**
  * Das FahrradRepository ist die Datenzugriffsschicht (Data Access Layer - DAL).
@@ -95,7 +96,7 @@ export class FahrradRepository
         try 
         {
             const stmt = 
-            "SELECT * FROM fahrraeder WHERE `fahrrad_id` = ?";
+            "SELECT * FROM fahrrad WHERE `fahrrad_id` = ?";
             
             const [result] = await dbPool.execute(stmt, [id]); 
 
@@ -115,7 +116,7 @@ export class FahrradRepository
 
         } catch (error)
         {
-            throw new Error("Fehler bei der Abfrage des Fahrrads in der Datenbank!");
+            throw new Error("Fehler bei der Abfrage des Fahrrads in der Datenbank!" + error);
         }
     }
 
@@ -127,7 +128,7 @@ export class FahrradRepository
      * @throws {Error} Wirft einen **Error**, wenn `searchRow` oder `searchValue` ungültig (null/leer) sind.
      * @throws {Error} Wirft einen **Error**, wenn bei der Datenbankabfrage ein Fehler auftritt.
      */
-    public async findByString(searchRow: string, searchValue: string): Promise<Fahrrad | undefined> 
+    public async findByString(searchRow: string, searchValue: string): Promise<any[] | undefined> 
     {
         //#region Guard
         if(!searchRow)
@@ -142,14 +143,18 @@ export class FahrradRepository
 
         try
         {
+            const allowedColumns = ['marke', 'rahmennummer', 'besonderheiten', 'erfasstVon', 'bearbeitungsstatus', 'herausgegebenAn', 'qrCode'];
+            if(!allowedColumns.includes(searchRow))
+            {
+                throw new Error("Ungültiger Spaltenname");
+            }
+
             const stmt =
-            `SELECT * FROM fahrraeder WHERE ? = ?`;
+            `SELECT * FROM fahrrad WHERE \`${searchRow}\` = ?`;
 
-            const values = [searchRow, searchValue]
+            const [result] = await dbPool.execute(stmt, [searchValue]);
 
-            const [rows, fields] = await dbPool.execute(stmt, [values]);
-
-            const fahrradRows = rows as any[];
+            const fahrradRows = result as any[];
 
             if(fahrradRows.length === 0)
             {
@@ -159,12 +164,15 @@ export class FahrradRepository
             const fahrradData: any = fahrradRows[0];
             //console.log(fahrradData); // NUR ZUM DEBUGGEN
             const rowToFahrrad = new RowToObject();
+
+            const fahrradList = fahrradRows.map(row => rowToFahrrad.mapRowToFahrrad(row))
     
-            return rowToFahrrad.mapRowToFahrrad(fahrradData);
+            //return rowToFahrrad.mapRowToFahrrad(fahrradData);
+            return fahrradList;
 
         } catch (error)
         {
-            throw new Error("Fehler bei der Abfrage des Fahrrads anhand eines Strings in der Datenbank!");
+            console.log(error);
         }
     }
 
@@ -176,7 +184,7 @@ export class FahrradRepository
      * @throws {Error} Wirft einen **Error**, wenn `searchRow` oder `searchDate` ungültig (null/leer) sind.
      * @throws {Error} Wirft einen **Error**, wenn bei der Datenbankabfrage ein Fehler auftritt.
      */
-    public async findByDate(searchRow: string, searchDate: Date): Promise<Fahrrad | undefined>
+    public async findByDate(searchRow: string, searchDate: Date): Promise<any[] | undefined>
     {
         //#region Guard
         if(!searchRow)
@@ -191,26 +199,35 @@ export class FahrradRepository
 
         try
         {
-            const stmt = "SELECT * FROM fahrraeder WHERE ? = ?";
-            const value = [searchRow, searchDate];
+            const allowedColumns = ['erfasstAm'];
+            if(!allowedColumns.includes(searchRow))
+            {
+                throw new Error("Ungültiger Spaltenname");
+            }
 
-            const [rows, fields] = await dbPool.execute(stmt, value);
+            const stmt =
+            `SELECT * FROM fahrrad WHERE \`${searchRow}\` = ?`;
 
-            const fahrradRows = rows as any[];
+            const [result] = await dbPool.execute(stmt, [searchDate]);
+
+            const fahrradRows = result as any[];
 
             if(fahrradRows.length === 0)
             {
                 return undefined;
-            }
-
-            const fahrradData: any = fahrradRows[0];
+            }        
+    
+            //console.log(fahrradData); // NUR ZUM DEBUGGEN
             const rowToFahrrad = new RowToObject();
 
-            return rowToFahrrad.mapRowToFahrrad(fahrradData);
+            const fahrradList = fahrradRows.map(row => rowToFahrrad.mapRowToFahrrad(row))
+    
+            //return rowToFahrrad.mapRowToFahrrad(fahrradData);
+            return fahrradList;
 
         } catch (error)
         {
-            throw new Error("Repository: Fehler beim Abfragen der Datenbank anhand eines Datums!");
+            console.log(error);
         }
     }
     
@@ -219,36 +236,28 @@ export class FahrradRepository
      * @returns Ein **Promise**, das ein Array von `Fahrrad`-Objekten (`Fahrrad[]`) zurückgibt. `undefined` wird zurückgegeben, wenn keine Einträge gefunden wurden.
      * @throws {Error} Wird geworfen, wenn bei der Datenbankabfrage ein Fehler auftritt.
      */
-    public async findAll(): Promise<Fahrrad[] | undefined>
+    public async findAll(): Promise<any[] | undefined>
     {
-        const stmt = "SELECT * FROM fahrraeder";
-        
-        const [rows, fields] = await dbPool.execute(stmt);
-
-        //Es wird ein Array aus der generischen Rückgabe erstellt. Der ArrayTyp ist noch auf "any[]"
-        const fahrradRows = rows as any[];
-
-        //Das Array wird auf Gültigkeit geprüft
-        if(fahrradRows.length === 0)
+        try 
         {
-            return undefined; //Wenn kein Inhalt in der abfrage geliefert wurde.
+            const stmt = "SELECT * FROM fahrrad";
+        
+            const [allResults] = await dbPool.execute(stmt);
+    
+            const resultList = allResults as any[];
+    
+            //Das Array wird auf Gültigkeit geprüft
+            if(resultList.length === 0)
+            {
+                return undefined; //Wenn kein Inhalt in der abfrage geliefert wurde.
+            }
+    
+            return resultList;
+
+        } catch (error)
+        {
+            console.log(error);
         }
-
-        //Das Array muss jetzt zu einem Fahrrad[] gewandelt werden.
-        //Ein Fahrrad[] muss erstellt werden
-        let fahrrad: Fahrrad[] = [];
-        const rowToFahrrad = new RowToObject();
-        let i = 0;
-
-        fahrradRows.forEach(element => {
-            fahrrad[i] = rowToFahrrad.mapRowToFahrrad(element);
-            i++;
-        });
-
-        //Die Daten des Any[] muss ins das Fahrrad[] übertragen werden.
-
-        //Fahrrad[] zurückgeben
-        return fahrrad;
     }
 
     /**
@@ -257,29 +266,25 @@ export class FahrradRepository
      * @returns Gibt ein **Promise** zurück. Die aktuelle Implementierung gibt das Ergebnis der Datenbankoperation (z.B. betroffene Zeilen) zurück. Idealerweise sollte das *gelöschte* `Fahrrad`-Objekt oder `undefined` zurückgegeben werden.
      * @throws {Error} Falls die übergebene ID ungültig ist.
      */
-    public async deleteById(id: number) : Promise<Fahrrad | undefined>
+    public async deleteById(fahrrad_id: number) : Promise<any[] | undefined>
     {
-        if(!id) 
+        if(!fahrrad_id) 
         {
             throw new Error("Repository: Die übergebene ID ist ungültig!");
         }
 
         const stmt = "DELETE FROM fahrraeder WHERE fahrrad_id = ? ";
-        const value = [id];
+        const value = [fahrrad_id];
 
-        const [rows, fields] = await dbPool.execute(stmt, [value]);
+        const [rows] = await dbPool.execute(stmt, [value]);
         
-        const fahrradRows = rows as any[];
+        const result = rows as any[];
 
-        if(fahrradRows.length === 0)
+        if(result.length === 0)
         {
             return undefined;
         }
 
-        const fahrradData: any = fahrradRows[0];
-        const rowToFahrrad = new RowToObject();
-
-        return rowToFahrrad.mapRowToFahrrad(fahrradData);
-
+        return result;
     }
 }
