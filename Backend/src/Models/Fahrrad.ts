@@ -1,3 +1,5 @@
+import { IFahrrad } from "../Interfaces/IFahrrad";
+
 /**
  * Das FahrradModel ist eine Entitiy in der Anwendung.
  * Es specihert alle relevanten Eigenschaften, die ein einzelnes Fahrrad haben kann.
@@ -8,6 +10,14 @@ export class Fahrrad
     //#region Konstruktor
 
     private fahrrad_id?: number;
+    private marke?: string;
+    private rahmennummer?: string;
+    private besonderheiten?: string;
+    private bearbeitungsstatus?: string;
+    private erfasstAm?: Date;
+    private erfasstVon?: string;
+    private herausgegebenAn?: string;
+    private qrCode?: string;
 
     /**
      * Erstellt eine Instanz des Fahrrad-Objekts.
@@ -22,16 +32,17 @@ export class Fahrrad
      * @param erfasstVon Der Name oder die Kennung der Person, die das Fahrrad erfasst hat.
      * @param herausgegebenAn Der Name der Person, an die das Fahrrad herausgegeben wurde (oder `undefined`, falls noch nicht herausgegeben).
      */
-    constructor(
-        //private fahrrad_id?: number,
-        private marke?: string, 
-        private rahmennummer?: string, 
-        private besonderheiten?: string, 
-        private bearbeitungsstatus?: string,
-        private erfasstAm?: Date,
-        private erfasstVon?: string,
-        private herausgegebenAn?: string)
+    constructor(data: IFahrrad)
         {
+            this.fahrrad_id = data.fahrrad_id;
+            this.marke = data.marke;
+            this.rahmennummer = data.rahmennummer;
+            this.besonderheiten = data.besonderheiten;
+            this.bearbeitungsstatus = data.bearbeitungsstatus;
+            this.erfasstAm = data.erfasstAm;
+            this.erfasstVon = data.erfasstVon;
+            this.herausgegebenAn = data.herausgegebenAn;
+            this.qrCode = data.qrCode;
         }
 
     //#endregion
