@@ -52,7 +52,7 @@ export class FahrradController
                 req.body.marke,
                 req.body.rahmennummer,
                 req.body.besonderheiten,
-                req.body.bearbeitungstatus,
+                req.body.bearbeitungsstatus,
                 req.body.erfasstAm,
                 req.body.erfasstVon,
                 req.body.herausgegebenAn
