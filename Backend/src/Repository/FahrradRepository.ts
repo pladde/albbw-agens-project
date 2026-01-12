@@ -37,7 +37,7 @@ export class FahrradRepository
         //#endregion
 
         const stmt = 
-        `INSERT INTO fahrrad (marke, rahmennummer, besonderheiten, bearbeitungstatus, erfasstAm, erfasstVon, herausgegebenAn)
+        `INSERT INTO fahrrad (marke, rahmennummer, besonderheiten, bearbeitungsstatus, erfasstAm, erfasstVon, herausgegebenAn)
         VALUES(?, ?, ?, ?, ?, ?, ?)`;
 
         // Darf nicht undefined sein und wird falls der Wert nicht definiert wurde auf 'null' gesetzt.
@@ -58,6 +58,15 @@ export class FahrradRepository
             const insertResult = result as any;
 
             console.log(`Neues Fahrrad unter der ID "${insertResult.insertId}" erfolgreich gespeichert.`);
+            fahrrad.setFahrradId(parseInt(insertResult.insertId));
+
+            // DEBUG
+            console.log("Fahrrad ID: " + fahrrad.getFahrradId());
+            if(fahrrad.getFahrradId() != null || fahrrad.getFahrradId() != undefined)
+            {
+                console.log(`Dem Objekt wurde erfolgreich die ID "${fahrrad.getFahrradId()}" hinzugefügt..`);
+            }
+
             return fahrrad;
             
         } catch (error)
