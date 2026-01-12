@@ -48,18 +48,27 @@ export class FahrradController
                 req.body.herausgegebenAn
             ); */
             
-            let fahrrad = new Fahrrad(
-                req.body.marke,
-                req.body.rahmennummer,
-                req.body.besonderheiten,
-                req.body.bearbeitungsstatus,
-                req.body.erfasstAm,
-                req.body.erfasstVon,
-                req.body.herausgegebenAn
-            );
+            let fahrrad = new Fahrrad({
+                marke: req.body.marke,
+                rahmennummer: req.body.rahmennummer,
+                besonderheiten: req.body.besonderheiten,
+                bearbeitungsstatus: req.body.bearbeitungsstatus,
+                erfasstAm: req.body.erfasstAm,
+                erfasstVon: req.body.erfasstVon,
+                herausgegebenAn: req.body.herausgegebenAn
+        });
+            
             
             const newBike = await this.fahrradService.createNewFahrrad(fahrrad);
-            res.status(200).json(newBike);
+
+            if(newBike != undefined || newBike != null) 
+            {
+                res.status(200).json(newBike);
+            }
+            else
+            {
+                res.status(404).json(`Es wurde kein Objekt mit der ID: ${req.body.fahrrad_id} gefunden.`)
+            }
             
         } catch (error) 
         {
@@ -75,14 +84,32 @@ export class FahrradController
      * falls kein Fahrrad mit dieser ID existiert.
      * @throws {Error} Falls die übergebene ID `null` oder `undefined` ist.
      */
-    public async findFahrradById(id: number) : Promise<Fahrrad | undefined>
+    public async findFahrradById(req: Request, res: Response) : Promise<void>
     {
-        if(!id)
+        if(!req.body.fahrrad_id)
         {
             throw new Error(`Controller: Die übergebene ID zum suchen eines Fahrrads darf nicht null oder leer sein!`)
         }
 
-        return this.fahrradService.findFahrradById(id);
+        try 
+        {
+            const foundFahrrad = await this.fahrradService.findFahrradById(req.body.fahrrad_id);
+
+            if(foundFahrrad == undefined)
+            {
+                console.log("Keinen Eintrag gefunden!");
+                res.status(404).json(null);
+            }
+            else
+            {
+                res.status(200).json(foundFahrrad);
+            }
+
+        } catch (error)
+        {
+            console.log(error);
+            res.status(500).json({ error: "Interner Server Fehler" });
+        }
     }
 
     /**
@@ -92,18 +119,36 @@ export class FahrradController
      * @returns Eine Promise, die das gefundene Fahrrad-Objekt oder `undefined` zurückgibt.
      * @throws {Error} Falls `searchValue` oder `searchRow` `null` oder leer sind.
      */
-    public async findFahrradByString(searchRow: string, searchValue: string) : Promise<Fahrrad | undefined>
+    public async findFahrradByString(req: Request, res: Response) : Promise<void>
     {
-        if(!searchValue)
+        if(!req.body.searchRow)
         {
             throw new Error(`Controller: Die übergebene Zeile für den String darf nicht null oder leer sein!`)
         }  
-        if(!searchRow)
+        if(!req.body.searchValue)
         {
             throw new Error(`Controller: Der übergebene Wert darf nicht null oder leer sein!`)
         }      
         
-        return this.fahrradService.findFahrradByString(searchRow, searchValue);
+        try 
+        {
+            const foundFahrrad = await this.fahrradService.findFahrradByString(req.body.searchRow, req.body.searchValue);
+
+            if(foundFahrrad == undefined)
+            {
+                console.log("Keinen Eintrag gefunden!");
+                res.status(404).json(null);
+            }
+            else
+            {
+                res.status(200).json(foundFahrrad);
+            }
+
+        } catch (error)
+        {
+            console.log(error);
+            res.status(500).json({ error: "Interner Server Fehler" });
+        }
     }
 
     /**
@@ -113,18 +158,34 @@ export class FahrradController
      * @returns Eine Promise, die das gefundene Fahrrad-Objekt oder `undefined` zurückgibt.
      * @throws {Error} Falls `searchRow` oder `date` `null` oder leer sind.
      */
-    public async findFahrradByDate(searchRow: string, date: Date) : Promise<Fahrrad | undefined>
+    public async findFahrradByDate(req: Request, res: Response) : Promise<void>
     {
-        if(!searchRow)
+        if(!req.body.searchRow)
         {
             throw new Error(`Controller: Die übergebene Zeile fürs das Datum darf nicht null oder leer sein!`)
         } 
-        if(!date)
+        if(!req.body.date)
         {
             throw new Error(`Controller: Das übergebene Datum darf nicht null oder leer sein!`)
         }
 
-        return this.fahrradService.findFahrradByDate(searchRow, date);
+        try 
+        {
+            const result = await this.fahrradService.findFahrradByDate(req.body.searchRow, req.body.date);
+            if(result == undefined)
+            {
+                console.log("Keinen Eintrag gefunden!");
+                res.status(404).json(null);
+            }
+            else
+            {
+                res.status(200).json({result});
+            }
+
+        } catch(error)
+        {
+
+        }
     }
 
     /**
@@ -132,9 +193,26 @@ export class FahrradController
      * @returns Eine Promise, die ein Array von Fahrrad-Objekten oder `undefined` zurückgibt, 
      * falls keine Fahrräder gefunden wurden.
      */
-    public async findAllFahrraeder() : Promise<Fahrrad[] | undefined>
+    public async findAllFahrraeder(res: Response) : Promise<void>
     {
-        return this.fahrradService.findAllFahrrader();
+        try 
+        {
+            const allResults = await this.fahrradService.findAllFahrrader();
+
+            if(allResults == undefined) 
+            {
+                console.log("Keinen Eintrag gefunden!");
+                res.status(404).json(null);
+            }
+            else
+            {
+                res.status(200).json(allResults);
+            }
+
+        } catch (error)
+        {
+            console.log(error);
+        }
     }
 
     /**
@@ -144,13 +222,30 @@ export class FahrradController
      * falls kein Datensatz gefunden wurde.
      * @throws {Error} Falls die übergebene ID `null` oder `undefined` ist.
      */
-    public async deleteFahrradById(id: number) : Promise<Fahrrad | undefined>
+    public async deleteFahrradById(req: Request, res: Response) : Promise<void>
     {
-        if(!id)
+        if(!req.body.fahrrad_id)
         {
             throw new Error(`Controller: Die übergebene ID zum löschen eines Datensatzes darf nicht null oder leer sein!`)
         }
         
-        return this.fahrradService.deleteFahrradById(id);
+        try
+        {
+            const result = await this.fahrradService.deleteFahrradById(req.body.fahrrad_id);
+
+            if (result === undefined) 
+            {
+                console.log("Keinen Eintrag gefunden!");
+                res.status(404).json(null);
+            } 
+            else
+            {
+                res.status(200).json(result)
+            }
+
+        } catch (error)
+        {
+
+        }
     }
 }
