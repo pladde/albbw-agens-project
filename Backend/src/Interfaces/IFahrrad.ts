@@ -1,13 +1,13 @@
 export interface IFahrrad 
 {
     // Attribute
-    id?: number;
+    fahrrad_id?: number;
     marke?: string;
     rahmennummer?: string;
     besonderheiten?: string;
-    bearbeitungsstatus: string;
-    erfasstAm: Date;
-    erfasstVon: string;
+    bearbeitungsstatus?: string;
+    erfasstAm?: Date;
+    erfasstVon?: string;
     herausgegebenAn?: string;
-    qrCode: string;
+    qrCode?: string;
 }
