@@ -7,6 +7,8 @@ export class Fahrrad
 {
     //#region Konstruktor
 
+    private fahrrad_id? : number;
+
     /**
      * Erstellt eine Instanz des Fahrrad-Objekts.
      * Alle Parameter sind optional, da ein Objekt entweder neu erstellt (ohne ID) 
@@ -21,7 +23,7 @@ export class Fahrrad
      * @param herausgegebenAn Der Name der Person, an die das Fahrrad herausgegeben wurde (oder `undefined`, falls noch nicht herausgegeben).
      */
     constructor(
-        private fahrrad_id?: number,
+        //private fahrrad_id?: number,
         private marke?: string, 
         private rahmennummer?: string, 
         private besonderheiten?: string, 
@@ -30,16 +32,6 @@ export class Fahrrad
         private erfasstVon?: string,
         private herausgegebenAn?: string)
         {
-            /* DEBUG
-            console.log("\nDEBUG Fahrrad Konstruktor",        // nur zum Debuggen
-                "\nMarke: ", this.marke,
-                "\nRahmenummer: ", this.rahmennummer,
-                "\nBesonderheiten: ", this.besonderheiten,
-                "\nBearbeitungsstatus", this.bearbeitungsstatus,
-                "\nErfassungsdatum: ", this.erfasstAm,
-                "\nErfasst von: ", this.erfasstVon,
-                "\nHerausgabe an: ", this.herausgegebenAn
-            ); */
         }
 
     //#endregion
@@ -63,6 +55,7 @@ export class Fahrrad
     {
         this.fahrrad_id = this.fahrrad_id;
     }
+
 
     // --- Getter & Setter für 'marke' ---
     /**
