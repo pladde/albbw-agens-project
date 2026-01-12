@@ -66,7 +66,7 @@ export class FahrradService
 
         } catch (error)
         {
-            throw new Error("Service: Fehler beim Aufrufen des Fahrrads anhand der Id!");
+            throw new Error("Service: Fehler beim Aufrufen des Fahrrads anhand der Id!: " + error);
         }
 
         return result;
@@ -81,7 +81,7 @@ export class FahrradService
      * @throws {Error} Wird geworfen, wenn `searchValue` ungültig (null/leer) ist. Der Fehlertext ist: `Service.Guard: Ungültigen Wert übergeben!`.
      * @throws {Error} Wird geworfen, wenn bei der Repository-Abfrage ein unerwarteter Fehler auftritt. Der Fehlertext ist: `Service: Fehler beim Aufrufen des Fahrrads anhand der Zeile und des Wertes!`.
      */
-    public async findFahrradByString(searchRow: string, searchValue: string): Promise<Fahrrad | undefined>
+    public async findFahrradByString(searchRow: string, searchValue: string): Promise<any[] | undefined>
     {
         //#region Guard
         if(!searchRow)
@@ -94,7 +94,7 @@ export class FahrradService
         }
         //#endregion
 
-        let result: Fahrrad | undefined;
+        let result: any[] | undefined;
 
         try 
         {
@@ -102,7 +102,7 @@ export class FahrradService
 
         } catch (error)
         {
-            throw new Error("Service: Fehler beim Aufrufen des Fahrrads anhand der Zeile und des Wertes!");
+            throw new Error("Service: Fehler beim Aufrufen des Fahrrads anhand der Zeile und des Wertes!" + error);
         }
 
         return result;
@@ -117,7 +117,7 @@ export class FahrradService
      * @throws {Error} Wird geworfen, wenn `searchDate` ungültig (null/leer) ist.
      * @throws {Error} Wird geworfen, wenn bei der Datenbankabfrage ein Fehler auftritt. Der Fehlertext ist: `Service: Fehler beim Aufrufen des Fahrrads anhand der Zeile und des Datums!`.
      */
-    public async findFahrradByDate(searchRow: string, searchDate: Date): Promise<Fahrrad | undefined>
+    public async findFahrradByDate(searchRow: string, searchDate: Date): Promise<any[] | undefined>
     {
         //#region Guards
         if(!searchRow) 
@@ -130,7 +130,7 @@ export class FahrradService
         }
         //#endregion
 
-        let result: Fahrrad | undefined;
+        let result: any[] | undefined;
 
         try
         {
@@ -149,9 +149,9 @@ export class FahrradService
      * @returns Ein **Promise**, das ein Array von `Fahrrad`-Objekten oder `undefined` zurückgibt, wenn keine Fahrräder gefunden wurden.
      * @throws {Error} Wird geworfen, wenn bei der Repository-Abfrage ein Fehler auftritt. Der Fehlertext ist: `Service: Fehler beim Aufrufen aller Fahrräder!`.
      */
-    public async findAllFahrrader() : Promise<Fahrrad[] | undefined>
+    public async findAllFahrrader() : Promise<any[] | undefined>
     {
-        let result: Fahrrad[] | undefined = [];
+        let result: any[] | undefined = [];
 
         try
         {
@@ -159,7 +159,7 @@ export class FahrradService
 
         } catch (error)
         {
-            throw new Error("Service: Fehler beim Aufrufen aller Fahrräder!");
+            console.log(error);
         }
 
         return result;
@@ -172,20 +172,20 @@ export class FahrradService
      * @throws {Error} Wird geworfen, wenn die übergebene ID ungültig (null/undefined) ist. Der Fehlertext ist: `Service: Fehler beim löschen eines Fahrrads!`.
      * @throws {Error} Wird geworfen, wenn bei der Repository-Abfrage zum Löschen ein Fehler auftritt. Der Fehlertext ist: `Service: Fehler beim löschen eines Fahrrads!`.
      */
-    public async deleteFahrradById(id: number) : Promise<Fahrrad | undefined>
+    public async deleteFahrradById(fahrrad_id: number) : Promise<any[] | undefined>
     {
         //#region Guard
-        if (id == null || id <= 0)
+        if (fahrrad_id == null || fahrrad_id <= 0)
         {
             throw new Error("Service: Fehler beim löschen eines Fahrrads!");
         }
         //#endregion
 
-        let result: Fahrrad | undefined; 
+        let result: any[] | undefined; 
 
         try 
         {
-            result = await this.fahrradRepository.deleteById(id);
+            result = await this.fahrradRepository.deleteById(fahrrad_id);
 
         } catch (error)
         {
