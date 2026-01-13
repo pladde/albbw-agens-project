@@ -18,7 +18,28 @@ import { error } from "node:console";
  */
 export class FahrradRepository 
 {
-    //constructor (db: Pool) {};
+    private allowedColumns: string[] = [];
+
+    private async getTableColumns(): Promise<string[]> 
+    {
+        if (this.allowedColumns.length > 0)
+        {
+            return this.allowedColumns;
+        }
+
+        const stmt = `
+            SELECT column_name 
+            FROM information_schema.columns 
+            WHERE table_name = 'fahrrad' 
+            ORDER BY ordinal_position;
+            `;
+
+            const [rows]: any = await dbPool.execute(stmt);
+
+            this.allowedColumns = rows.map((row: any) => row.COLUMN_NAME);
+
+            return this.allowedColumns;
+    }
 
     /**
      * Diese Methode **erstellt** über eine SQL-Query ein **neues Fahrrad** in die Datenbank.
@@ -143,7 +164,8 @@ export class FahrradRepository
 
         try
         {
-            const allowedColumns = ['marke', 'rahmennummer', 'besonderheiten', 'erfasstVon', 'bearbeitungsstatus', 'herausgegebenAn', 'qrCode'];
+            const allowedColumns = await this.getTableColumns();
+
             if(!allowedColumns.includes(searchRow))
             {
                 throw new Error("Ungültiger Spaltenname");
@@ -199,7 +221,8 @@ export class FahrradRepository
 
         try
         {
-            const allowedColumns = ['erfasstAm'];
+            const allowedColumns = await this.getTableColumns();
+
             if(!allowedColumns.includes(searchRow))
             {
                 throw new Error("Ungültiger Spaltenname");
@@ -286,5 +309,35 @@ export class FahrradRepository
         }
 
         return result;
+    }
+
+    public async editById(id: number, column: string, value: any) : Promise<any[] | undefined>
+    {
+        if (!id)
+        {
+            throw new Error("Repository Fehler: Die ID zum editieren darf nicht null oder leer sein.");
+        }
+
+        try
+        {
+        const allowedColumns = await this.getTableColumns();
+
+        if(!allowedColumns.includes(column))
+        {
+            throw new Error("Ungültiger Spaltenname");
+        }
+
+        const stmt = 
+        `UPDATE fahrrad SET ${column} = ? WHERE fahrrad_id = ?`;
+
+        const result = await dbPool.execute(stmt, value); 
+
+        return result;
+
+        } catch (error)
+        {
+            console.log("Fehler: " + error);
+        }
+
     }
 }
