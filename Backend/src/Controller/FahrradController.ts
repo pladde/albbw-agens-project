@@ -252,9 +252,11 @@ export class FahrradController
 
     public async editFahrradById(req: Request, res: Response) 
     {
-        if(!req.body.)
+        if(!req.body.fahrrad_id)
         {
-
+            throw new Error("Die Fahrrad-ID darf zum editieren eines Datensatzes nicht null oder leer sein.");
         }
+
+        
     }
 }
