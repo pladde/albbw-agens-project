@@ -5,19 +5,19 @@ export default function(fahrradController: FahrradController) {
 
     const router = Router();
 
-    router.post('/create', (req, res) => fahrradController.saveFahrrad(req, res));
+    router.post('/', (req, res) => fahrradController.saveFahrrad(req, res));
 
-    router.get('/getByNumber', (req, res) => fahrradController.findFahrradById(req, res));
+    router.get('/id/:id', (req, res) => fahrradController.findFahrradById(req, res));
 
-    router.get('/getByString', (req, res) => fahrradController.findFahrradByString(req, res));
+    router.get('/string/:col/:val', (req, res) => fahrradController.findFahrradByString(req, res));
 
-    router.get('/getByDate', (req, res) => fahrradController.findFahrradByDate(req, res));
+    router.get('/date/:col/:date', (req, res) => fahrradController.findFahrradByDate(req, res));
 
-    router.get('/getAll', (req, res) => fahrradController.findAllFahrraeder(res));
+    router.get('/', (req, res) => fahrradController.findAllFahrraeder(req, res));
 
-    router.delete('/deleteById', (req, res) => fahrradController.deleteFahrradById(req, res));
+    router.delete('/id/:id', (req, res) => fahrradController.deleteFahrradById(req, res));
 
-    router.put('/editById', (req, res) => fahrradController.editFahrradById(req, res));
+    router.put('/edit/:id/:col/:val', (req, res) => fahrradController.editFahrradById(req, res));
 
     return router;
 }
