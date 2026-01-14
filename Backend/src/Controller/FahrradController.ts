@@ -5,7 +5,15 @@ import { FahrradService } from "../Service/FahrradService";
 /**
  * Der FahrradController dient als Schnittstelle zwischen der Anwendungsschicht 
  * und dem FahrradService. Er verwaltet die Logik für CRUD-Operationen (Erstellen, 
- * Lesen, Aktualisieren, Löschen) von Fahrrad-Objekten.
+ * Lesen, Aktualisieren, Löschen) von Fahrrad-Objekten über HTTP-Schnittstellen.
+ * * Diese Klasse stellt folgende Methoden bereit:
+ * @function `async saveFahrrad(req: Request, res: Response) : Promise<void>`
+ * @function `async findFahrradById(req: Request, res: Response) : Promise<void>`
+ * @function `async findFahrradByString(req: Request, res: Response) : Promise<void>`
+ * @function `async findFahrradByDate(req: Request, res: Response) : Promise<void>`
+ * @function `async findAllFahrraeder(req: Request, res: Response) : Promise<void>`
+ * @function `async deleteFahrradById(req: Request, res: Response) : Promise<void>`
+ * @function `async editFahrradById(req: Request, res: Response) : Promise<void>`
  */
 export class FahrradController
 {
@@ -25,29 +33,15 @@ export class FahrradController
     }
 
     /**
-     * **Erstellt** aus dem **Fahrrad-Objekt** einen neuen Datensatz in der Datenbank.
-     * Führt eine Validierung des übergebenen Objekts durch.
-     * @param fahrrad Ein **Fahrrad-Objekt**, welches in die Datenbank gespeichert werden soll.
-     * @returns Eine Promise, die entweder das gespeicherte Fahrrad-Objekt oder `undefined` zurückgibt, 
-     * wenn der Service das Objekt nicht erstellen konnte.
-     * @throws {Error} Falls das übergebene Fahrrad-Objekt `null` oder `undefined` ist, oder 
-     * wenn ein Fehler während des Speichervorgangs auftritt.
+     * **Erstellt** aus den Daten im Request-Body einen neuen Datensatz in der Datenbank.
+     * @param req Der Express **Request** (erwartet Fahrrad-Attribute im Body).
+     * @param res Die Express **Response** (sendet Status 200 bei Erfolg oder 404/500 bei Fehlern).
+     * @returns Ein Promise vom Typ `void`.
      */
     public async saveFahrrad(req: Request, res: Response) : Promise<void>
     {
         try 
         {
-            /* Debug
-            console.log("DEBUG JSON EINTRAEGE: ",
-                req.body.marke,
-                req.body.rahmennummer,
-                req.body.besonderheiten,
-                req.body.bearbeitungstatus,
-                req.body.erfasstAm,
-                req.body.erfasstVon,
-                req.body.herausgegebenAn
-            ); */
-            
             let fahrrad = new Fahrrad({
                 marke: req.body.marke,
                 rahmennummer: req.body.rahmennummer,
@@ -58,7 +52,6 @@ export class FahrradController
                 herausgegebenAn: req.body.herausgegebenAn
         });
             
-            
             const newBike = await this.fahrradService.createNewFahrrad(fahrrad);
 
             if(newBike != undefined || newBike != null) 
@@ -67,7 +60,7 @@ export class FahrradController
             }
             else
             {
-                res.status(404).json(`Es wurde kein Objekt mit der ID: ${req.body.fahrrad_id} gefunden.`)
+                res.status(404).json(`Es wurde kein Objekt erstellt.`)
             }
             
         } catch (error) 
@@ -78,22 +71,25 @@ export class FahrradController
     }
 
     /**
-     * **Sucht** ein **Fahrrad** anhand seiner eindeutigen **ID**.
-     * @param id Die eindeutige ID des zu suchenden Fahrrads.
-     * @returns Eine Promise, die das gefundene Fahrrad-Objekt oder `undefined` zurückgibt, 
-     * falls kein Fahrrad mit dieser ID existiert.
-     * @throws {Error} Falls die übergebene ID `null` oder `undefined` ist.
+     * **Sucht** ein **Fahrrad** anhand seiner eindeutigen **ID** aus dem Request-Body.
+     * @param req Der Express **Request** (erwartet `id` im Body).
+     * @param res Die Express **Response** (sendet das Objekt oder Status 404).
+     * @description
+     * Falls die `id` fehlt, wird ein Status **400 (Bad Request)** gesendet.
+     * Falls kein Fahrrad gefunden wird, sollte ein Status **404 (Not Found)** folgen.
      */
     public async findFahrradById(req: Request, res: Response) : Promise<void>
     {
-        if(!req.body.fahrrad_id)
+        //#region Guard
+        if(!req.params.id)
         {
-            throw new Error(`Controller: Die übergebene ID zum suchen eines Fahrrads darf nicht null oder leer sein!`)
+            res.status(400).json({ error: "id ist ein Pflichtfeld!"}); // 404 = Bad Request
         }
+        //#endregion
 
         try 
         {
-            const foundFahrrad = await this.fahrradService.findFahrradById(req.body.fahrrad_id);
+            const foundFahrrad = await this.fahrradService.findFahrradById(parseInt(req.params.id));
 
             if(foundFahrrad == undefined)
             {
@@ -113,26 +109,29 @@ export class FahrradController
     }
 
     /**
-     * **Sucht** ein Fahrrad anhand eines **String-Werts** in einer bestimmten **Datenbankspalte**.
-     * @param searchRow Die Spalte in der Datenbanktabelle, in der gesucht werden soll (z.B. 'marke', 'rahmnenummer').
-     * @param searchValue Der String-Wert, nach dem gesucht werden soll.
-     * @returns Eine Promise, die das gefundene Fahrrad-Objekt oder `undefined` zurückgibt.
-     * @throws {Error} Falls `searchValue` oder `searchRow` `null` oder leer sind.
+     * **Sucht** ein oder mehrere Fahrräder anhand eines **String-Werts** in einer Spalte.
+     * @param req Der Express **Request** (erwartet `searchRow` und `searchValue` im Body).
+     * @param res Die Express **Response** (sendet Array oder Status 404).
+     * @description 
+     * Falls die `col` oder der `val` fehlt, wird ein Status **404 (Bad Request)** gesendet.
+     * Falls kein Fahrrad gefunden wird, sollte ein Status *400* (Not Found)** folgen.
      */
     public async findFahrradByString(req: Request, res: Response) : Promise<void>
     {
-        if(!req.body.searchRow)
+        //#region Guard
+        if(!req.params.col)
         {
-            throw new Error(`Controller: Die übergebene Zeile für den String darf nicht null oder leer sein!`)
-        }  
-        if(!req.body.searchValue)
+            res.status(400).json({ error: "col ist ein Pflichtfeld!"});
+        }  
+        if(!req.params.val)
         {
-            throw new Error(`Controller: Der übergebene Wert darf nicht null oder leer sein!`)
-        }      
+            res.status(400).json({ error: "val ist ein Pflichtfeld!"});
+        }      
+        //#endregion
         
         try 
         {
-            const foundFahrrad = await this.fahrradService.findFahrradByString(req.body.searchRow, req.body.searchValue);
+            const foundFahrrad = await this.fahrradService.findFahrradByString(req.params.col, req.params.val);
 
             if(foundFahrrad == undefined)
             {
@@ -152,26 +151,31 @@ export class FahrradController
     }
 
     /**
-     * **Sucht** ein Fahrrad anhand eines **Datumswerts** in einer bestimmten **Datenbankspalte**.
-     * @param searchRow Die Spalte in der Datenbanktabelle, in der gesucht werden soll (z.B. 'kaufdatum').
-     * @param date Das Datum, nach dem gesucht werden soll.
-     * @returns Eine Promise, die das gefundene Fahrrad-Objekt oder `undefined` zurückgibt.
-     * @throws {Error} Falls `searchRow` oder `date` `null` oder leer sind.
+     * **Sucht** Fahrräder anhand eines **Datumswerts** in einer bestimmten Spalte.
+     * @param req Der Express **Request** (erwartet `searchRow` und `date` im Body).
+     * @param res Die Express **Response**.
+     * @description
+     * Falls die `col` oder das `date` fehlt, wird ein Status **400 (Bad Request)** gesendet.
+     * Falls kein Fahrrad gefunden wird, sollte ein Status **404 (Not Found)** folgen.
      */
     public async findFahrradByDate(req: Request, res: Response) : Promise<void>
     {
-        if(!req.body.searchRow)
+        //#region Guard
+        if(!req.params.col)
         {
-            throw new Error(`Controller: Die übergebene Zeile fürs das Datum darf nicht null oder leer sein!`)
+            res.status(400).json({ error: "column ist ein Pflichtfeld!"});
         } 
-        if(!req.body.date)
+        if(!req.params.date)
         {
-            throw new Error(`Controller: Das übergebene Datum darf nicht null oder leer sein!`)
+            res.status(400).json({ error: "date ist ein Pflichtfeld!"});
         }
+        //#endregion
 
         try 
         {
-            const result = await this.fahrradService.findFahrradByDate(req.body.searchRow, req.body.date);
+            const date = new Date(req.params.date);
+
+            const result = await this.fahrradService.findFahrradByDate(req.params.col, date);
             if(result == undefined)
             {
                 console.log("Keinen Eintrag gefunden!");
@@ -184,16 +188,19 @@ export class FahrradController
 
         } catch(error)
         {
-
+            console.log(error);
+            res.status(500).json({ error: "Interner Server Fehler" });
         }
     }
 
     /**
      * Ruft **alle** in der Datenbank gespeicherten **Fahrräder** ab.
-     * @returns Eine Promise, die ein Array von Fahrrad-Objekten oder `undefined` zurückgibt, 
-     * falls keine Fahrräder gefunden wurden.
+     * @param req Der Express **Request**.
+     * @param res Die Express **Response** (sendet ein Array aller Fahrräder).
+     * @description
+     * Falls kein Fahrrad gefunden wird, sollte ein Status **404 (Not Found)** folgen.
      */
-    public async findAllFahrraeder(res: Response) : Promise<void>
+    public async findAllFahrraeder(req: Request, res: Response) : Promise<void>
     {
         try 
         {
@@ -212,26 +219,30 @@ export class FahrradController
         } catch (error)
         {
             console.log(error);
+            res.status(500).json({ error: "Interner Server Fehler" });
         }
     }
 
     /**
-     * **Löscht** einen **Fahrrad-Datensatz** anhand seiner eindeutigen **ID** aus der Datenbank.
-     * @param id Die eindeutige ID des zu löschenden Fahrrads.
-     * @returns Eine Promise, die das gelöschte Fahrrad-Objekt oder `undefined` zurückgibt, 
-     * falls kein Datensatz gefunden wurde.
-     * @throws {Error} Falls die übergebene ID `null` oder `undefined` ist.
+     * **Löscht** einen **Fahrrad-Datensatz** anhand seiner ID aus der Datenbank.
+     * @param req Der Express **Request** (erwartet `id` im Body).
+     * @param res Die Express **Response**.
+        * @description
+     * Falls die `id` fehlt, wird ein Status **400 (Bad Request)** gesendet.
+     * Falls kein Fahrrad gefunden wird, sollte ein Status **404 (Not Found)** folgen.
      */
     public async deleteFahrradById(req: Request, res: Response) : Promise<void>
     {
-        if(!req.body.fahrrad_id)
+        //#region Guard
+        if(!req.params.id)
         {
-            throw new Error(`Controller: Die übergebene ID zum löschen eines Datensatzes darf nicht null oder leer sein!`)
+            res.status(400).json({ error: "id ist ein Pflichtfeld!"});
         }
+        //#endregion
         
         try
         {
-            const result = await this.fahrradService.deleteFahrradById(req.body.fahrrad_id);
+            const result = await this.fahrradService.deleteFahrradById(parseInt(req.params.id));
 
             if (result === undefined) 
             {
@@ -245,18 +256,50 @@ export class FahrradController
 
         } catch (error)
         {
-
+            console.log(error);
+            res.status(500).json({ error: "Interner Server Fehler" });
         }
     }
 
-
-    public async editFahrradById(req: Request, res: Response) 
+    /**
+     * **Aktualisiert** ein spezifisches Feld eines Fahrrad-Datensatzes.
+     * @param req Der Express **Request** (erwartet `id`, `column` und `value` im Body).
+     * @param res Die Express **Response** (Status 200 bei Erfolg, 404 falls keine Änderung möglich).
+     * @description
+     * Falls die `id` oder `col` fehlt, wird ein Status **400 (Bad Request)** gesendet.
+     * Falls kein Fahrrad gefunden wird, sollte ein Status **404 (Not Found)** folgen.
+     */
+    public async editFahrradById(req: Request, res: Response) : Promise<void>
     {
-        if(!req.body.fahrrad_id)
+        //#region Guard
+        if(!req.params.id)
         {
-            throw new Error("Die Fahrrad-ID darf zum editieren eines Datensatzes nicht null oder leer sein.");
+            res.status(400).json({ error: "id ist ein Pflichtfeld." });
         }
+        if(!req.params.col)
+        {
+            res.status(400).json({ error: "col ist ein Pflichtfeld." });
+        }
+        //#endregion
 
-        
+        try
+        {
+            const result = await this.fahrradService.editFahrradById(parseInt(req.params.id), req.params.col, req.params.val);
+
+            if (result === undefined) 
+            {
+                console.log("Es konnten keine Änderungen vorgenommen werden!");
+                res.status(404).json(null);
+            } 
+            else
+            {
+                res.status(200).json(result)
+            }
+
+        } catch (error)
+        {
+            console.log(error);
+            res.status(500).json({ error: "Interner Server Fehler" });
+        }
     }
 }
