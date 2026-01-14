@@ -2,9 +2,17 @@ import { Fahrrad } from "../Models/Fahrrad";
 import { FahrradRepository } from "../Repository/FahrradRepository";
 
 /**
- * Der FahrradService enthält die Geschäftslogik (Business Logic) für die Verwaltung 
+ * Der FahrradService enthält die **Geschäftslogik (Business Logic)** für die Verwaltung 
  * von Fahrrad-Objekten. Er fungiert als Vermittler zwischen dem Controller und dem Repository.
  * Die Hauptaufgaben sind Validierung und Aufruf der Datenzugriffsmethoden.
+ * * Diese Klasse stellt folgende Methoden bereit:
+ * @function `async createNewFahrrad(fahrrad: Fahrrad) : Promise<Fahrrad | undefined>`
+ * @function `async findFahrradById(id: number) : Promise<Fahrrad | undefined>`
+ * @function `async findFahrradByString(column: string, value: string): Promise<any[] | undefined>`
+ * @function `async findFahrradByDate(column: string, date: Date): Promise<any[] | undefined>`
+ * @function `async findAllFahrrader(): Promise<any[] | undefined>`
+ * @function `async deleteFahrradById(id: number) : Promise<any[] | undefined>`
+ * @function `async editFahrradById(id: number, column: string, value: string) : Promise<any[] | undefined>`
  */
 export class FahrradService 
 {
@@ -25,11 +33,10 @@ export class FahrradService
     }
 
     /**
-     * Diese Methode prüft, ob das Fahrrad gültige Werte hat, übergibt das Fahrrad-Objekt
-     * zur weiteren Verarbeitung an das Repository und gibt das erfolgreich gespeicherte Objekt zurück. 
-     * @param fahrrad Das Fahrrad-Objekt, das in der Datenbank gespeichert werden soll.
-     * @returns Ein **Promise**, das entweder das gespeicherte `Fahrrad`-Objekt oder `undefined` zurückgibt (falls der Speichervorgang im Repository fehlschlägt, aber keine Ausnahme geworfen wird).
-     * @throws {Error} Wird geworfen, wenn das übergebene Fahrrad-Objekt `null` oder `undefined` ist. Der Fehlertext ist: `Service: Das Objekt [fahrrad] darf nicht null oder leer sein!`.
+     * **Validiert** ein **Fahrrad-Objekt** und übergibt es an das Repository **zum Speichern**.
+     * @param fahrrad Das Fahrrad-Objekt, das gespeichert werden soll.
+     * @returns Ein Promise, das das gespeicherte `Fahrrad`-Objekt (inkl. ID) oder `undefined` zurückgibt.
+     * @throws {Error} Wenn das Fahrrad-Objekt null oder undefined ist.
      */
     public async createNewFahrrad(fahrrad: Fahrrad): Promise<Fahrrad | undefined>
     {
@@ -44,17 +51,16 @@ export class FahrradService
     }
 
     /**
-     * Diese Methode nimmt eine ID entgegen, ruft den Repository-Layer auf und übergibt diesen die ID zur Suche nach dem gewünschten Objekt.
-     * @param id Die ID, mit der das Objekt in der Datenbank gesucht wird.
-     * @returns Ein **Promise**, das das gefundene `Fahrrad`-Objekt oder `undefined` zurückgibt, wenn kein Objekt gefunden wurde.
-     * @throws {Error} Wird geworfen, wenn eine ungültige ID (null, 0 oder negativ) übergeben wird. Der Fehlertext ist: `Service: Die Id darf nicht null sein!`.
-     * @throws {Error} Wird geworfen, wenn ein Fehler beim Aufrufen der Repository-Methode zur Suche auftritt. Der Fehlertext ist: `Service: Fehler beim Aufrufen des Fahrrads anhand der Id!`.
+     * **Sucht** ein einzelnes Fahrrad anhand seiner **ID** über das Repository.
+     * @param id Die eindeutige ID des Fahrrads.
+     * @returns Ein Promise, das das gefundene `Fahrrad`-Objekt oder `undefined` zurückgibt.
+     * @throws {Error} Wenn die ID null, 0 oder negativ ist ("Service: Die Id darf nicht null sein!").
+     * @throws {Error} Wenn beim Repository-Aufruf ein Fehler auftritt.
      */
     public async findFahrradById(id: number) : Promise<Fahrrad | undefined>
     {
         if(id == null || id <= 0)
         {
-            //console.log("DEBUG_SERVICE: ID: " + id);
             throw new Error ('Service: Die Id darf nicht null sein!');
         }
 
@@ -66,20 +72,20 @@ export class FahrradService
 
         } catch (error)
         {
-            throw new Error("Service: Fehler beim Aufrufen des Fahrrads anhand der Id!: " + error);
+            console.log(error);
+            throw new Error("Fehler: " + error);
         }
 
         return result;
     }
 
     /**
-     * Diese Methode übergibt dem Repository-Layer zwei Strings zum dynamischen Durchsuchen der Datenbank wie z.B. Zeile und Wert in Kombination.
-     * @param searchRow Die zu durchsuchende **Spalte** (z.B. 'marke', 'rahmenummer' etc.).
-     * @param searchValue Der zu suchende **Datenwert** (z.B. "CANYON", "CUBE" etc.).
-     * @returns Ein **Promise**, das das gefundene `Fahrrad`-Objekt oder `undefined` zurückgibt, falls keines gefunden wurde.
-     * @throws {Error} Wird geworfen, wenn `searchRow` ungültig (null/leer) ist. Der Fehlertext ist: `Service.Guard: Ungültige Zeile übergeben!`.
-     * @throws {Error} Wird geworfen, wenn `searchValue` ungültig (null/leer) ist. Der Fehlertext ist: `Service.Guard: Ungültigen Wert übergeben!`.
-     * @throws {Error} Wird geworfen, wenn bei der Repository-Abfrage ein unerwarteter Fehler auftritt. Der Fehlertext ist: `Service: Fehler beim Aufrufen des Fahrrads anhand der Zeile und des Wertes!`.
+     * **Sucht nach** Fahrrädern basierend auf einem **Spaltennamen** und einem **String-Wert**.
+     * @param searchRow Die zu durchsuchende Datenbankspalte.
+     * @param searchValue Der Suchbegriff (z.B. Marke).
+     * @returns Ein Promise, das ein **Array** gefundener Datensätze oder `undefined` zurückgibt.
+     * @throws {Error} Wenn Spalte oder Suchwert fehlen (Service.Guard Fehler).
+     * @throws {Error} Bei Fehlern während der Repository-Abfrage.
      */
     public async findFahrradByString(searchRow: string, searchValue: string): Promise<any[] | undefined>
     {
@@ -102,29 +108,28 @@ export class FahrradService
 
         } catch (error)
         {
-            throw new Error("Service: Fehler beim Aufrufen des Fahrrads anhand der Zeile und des Wertes!" + error);
+            console.log(error);
+            throw new Error("Fehler: " + error);
         }
 
         return result;
     }
 
     /**
-     * Sucht ein Fahrrad-Objekt anhand der angegebenen **Suchzeile** und des **Suchdatums** in der Datenbank.
-     * @param searchRow Die **Spalte** (z.B. 'kaufdatum'), die für die Suche verwendet werden soll.
-     * @param searchDate Das **Datum** (vom Typ `Date`), das für die Suche verwendet werden soll.
-     * @returns Ein **Promise**, das entweder das gefundene `Fahrrad`-Objekt oder `undefined` zurückgibt, wenn kein Eintrag gefunden wurde.
-     * @throws {Error} Wird geworfen, wenn `searchRow` ungültig (null/leer) ist.
-     * @throws {Error} Wird geworfen, wenn `searchDate` ungültig (null/leer) ist.
-     * @throws {Error} Wird geworfen, wenn bei der Datenbankabfrage ein Fehler auftritt. Der Fehlertext ist: `Service: Fehler beim Aufrufen des Fahrrads anhand der Zeile und des Datums!`.
+     * **Sucht nach** Fahrrädern basierend auf einer **Spalte** und einem **Datumswert**.
+     * @param searchRow Die Datumsspalte (z.B. 'erfasstAm').
+     * @param searchDate Das gesuchte Datum.
+     * @returns Ein Promise, das ein **Array** gefundener Datensätze oder `undefined` zurückgibt.
+     * @throws {Error} Wenn Spalte oder Datum fehlen (Service.Guard Fehler).
      */
-    public async findFahrradByDate(searchRow: string, searchDate: Date): Promise<any[] | undefined>
+    public async findFahrradByDate(column: string, date: Date): Promise<any[] | undefined>
     {
         //#region Guards
-        if(!searchRow) 
+        if(!column) 
         {
             throw new Error("Service.Guard: Ungültige Zeile übergeben!");
         }
-        if(!searchDate)
+        if(!date)
         {
             throw new Error("Service.Guard: Ungültiges Datum übergeben!");
         }
@@ -134,20 +139,21 @@ export class FahrradService
 
         try
         {
-            result = await this.fahrradRepository.findByDate(searchRow, searchDate);
+            result = await this.fahrradRepository.findByDate(column, date);
 
         } catch (error)
         {
-            throw new Error("Service: Fehler beim Aufrufen des Fahrrads anhand der Zeile und des Datums!");
+            console.log(error);
+            throw new Error("Fehler: " + error);
         }
 
         return result;
     }
 
     /**
-     * Sucht **alle** Fahrräder in der Datenbank und gibt sie als Array zurück.
-     * @returns Ein **Promise**, das ein Array von `Fahrrad`-Objekten oder `undefined` zurückgibt, wenn keine Fahrräder gefunden wurden.
-     * @throws {Error} Wird geworfen, wenn bei der Repository-Abfrage ein Fehler auftritt. Der Fehlertext ist: `Service: Fehler beim Aufrufen aller Fahrräder!`.
+     * Ruft **alle** vorhandenen **Fahrräder** aus der Datenbank ab.
+     * @returns Ein Promise, das ein Array aller Datensätze oder `undefined` zurückgibt.
+     * @throws {Error} Bei Fehlern während der Repository-Abfrage.
      */
     public async findAllFahrrader() : Promise<any[] | undefined>
     {
@@ -160,17 +166,17 @@ export class FahrradService
         } catch (error)
         {
             console.log(error);
+            throw new Error("Fehler: " + error);
         }
 
         return result;
     }
 
     /**
-     * Nimmt eine *ID* entgegen und leitet den **Löschvorgang** an das Repository weiter.
-     * @param id Die **ID** des Objektes, das gelöscht werden soll.
-     * @returns Ein **Promise**, das bei Erfolg das gelöschte `Fahrrad`-Objekt oder `undefined` zurückgibt, wenn kein Datensatz gefunden oder gelöscht wurde. 
-     * @throws {Error} Wird geworfen, wenn die übergebene ID ungültig (null/undefined) ist. Der Fehlertext ist: `Service: Fehler beim löschen eines Fahrrads!`.
-     * @throws {Error} Wird geworfen, wenn bei der Repository-Abfrage zum Löschen ein Fehler auftritt. Der Fehlertext ist: `Service: Fehler beim löschen eines Fahrrads!`.
+     * **Löscht** ein Fahrrad anhand seiner **ID**.
+     * @param fahrrad_id Die ID des zu löschenden Objektes.
+     * @returns Ein Promise mit den Informationen zur Löschung oder `undefined`.
+     * @throws {Error} Wenn die ID ungültig ist ("Service: Fehler beim löschen eines Fahrrads!").
      */
     public async deleteFahrradById(fahrrad_id: number) : Promise<any[] | undefined>
     {
@@ -189,7 +195,44 @@ export class FahrradService
 
         } catch (error)
         {
-            throw new Error("Service: Fehler beim löschen eines Fahrrads!");
+            console.log(error);
+            throw new Error("Fehler: " + error);
+        }
+
+        return result;
+    }
+
+    /**
+     * **Aktualisiert** einen spezifischen **Spaltenwert** eines Fahrrads.
+     * @param id Die ID des zu editierenden Fahrrads.
+     * @param column Die Datenbankspalte, die geändert werden soll.
+     * @param value Der neue Wert für die Spalte.
+     * @returns Ein Promise mit dem Ergebnis der Datenbankoperation oder `undefined`.
+     * @throws {Error} Wenn die ID oder Spalte nicht angegeben wurde.
+     */
+    public async editFahrradById(id: number, column: string, value: string): Promise<any[] | undefined>
+    {
+        //#region Guard
+        if(!id)
+        {
+            throw new Error("Service: ID zum editieren eines Objektes darf nicht null oder leer sein!");
+        }
+        if(!column)
+        {
+            throw new Error("Service: Die Zeile zum editieren eines Objektes darf nicht null oder leer sein!");
+        }
+        //#endregion
+
+        let result: any[] | undefined;
+
+        try
+        {
+            result = await this.fahrradRepository.editById(id, column, value);
+
+        } catch(error)
+        {
+            console.log(error);
+            throw new Error("Fehler: " + error);
         }
 
         return result;
