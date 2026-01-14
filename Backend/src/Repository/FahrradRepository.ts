@@ -9,17 +9,22 @@ import { error } from "node:console";
  * Es ist direkt für die Kommunikation mit der Datenbank (via SQL-Queries) und 
  * die Konvertierung von Datenbankzeilen in `Fahrrad`-Objekte zuständig.
  * * Diese Klasse stellt folgende Methoden bereit:
- * @function `async save(Fahrrad) : Promise<Fahrrad | undefined>`
- * @function `async findFahrradById(number) : Promise<Fahrrad | undefined>`
- * @function `async findByString(string, string): Promise<Fahrrad | undefined>`
- * @function `async findByDate(string, Date): Promise<Fahrrad | undefined>`
- * @function `async findAll(): Promise<Fahrrad[] | undefined>`
- * @function `async deleteById(number) : Promise<Fahrrad | undefined>`
+ * @function `async save(fahrrad: Fahrrad) : Promise<Fahrrad | undefined>`
+ * @function `async findFahrradById(id: number) : Promise<Fahrrad | undefined>`
+ * @function `async findByString(column: string, value: string): Promise<any[] | undefined>`
+ * @function `async findByDate(column: string, date: Date): Promise<any[] | undefined>`
+ * @function `async findAll(): Promise<any[] | undefined>`
+ * @function `async deleteById(id: number) : Promise<any[] | undefined>`
+ * @function `async editById(id: number, column: string, value: any) : Promise<any[] | undefined>`
  */
 export class FahrradRepository 
 {
     private allowedColumns: string[] = [];
 
+    /**
+     * Ruft die **Spaltennamen** der Tabelle 'fahrrad' ab, um **SQL-Injection** bei dynamischen Abfragen zu **verhindern**.
+     * @returns Ein Promise mit einem Array der Spaltennamen.
+     */
     private async getTableColumns(): Promise<string[]> 
     {
         if (this.allowedColumns.length > 0)
@@ -40,14 +45,12 @@ export class FahrradRepository
 
             return this.allowedColumns;
     }
-
     /**
-     * Diese Methode **erstellt** über eine SQL-Query ein **neues Fahrrad** in die Datenbank.
-     * Nach erfolgreicher Einfügung wird das neu erstellte Objekt zurückgegeben (mit der automatisch generierten ID).
+     * **Erstellt** über eine SQL-Query ein **neues Fahrrad** in der Datenbank.
+     * Nach erfolgreicher Einfügung wird das Objekt mit der generierten ID aktualisiert und zurückgegeben.
      * @param fahrrad Das Objekt vom Typ `Fahrrad`, das gespeichert werden soll.
-     * @returns Gibt über ein **Promise** entweder das gespeicherte `Fahrrad`-Objekt (mit ID) oder `undefined` zurück, wenn kein Datensatz verarbeitet wurde.
-     * @throws {Error} Wird geworfen, wenn das `fahrrad`-Objekt `null` oder `undefined` ist.
-     * @throws {Error} Wird geworfen, wenn bei der Datenbankoperation ein Fehler auftritt.
+     * @returns Gibt das gespeicherte `Fahrrad`-Objekt (mit ID) oder `undefined` zurück.
+     * @throws {Error} Wenn das `fahrrad`-Objekt fehlt oder ein Datenbankfehler auftritt.
      */
     public async save(fahrrad: Fahrrad) : Promise<Fahrrad | undefined>
     {
@@ -99,11 +102,10 @@ export class FahrradRepository
     }
 
     /**
-     * Diese Methode nimmt eine ID entgegen, baut eine Verbindung zur Datenbank auf, sucht ein Objekt anhand der ID und gibt dieses zurück.
-     * @param id Die ID, mit der das Objekt gesucht werden soll. 
-     * @returns Ein **Promise**, das entweder das gefundene `Fahrrad`-Objekt oder `undefined` zurückgibt, wenn kein Eintrag gefunden wurde.
-     * @throws {Error} Wird geworfen, wenn die ID ungültig (`null` oder `undefined`) ist.
-     * @throws {Error} Wird geworfen, wenn bei der Datenbankabfrage ein Fehler auftritt.
+     * **Sucht** ein spezifisches Fahrrad anhand seiner **eindeutigen ID**.
+     * @param id Die ID des gesuchten Fahrrads. 
+     * @returns Ein Promise, das entweder das gefundene `Fahrrad`-Objekt oder `undefined` zurückgibt.
+     * @throws {Error} Wenn die ID ungültig ist oder ein Datenbankfehler auftritt.
      */
     public async findFahrradById(id: number) : Promise<Fahrrad | undefined>
     {
@@ -142,12 +144,11 @@ export class FahrradRepository
     }
 
     /**
-     * Liest ein einzelnes Fahrrad-Objekt aus der Datenbank, indem es nach einem **String-Wert** in einer bestimmten **Spalte** sucht.
-     * @param searchRow Die **Spalte** (der Datenbankzeile), in der gesucht werden soll (z.B. 'marke', 'rahmennummer').
-     * @param searchValue Der **String-Wert**, nach dem in der angegebenen Spalte gesucht werden soll (z.B. 'CANYON', '12345').
-     * @returns Ein **Promise**, das entweder das gefundene `Fahrrad`-Objekt oder `undefined` zurückgibt, wenn kein Eintrag gefunden wurde.
-     * @throws {Error} Wirft einen **Error**, wenn `searchRow` oder `searchValue` ungültig (null/leer) sind.
-     * @throws {Error} Wirft einen **Error**, wenn bei der Datenbankabfrage ein Fehler auftritt.
+     * **Sucht nach** allen Fahrrädern, die in einer bestimmten Spalte einen bestimmten **String-Wert** aufweisen.
+     * @param searchRow Die Spalte, in der gesucht werden soll (z.B. 'marke').
+     * @param searchValue Der Wert, nach dem gefiltert wird.
+     * @returns Ein Promise mit einem **Array** von `Fahrrad`-Objekten oder `undefined`, wenn keine Treffer gefunden wurden.
+     * @throws {Error} Wenn die Spalte ungültig ist oder Parameter fehlen.
      */
     public async findByString(searchRow: string, searchValue: string): Promise<any[] | undefined> 
     {
@@ -199,12 +200,11 @@ export class FahrradRepository
     }
 
     /**
-     * Sucht ein einzelnes Fahrrad-Objekt in der Datenbank, indem es nach einem **Datumswert** in einer bestimmten **Spalte** sucht.
-     * @param searchRow Die **Spalte** (der Datenbankzeile), in der nach dem Datum gesucht werden soll (z.B. 'erfasstAm').
-     * @param searchDate Der **Datumswert** (`Date`-Objekt), nach dem in der angegebenen Spalte gesucht werden soll.
-     * @returns Ein **Promise**, das entweder das gefundene `Fahrrad`-Objekt oder `undefined` zurückgibt, wenn kein Eintrag gefunden wurde.
-     * @throws {Error} Wirft einen **Error**, wenn `searchRow` oder `searchDate` ungültig (null/leer) sind.
-     * @throws {Error} Wirft einen **Error**, wenn bei der Datenbankabfrage ein Fehler auftritt.
+     * **Sucht nach** allen Fahrrädern, die in einer **Datumsspalte** den angegebenen Wert aufweisen.
+     * @param searchRow Die Datumsspalte (z.B. 'erfasstAm').
+     * @param searchDate Das Datum, nach dem gesucht wird.
+     * @returns Ein Promise mit einem **Array** von `Fahrrad`-Objekten oder `undefined`.
+     * @throws {Error} Wenn die Spalte ungültig ist oder Parameter fehlen.
      */
     public async findByDate(searchRow: string, searchDate: Date): Promise<any[] | undefined>
     {
@@ -255,9 +255,8 @@ export class FahrradRepository
     }
     
     /**
-     * Sucht **alle** Fahrrad-Objekte in der Datenbank und wandelt die Antwort direkt in ein Array von `Fahrrad`-Objekten um.
-     * @returns Ein **Promise**, das ein Array von `Fahrrad`-Objekten (`Fahrrad[]`) zurückgibt. `undefined` wird zurückgegeben, wenn keine Einträge gefunden wurden.
-     * @throws {Error} Wird geworfen, wenn bei der Datenbankabfrage ein Fehler auftritt.
+     * Ruft **alle Datensätze** aus der Tabelle 'fahrrad' ab.
+     * @returns Ein Promise mit einem Array der rohen Datensätze (`any[]`) oder `undefined`.
      */
     public async findAll(): Promise<any[] | undefined>
     {
@@ -284,10 +283,10 @@ export class FahrradRepository
     }
 
     /**
-     * **Löscht** einen **Datensatz** eines Fahrrad-Objektes anhand der **ID**.
-     * @param id Die ID des zu löschenden Fahrrad-Objektes.
-     * @returns Gibt ein **Promise** zurück. Die aktuelle Implementierung gibt das Ergebnis der Datenbankoperation (z.B. betroffene Zeilen) zurück. Idealerweise sollte das *gelöschte* `Fahrrad`-Objekt oder `undefined` zurückgegeben werden.
-     * @throws {Error} Falls die übergebene ID ungültig ist.
+     * **Löscht** ein Fahrrad anhand seiner **ID** aus der Datenbank.
+     * @param fahrrad_id Die ID des zu löschenden Fahrrads.
+     * @returns Ein Promise mit dem Ergebnis der Datenbankoperation oder `undefined`, falls nichts gelöscht wurde.
+     * @throws {Error} Wenn die ID fehlt.
      */
     public async deleteById(fahrrad_id: number) : Promise<any[] | undefined>
     {
@@ -311,33 +310,52 @@ export class FahrradRepository
         return result;
     }
 
+    /**
+     * Editiert Daten in einem Datensatz.
+     * @param id Die ID des zu editierenden Objektes.
+     * @param column Die zu editierende Zeile des Objektes.
+     * @param value Der neue Datenfeldwert.
+     * @returns Gibt das editierte Objekt als Any-Array zurück und undefined falls das Array leer ist.
+     * @throws Falls die übergebene ID oder die übergebene Zeile leer ist, wird ein Error geworfen.
+     * @throws Bei einem Fehler in der Datenbank wird der Fehler geworfen.
+     */
     public async editById(id: number, column: string, value: any) : Promise<any[] | undefined>
     {
+        // #region Guard
         if (!id)
         {
             throw new Error("Repository Fehler: Die ID zum editieren darf nicht null oder leer sein.");
         }
+        if(!column)
+        {
+            throw new Error("Repository Fehler: Die Zeile zum editieren darf nicht null oder leer sein.");  
+        }
+        //#endregion
 
         try
         {
-        const allowedColumns = await this.getTableColumns();
+            const allowedColumns = await this.getTableColumns();
 
-        if(!allowedColumns.includes(column))
-        {
-            throw new Error("Ungültiger Spaltenname");
-        }
+            if(!allowedColumns.includes(column))
+            {
+                throw new Error("Ungültiger Spaltenname");
+            }
 
-        const stmt = 
-        `UPDATE fahrrad SET ${column} = ? WHERE fahrrad_id = ?`;
+            const stmt = 
+            `UPDATE fahrrad SET ${column} = ? WHERE fahrrad_id = ?`;
 
-        const result = await dbPool.execute(stmt, value); 
+            const result = await dbPool.execute(stmt, value);
 
-        return result;
+            if (!result) 
+            {
+                return undefined;
+            }
+
+            return result;
 
         } catch (error)
         {
             console.log("Fehler: " + error);
         }
-
     }
 }
