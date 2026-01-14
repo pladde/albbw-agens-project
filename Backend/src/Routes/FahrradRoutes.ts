@@ -15,9 +15,9 @@ export default function(fahrradController: FahrradController) {
 
     router.get('/', (req, res) => fahrradController.findAllFahrraeder(req, res));
 
-    router.delete('/id/:id', (req, res) => fahrradController.deleteFahrradById(req, res));
+    router.delete('/:id', (req, res) => fahrradController.deleteFahrradById(req, res));
 
-    router.put('/edit/:id/:col/:val', (req, res) => fahrradController.editFahrradById(req, res));
+    router.put('/:id/:col/:val', (req, res) => fahrradController.editFahrradById(req, res));
 
     return router;
 }
