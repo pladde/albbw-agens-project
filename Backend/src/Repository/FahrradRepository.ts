@@ -32,6 +32,7 @@ export class FahrradRepository
             return this.allowedColumns;
         }
 
+        // Gibt nur die Namen der Tabellenspalten zurück
         const stmt = `
             SELECT column_name 
             FROM information_schema.columns 
