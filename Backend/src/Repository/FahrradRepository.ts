@@ -46,6 +46,7 @@ export class FahrradRepository
 
             return this.allowedColumns;
     }
+    
     /**
      * **Erstellt** über eine SQL-Query ein **neues Fahrrad** in der Datenbank.
      * Nach erfolgreicher Einfügung wird das Objekt mit der generierten ID aktualisiert und zurückgegeben.
