@@ -9,32 +9,202 @@ Folgt...
 
 ---
 
-## 📬 Schnittstellen
+## 📬 Schnittstellen (API-Dokumentation)
 
-Die API für dieses Projekt liegt unter:
-```plaintext
-/api/fahrrad
-```
+Die Basis-URL für alle Endpunkte ist:  
+`http://localhost:3000/api/fahrrad`
 
-Folgende Schnittstellen sind verfügbar:
 
-Erstellen eines neues Fahrrads.
-/create 
-liefert das erstellte Objekt mit der ID zurück.
-Hier ein Beispiel:
-```plaintext
-JSON
+### 1. Fahrrad erstellen
+Legt einen neuen Datensatz in der Datenbank an.
+
+* **URL:** `api/fahrrad/`
+* **Methode:** `POST`
+
+***Request:***
+```json
 {
-    "fahrrad_id" : 0,
-    "marke" : "Canyon",
-    "rahmennummer" : "0815-123ABC",
-    "besonderheiten" : "Aerolenekr-Aufsatz",
-    "bearbeitungsstatus" : "gespendet",
-    "erfasstAm" : "YYYY-MM-DD HH:MI:SS",
-    "erfasstVon" : "Mustermann, Max",
-    "herausgegebenAn:" : "Musterfrau, Maria"
+    "marke": "BEISPIELMARKE",
+    "rahmennummer": "RHNr-0815",
+    "besonderheiten": "Beispieltext",
+    "bearbeitungsstatus": "angenommen",
+    "erfasstAm": "2026-01-14T13:00:00Z",
+    "erfasstVon": "MITARBEITER_ID",
+    "herausgegebenAn": "KUNDEN_ID",
+    "qrCode": "123456789QWERTZ"
 }
 ```
+***Response-Body: (200 OK)***
+```json
+{
+    "fahrrad_id" : 0815,
+    "marke": "BEISPIELMARKE",
+    "rahmennummer": "RHNr-0815",
+    "besonderheiten": "Beispieltext",
+    "bearbeitungsstatus": "angenommen",
+    "erfasstAm": "2026-01-14T13:00:00Z",
+    "erfasstVon": "MITARBEITER_ID",
+    "herausgegebenAn": "KUNDEN_ID",
+    "qrCode": "123456789QWERTZ"
+}
+```
+
+
+### 2. Alle Fahrräder abfragen
+Legt einen neuen Datensatz in der Datenbank an.
+
+* **URL:** `api/fahrrad/`
+* **Methode:** `GET`
+
+***Response-Body: (200 OK)***
+```json
+[
+    {
+        "fahrrad_id" : 0815,
+        "marke" : "BEISPIELMARKE",
+        "rahmennummer" : "RHNr-0815",
+        "besonderheiten" : "HIER KÖNNEN BESONDERHEITEN STEHEN",
+        "bearbeitungsstatus" : "angenommen",
+        "erfasstAm" : "YYYY-MM-DD HH:MM:SS",
+        "erfasstVon" : "MITARBEITER_ID",
+        "herausgegebenAn" : "KUNDEN_ID",
+        "qrCode" : "123456789QWERTZ" 
+    },
+    {
+        "fahrrad_id" : 1815,
+        "marke" : "BEISPIELMARKE",
+        "rahmennummer" : "RHNr-0816",
+        "besonderheiten" : "HIER KÖNNEN BESONDERHEITEN STEHEN",
+        "bearbeitungsstatus" : "angenommen",
+        "erfasstAm" : "YYYY-MM-DD HH:MM:SS",
+        "erfasstVon" : "MITARBEITER_ID",
+        "herausgegebenAn" : "KUNDEN_ID",
+        "qrCode" : "QWERTZ123456789" 
+    }
+]
+```
+
+
+### 3. Fahrrad anhand einer spzifischen ID abfragen
+
+
+* **URL:** `api/fahrrad/id/:id`
+* **Methode:** `GET`
+* **Parameter:** `id` (Ganzzahl)
+* **Beispiel-URL:** `GET /api/fahrrad/id/0815`
+
+***Response-Body: (200 OK)***
+```json
+{
+    "fahrrad_id" : 0815,
+    "marke" : "BEISPIELMARKE",
+    "rahmennummer" : "RHNr-0815",
+    "besonderheiten" : "HIER KÖNNEN BESONDERHEITEN STEHEN",
+    "bearbeitungsstatus" : "angenommen",
+    "erfasstAm" : "YYYY-MM-DD HH:MM:SS",
+    "erfasstVon" : "MITARBEITER_ID",
+    "herausgegebenAn" : "KUNDEN_ID",
+    "qrCode" : "123456789QWERTZ" 
+}
+```
+
+
+### 4. Fahrräder anhand eines Strings abfragen
+
+
+* **URL:** `api/fahrrad/string/:col/:val`
+* **Methode:** `GET`
+* **Parameter:** `col`, `val`
+* **Beispiel-URL:** `GET /api/fahrrad/string/rahmennummer&RHNr-0815`
+
+***Response-Body: (200 OK)***
+```json
+{
+    "fahrrad_id" : 0815,
+    "marke" : "BEISPIELMARKE",
+    "rahmennummer" : "RHNr-0815",
+    "besonderheiten" : "HIER KÖNNEN BESONDERHEITEN STEHEN",
+    "bearbeitungsstatus" : "angenommen",
+    "erfasstAm" : "YYYY-MM-DD HH:MM:SS",
+    "erfasstVon" : "MITARBEITER_ID",
+    "herausgegebenAn" : "KUNDEN_ID",
+    "qrCode" : "123456789QWERTZ" 
+}
+```
+
+
+### 5. Fahrräder anhand eines Datums abfragen
+
+
+* **URL:** `api/fahrrad/date/:col/:val`
+* **Methode:** `GET`
+* **Parameter:** `col`, `val`
+* **Beispiel-URL:** `GET /api/fahrrad/date/erfasstAm&2026-01-14`
+
+***Response-Body: (200 OK)***
+```json
+{
+    "fahrrad_id" : 0815,
+    "marke" : "BEISPIELMARKE",
+    "rahmennummer" : "RHNr-0815",
+    "besonderheiten" : "HIER KÖNNEN BESONDERHEITEN STEHEN",
+    "bearbeitungsstatus" : "angenommen",
+    "erfasstAm" : "YYYY-MM-DD HH:MM:SS",
+    "erfasstVon" : "MITARBEITER_ID",
+    "herausgegebenAn" : "KUNDEN_ID",
+    "qrCode" : "123456789QWERTZ" 
+}
+```
+
+
+### 6. Ein Fahrrad anhand seiner ID löschen
+
+
+* **URL:** `api/fahrrad/`
+* **Methode:** `DELETE`
+* **Parameter:** `id`
+* **Beispiel-URL:** `DELETE /api/fahrrad/0815`
+
+***Response-Body: (200 OK)***
+```json
+{
+    "fahrrad_id" : 0815,
+    "marke" : "BEISPIELMARKE",
+    "rahmennummer" : "RHNr-0815",
+    "besonderheiten" : "HIER KÖNNEN BESONDERHEITEN STEHEN",
+    "bearbeitungsstatus" : "angenommen",
+    "erfasstAm" : "YYYY-MM-DD HH:MM:SS",
+    "erfasstVon" : "MITARBEITER_ID",
+    "herausgegebenAn" : "KUNDEN_ID",
+    "qrCode" : "123456789QWERTZ" 
+}
+```
+
+
+### 7. Ein Fahrrad anhand seiner ID bearbeiten
+
+
+* **URL:** `api/fahrrad/:id/:col/:val`
+* **Methode:** `PUT`
+* **Parameter:** `id`, `col`, `val`
+* **Beispiel-URL:** `PUT /api/fahrrad/0815&marke&Cube`
+
+***Response-Body: (200 OK)***
+```json
+{
+    "fahrrad_id" : 0815,
+    "marke" : "Cube",
+    "rahmennummer" : "RHNr-0815",
+    "besonderheiten" : "HIER KÖNNEN BESONDERHEITEN STEHEN",
+    "bearbeitungsstatus" : "angenommen",
+    "erfasstAm" : "YYYY-MM-DD HH:MM:SS",
+    "erfasstVon" : "MITARBEITER_ID",
+    "herausgegebenAn" : "KUNDEN_ID",
+    "qrCode" : "123456789QWERTZ" 
+}
+```
+
+
 
 ---
 
