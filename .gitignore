@@ -27,6 +27,8 @@ yarn-error.log*
 # VS Code
 .vscode/settings.json
 .vscode/tasks.json
+# Git
+README.md
 
 # macOS
 .DS_Store
