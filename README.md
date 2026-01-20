@@ -1,4 +1,4 @@
-# 🌐 agens-fahrrad-projekt
+# 🌐 agens-fahrrad-projekt - FRONTEND
 ### *von Michel Poerschke*  
 
 ---
@@ -9,223 +9,43 @@ Folgt...
 
 ---
 
-## 📬 Schnittstellen (API-Dokumentation)
+## 🎨 MockUps
 
-Die Basis-URL für alle Endpunkte ist:  
-`http://localhost:3000/api/fahrrad`
+### **Screen 1 (Fahrrad-Root)**
 
-
-### 1. Fahrrad erstellen
-Legt einen neuen Datensatz in der Datenbank an.
-
-* **URL:** `api/fahrrad/`
-* **Methode:** `POST`
-
-***Request:***
-```json
-{
-    "marke": "BEISPIELMARKE",
-    "rahmennummer": "RHNr-0815",
-    "besonderheiten": "Beispieltext",
-    "bearbeitungsstatus": "angenommen",
-    "erfasstAm": "2026-01-14T13:00:00Z",
-    "erfasstVon": "MITARBEITER_ID",
-    "herausgegebenAn": "KUNDEN_ID",
-    "qrCode": "123456789QWERTZ"
-}
-```
-***Response-Body: (200 OK)***
-```json
-{
-    "fahrrad_id" : 0815,
-    "marke": "BEISPIELMARKE",
-    "rahmennummer": "RHNr-0815",
-    "besonderheiten": "Beispieltext",
-    "bearbeitungsstatus": "angenommen",
-    "erfasstAm": "2026-01-14T13:00:00Z",
-    "erfasstVon": "MITARBEITER_ID",
-    "herausgegebenAn": "KUNDEN_ID",
-    "qrCode": "123456789QWERTZ"
-}
-```
+![agens_fahrrad_mockups Screen 1](https://github.com/user-attachments/assets/c94d6b91-21f6-4f27-83e2-6c5fdd1d0f46)
 
 
-### 2. Alle Fahrräder abfragen
-Legt einen neuen Datensatz in der Datenbank an.
+### **Screen 2 (Fahrrad suchen)**
 
-* **URL:** `api/fahrrad/`
-* **Methode:** `GET`
+![agens_fahrrad_mockups Screen 2 (Fahrrad suchen)](https://github.com/user-attachments/assets/b3cfcfc1-a44a-4678-a72e-98c71f64c672)
 
-***Response-Body: (200 OK)***
-```json
-[
-    {
-        "fahrrad_id" : 0815,
-        "marke" : "BEISPIELMARKE",
-        "rahmennummer" : "RHNr-0815",
-        "besonderheiten" : "HIER KÖNNEN BESONDERHEITEN STEHEN",
-        "bearbeitungsstatus" : "angenommen",
-        "erfasstAm" : "YYYY-MM-DD HH:MM:SS",
-        "erfasstVon" : "MITARBEITER_ID",
-        "herausgegebenAn" : "KUNDEN_ID",
-        "qrCode" : "123456789QWERTZ" 
-    },
-    {
-        "fahrrad_id" : 1815,
-        "marke" : "BEISPIELMARKE",
-        "rahmennummer" : "RHNr-0816",
-        "besonderheiten" : "HIER KÖNNEN BESONDERHEITEN STEHEN",
-        "bearbeitungsstatus" : "angenommen",
-        "erfasstAm" : "YYYY-MM-DD HH:MM:SS",
-        "erfasstVon" : "MITARBEITER_ID",
-        "herausgegebenAn" : "KUNDEN_ID",
-        "qrCode" : "QWERTZ123456789" 
-    }
-]
-```
+##### **Screen 2 + PopUp (Fahrrad löschen))**
+FOLGT...
 
 
-### 3. Fahrrad anhand einer spzifischen ID abfragen
+### **Screen 3 (Fahrrad bearbeiten & hinzufügen**
 
-
-* **URL:** `api/fahrrad/id/:id`
-* **Methode:** `GET`
-* **Parameter:** `id` (Ganzzahl)
-* **Beispiel-URL:** `GET /api/fahrrad/id/0815`
-
-***Response-Body: (200 OK)***
-```json
-{
-    "fahrrad_id" : 0815,
-    "marke" : "BEISPIELMARKE",
-    "rahmennummer" : "RHNr-0815",
-    "besonderheiten" : "HIER KÖNNEN BESONDERHEITEN STEHEN",
-    "bearbeitungsstatus" : "angenommen",
-    "erfasstAm" : "YYYY-MM-DD HH:MM:SS",
-    "erfasstVon" : "MITARBEITER_ID",
-    "herausgegebenAn" : "KUNDEN_ID",
-    "qrCode" : "123456789QWERTZ" 
-}
-```
-
-
-### 4. Fahrräder anhand eines Strings abfragen
-
-
-* **URL:** `api/fahrrad/string/:col/:val`
-* **Methode:** `GET`
-* **Parameter:** `col`, `val`
-* **Beispiel-URL:** `GET /api/fahrrad/string/rahmennummer&RHNr-0815`
-
-***Response-Body: (200 OK)***
-```json
-{
-    "fahrrad_id" : 0815,
-    "marke" : "BEISPIELMARKE",
-    "rahmennummer" : "RHNr-0815",
-    "besonderheiten" : "HIER KÖNNEN BESONDERHEITEN STEHEN",
-    "bearbeitungsstatus" : "angenommen",
-    "erfasstAm" : "YYYY-MM-DD HH:MM:SS",
-    "erfasstVon" : "MITARBEITER_ID",
-    "herausgegebenAn" : "KUNDEN_ID",
-    "qrCode" : "123456789QWERTZ" 
-}
-```
-
-
-### 5. Fahrräder anhand eines Datums abfragen
-
-
-* **URL:** `api/fahrrad/date/:col/:val`
-* **Methode:** `GET`
-* **Parameter:** `col`, `val`
-* **Beispiel-URL:** `GET /api/fahrrad/date/erfasstAm&2026-01-14`
-
-***Response-Body: (200 OK)***
-```json
-{
-    "fahrrad_id" : 0815,
-    "marke" : "BEISPIELMARKE",
-    "rahmennummer" : "RHNr-0815",
-    "besonderheiten" : "HIER KÖNNEN BESONDERHEITEN STEHEN",
-    "bearbeitungsstatus" : "angenommen",
-    "erfasstAm" : "YYYY-MM-DD HH:MM:SS",
-    "erfasstVon" : "MITARBEITER_ID",
-    "herausgegebenAn" : "KUNDEN_ID",
-    "qrCode" : "123456789QWERTZ" 
-}
-```
-
-
-### 6. Ein Fahrrad anhand seiner ID löschen
-
-
-* **URL:** `api/fahrrad/`
-* **Methode:** `DELETE`
-* **Parameter:** `id`
-* **Beispiel-URL:** `DELETE /api/fahrrad/0815`
-
-***Response-Body: (200 OK)***
-```json
-{
-    "fahrrad_id" : 0815,
-    "marke" : "BEISPIELMARKE",
-    "rahmennummer" : "RHNr-0815",
-    "besonderheiten" : "HIER KÖNNEN BESONDERHEITEN STEHEN",
-    "bearbeitungsstatus" : "angenommen",
-    "erfasstAm" : "YYYY-MM-DD HH:MM:SS",
-    "erfasstVon" : "MITARBEITER_ID",
-    "herausgegebenAn" : "KUNDEN_ID",
-    "qrCode" : "123456789QWERTZ" 
-}
-```
-
-
-### 7. Ein Fahrrad anhand seiner ID bearbeiten
-
-
-* **URL:** `api/fahrrad/:id/:col/:val`
-* **Methode:** `PUT`
-* **Parameter:** `id`, `col`, `val`
-* **Beispiel-URL:** `PUT /api/fahrrad/0815&marke&Cube`
-
-***Response-Body: (200 OK)***
-```json
-{
-    "fahrrad_id" : 0815,
-    "marke" : "Cube",
-    "rahmennummer" : "RHNr-0815",
-    "besonderheiten" : "HIER KÖNNEN BESONDERHEITEN STEHEN",
-    "bearbeitungsstatus" : "angenommen",
-    "erfasstAm" : "YYYY-MM-DD HH:MM:SS",
-    "erfasstVon" : "MITARBEITER_ID",
-    "herausgegebenAn" : "KUNDEN_ID",
-    "qrCode" : "123456789QWERTZ" 
-}
-```
-
+![agens_fahrrad_mockups Screen 3 (Fahrrad bearbeiten_hinzufügen)](https://github.com/user-attachments/assets/38c51b1a-de67-4a24-b38b-b214f2a480e6)
 
 
 ---
 
 ## 🚀 Kernfunktion
 
-- Verwalten von Fahrrädern.
+- Auflisten/Ansehen von Fahrrad-Datensätzen aus der Datenbank.
+- Erstellen von Fahrrad-Datensätze in der Datenbank.
+- Bearbeiten von Fahrrad-Datensätzen in der Datenbank.
+- Löschen von Fahrrad-Datensätzen in der Datenbank.
 
 ---
 
-## 🛠️ Geplanter Tech-Stack
+## 🛠️ Tech-Stack
 
-#### **Backend**
-- Node.js(@Typescript), Express, body-parser
 #### **Frontend**
 - React
 #### **Stylesheet**
 - Bootstrap
-#### **Datenbank**
-- MariaDB
-#### **Testverfahren**
-- jest
 
 ---
 
@@ -233,48 +53,30 @@ Legt einen neuen Datensatz in der Datenbank an.
 
 Anleitung um das Projekt lauffähig zu bekommen.
 
-1. Installation aller Dependencies:
+1. Sicherstellen, dass wir uns in dem Frontend-Directory befinden:
+```plaintext
+cd frontend
+```
+
+2. Installation aller Dependencies:
 ```plaintext
 npm install
 ```
 
-2. Einstellungen:
+3. Einstellungen:
 ```plaintext
-.env einfügen
-.env konfigurieren
+npm start dev
 ```
 
-3. Um diesen Branch zu aktivieren:
-
+4. Diesen Branch zu aktivieren:
 ```plaintext
-git pull https://github.com/pladde/albbw-agens-project/tree/agens_fahrrad
-git checkout agens_fahrrad
-```
-4. Server starten
-```plaintext
-npx tsx server.ts
+git pull https://github.com/pladde/albbw-agens-project/tree/fahrrad/frontend
+git checkout fahrrad/frontend
 ```
 
 **Troubleshooting:**
 
-Folgender Fehler kann bei der Installation aufretten:
-
-```plaintext
-npm : Die Datei "C:\Program Files\nodejs\npm.ps1" kann nicht geladen werden, da die Ausführung von Skripts auf diesem System deaktiviert ist. Weitere Informationen 
-finden Sie unter "about_Execution_Policies" (https:/go.microsoft.com/fwlink/?LinkID=135170).
-In Zeile:1 Zeichen:1
-+ npm i
-+ ~~~
-    + CategoryInfo          : Sicherheitsfehler: (:) [], PSSecurityException
-    + FullyQualifiedErrorId : UnauthorizedAccess
-```
-
-
-Das ist ein sehr klassisches Problem unter Windows. Die Fehlermeldung bedeutet, dass die PowerShell-Ausführungsrichtlinie (Execution Policy) verhindert, dass Skripte (wie npm.ps1) ausgeführt werden. Das ist eine Sicherheitsmaßnahme von Windows, die standardmäßig recht streng eingestellt ist.
-Die Richtlinien des aktuellen Benutzers können mit folgendem Befehl geändert werden.
-```plaintext
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-```
+NOCH KEINE BUGS ENTDECKT
 
 ##### IN DIESE BRANCH DARF NUR NACH ABSPRACHE GEPUSHT WERDEN!
 
