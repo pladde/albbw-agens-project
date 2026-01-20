@@ -65,7 +65,7 @@ npm install
 
 3. Einstellungen:
 ```plaintext
-npm start dev
+npm run dev
 ```
 
 4. Diesen Branch zu aktivieren:
