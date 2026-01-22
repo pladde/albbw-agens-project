@@ -1,27 +1,29 @@
-import { Container, Breadcrumb, Image, Dropdown, DropdownItem  } from 'react-bootstrap';
+import { Container, Row, Breadcrumb, Image, Dropdown, DropdownItem  } from 'react-bootstrap';
+import logo from '../assets/agens_logo.png';
 
 export const Header = () => {
 
     return (
-        <Container>
-            <div>
-                <Breadcrumb></Breadcrumb>
-            </div>
+        <Container className='md-4'>
+            
+            <Row>
+                <col>
+                    <Breadcrumb>
+                    </Breadcrumb>
+                </col>
 
-            <div>
-                <Image></Image>
-            </div>
+                <col>
+                    <Image src={logo} alt='agens_logo'></Image>
+                </col>
 
-
-            <div>
+                <col>
                 <Dropdown>
                     <DropdownItem>Neukölln</DropdownItem>
                 </Dropdown>
-            </div>
-
-            <div>
-                <Image></Image>
-            </div>
+                <Image>
+                </Image>
+                </col>
+            </Row>
 
         </Container>
     );
