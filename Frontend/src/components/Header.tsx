@@ -1,62 +1,65 @@
 import { Container, Row, Col, Breadcrumb, Image, Form } from 'react-bootstrap';
+import { useLocation, Link } from 'react-router-dom';
 import logo from '../assets/agens_logo.png';
 import profilePicture from '../assets/agens_default_profile_picture.jpg';
 
-import type { HeaderProps } from '../types/BreadcrumbPath';
-
-export const Header: React.FC<HeaderProps> = ({ breadcrumbPaths } ) => {
+export const Header: React.FC = () => {
+    const location = useLocation();
+    
+    const pathnames = location.pathname.split('/').filter((x) => x);
 
     return (
-        <Container fluid style={{
-            background: 'linear-gradient(90deg, #425272 0%, #2C4371 100%)',
+        <Container className='fixed-top' fluid style={{
+            background: 'linear-gradient(90deg, #5d6a9e 0%, #3d405f 100%)',
             minHeight: '60px',
             display: 'flex',
-            alignItems: 'center'
-            }}>
-            
+            alignItems: 'center',
+            fontSize: '18px'
+        }}>
             <Row className='align-items-center justify-content-start w-100'>
 
-                {/* Breadcrumbs*/}
-                <Col xs={4} className="text-start">
-                    <Breadcrumb className='mb-0'>
-                        {breadcrumbPaths.map((path, index) => (
-                            <Breadcrumb.Item
-                                key={index}
-                                href={path.link}
-                                active={path.active}>
-                                    {path.label}
+                <Col xs={4}>
+                    <Breadcrumb className='mb-0' style={{paddingLeft: '100px',}}>
+
+                        <Breadcrumb.Item linkAs={Link} linkProps={{ to: "/" }}>
+                            Home
+                        </Breadcrumb.Item>
+                        {pathnames.map((value, index) => {
+                            const last = index === pathnames.length - 1;
+                            const to = `/${pathnames.slice(0, index + 1).join('/')}`;
+
+                            return (
+                                <Breadcrumb.Item 
+                                    key={to} 
+                                    active={last}
+                                    linkAs={last ? "span" : Link}
+                                    linkProps={last ? {} : { to }}
+                                >
+                                    {value.charAt(0).toUpperCase() + value.slice(1)}
                                 </Breadcrumb.Item>
-                        ))}
+                            );
+                        })}
                     </Breadcrumb>
                 </Col>
 
                 {/* Logo */}
                 <Col xs={4} className="text-center">
-                    <Image src={logo} alt='agens_logo' className="w-50"></Image>
+                    <Image src={logo} alt='agens_logo' className="w-50" />
                 </Col>
 
-                {/* Select-Form und Profilbild */}
+                {/* Form und Profilbild */}
                 <Col xs={4} className="d-flex align-items-center justify-content-end">
-
-                    {/* Select-Form */}
-                    <Form.Select 
-                        className='me-3 ' 
-                        aria-label='Standort auswählen'
-                        style={{ width: 'auto' }}>
-                            <option value='NK'>Neukölln</option>
-                            <option value='SP'>Spandau</option>
+                    <Form.Select className='me-4' style={{ width: '250px', height: '50px', fontSize: '20px'}}>
+                        <option value='NK'>Neukölln</option>
+                        <option value='SP'>Spandau</option>
                     </Form.Select>
-
-                    {/* Profilbild */}
                     <Image 
                         src={profilePicture} 
-                        alt='default_profile_picture' 
                         roundedCircle
-                        style={{height: '60px', width: '60px', objectFit: 'cover'}}>   
-                    </Image>
+                        style={{height: '60px', width: '60px', objectFit: 'cover'}} />
                 </Col>
-            </Row>
 
+            </Row>
         </Container>
     );
 };
