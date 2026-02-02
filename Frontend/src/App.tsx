@@ -3,8 +3,8 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AddFahrrad } from './pages/AddFahrrad';
 import { SearchFahrrad } from './pages/SearchFahrrad';
 import { Home } from './pages/Home';
-//import { fahrradService } from './services/fahrradService';
-import { Header } from './components/Header';
+// import { fahrradService } from './services/fahrradService';
+// import { Header } from './components/Header';
 
 
 function App() 
@@ -15,7 +15,6 @@ function App()
         <Route path='/' element={<Home/>} />
         <Route path='/erfassen' element={<AddFahrrad />} />
         <Route path='/suchen' element={<SearchFahrrad />} />
-        <Route path='/header' element={<Header />} />
       </Routes>
     </Router>
   );
