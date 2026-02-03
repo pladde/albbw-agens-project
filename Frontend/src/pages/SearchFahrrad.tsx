@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Container, Card, Form, Row, Col, InputGroup, Table, Button, Modal } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import 'bootstrap-icons/font/bootstrap-icons.css'; // Lupenicons noch klickbar machen
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
 export const SearchFahrrad = () => {
   const navigate = useNavigate();
