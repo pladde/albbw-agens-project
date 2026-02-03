@@ -1,6 +1,9 @@
 import { Container, Row, Col, Button } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 
 export const Home = () => {
+  const navigate = useNavigate();
+
   return (
     <Container 
       fluid 
@@ -9,11 +12,13 @@ export const Home = () => {
     >
       <Row>
         <Col className="d-flex flex-column align-items-center gap-3">
-          <Button style={{ width: '280px', height: '150px', background: '#5a70a1', border: '#5a70a1', fontSize: '28px'}}>
+          <Button style={{ width: '280px', height: '150px', background: '#5374a5', border: '#5374a5', fontSize: '28px'}}
+                  onClick={() => navigate('/erfassen')}>
             Fahrrad erfassen
           </Button>
 
-          <Button style={{ width: '280px', height: '150px', background: '#5a70a1', border: '#5a70a1', fontSize: '28px'}}>
+          <Button style={{ width: '280px', height: '150px', background: '#5374a5', border: '#5374a5', fontSize: '28px'}}
+                  onClick={() => navigate('suchen')}>
             Fahrrad suchen
           </Button>
         </Col>
