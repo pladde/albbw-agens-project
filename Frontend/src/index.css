@@ -80,12 +80,10 @@ button:focus-visible {
     color: #b0b0b0 !important;
     text-decoration: none;
 }
-
 /* Hover-Effekt */
 .breadcrumb-item a:hover {
     color: #ff0000 !important;
 }
-
 /* actives Element */
 .breadcrumb-item.active {
     color: #ffffff !important;
