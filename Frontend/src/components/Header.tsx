@@ -10,7 +10,7 @@ export const Header: React.FC = () => {
 
     return (
         <Container className='fixed-top' fluid style={{
-            background: 'linear-gradient(90deg, #5d6a9e 0%, #3d405f 100%)',
+            background: 'linear-gradient(90deg, #5374a5 0%, #324360 100%)',
             minHeight: '60px',
             display: 'flex',
             alignItems: 'center',
@@ -33,8 +33,7 @@ export const Header: React.FC = () => {
                                     key={to} 
                                     active={last}
                                     linkAs={last ? "span" : Link}
-                                    linkProps={last ? {} : { to }}
-                                >
+                                    linkProps={last ? {} : { to }}>
                                     {value.charAt(0).toUpperCase() + value.slice(1)}
                                 </Breadcrumb.Item>
                             );
