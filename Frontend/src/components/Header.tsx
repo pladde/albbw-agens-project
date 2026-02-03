@@ -9,12 +9,15 @@ export const Header: React.FC = () => {
     const pathnames = location.pathname.split('/').filter((x) => x);
 
     return (
-        <Container className='fixed-top' fluid style={{
+        <Container className='sticky-top' fluid style={{
             background: 'linear-gradient(90deg, #5374a5 0%, #324360 100%)',
             minHeight: '60px',
             display: 'flex',
             alignItems: 'center',
-            fontSize: '18px'
+            fontSize: '18px',
+            top: 0,
+            left: 0,
+            right: 0
         }}>
             <Row className='align-items-center justify-content-start w-100'>
 
