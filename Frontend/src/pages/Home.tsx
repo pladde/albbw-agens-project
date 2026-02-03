@@ -8,19 +8,26 @@ export const Home = () => {
     <Container 
       fluid 
       className="d-flex align-items-center justify-content-center"
-      style={{ minWidth: "100vw", minHeight: "100vh", background: '#e7e7e7' }}
-    >
+      style={{ minWidth: "100%", minHeight: "80vh"}} >
       <Row>
         <Col className="d-flex flex-column align-items-center gap-3">
-          <Button style={{ width: '280px', height: '150px', background: '#5374a5', border: '#5374a5', fontSize: '28px'}}
+        
+          {/* Erfassen-Button */}
+          <Button variant='none'
+                  className='agens-button-primary'
+                  style={{ width: '280px', height: '150px', fontSize: '28px'}}
                   onClick={() => navigate('/erfassen')}>
             Fahrrad erfassen
           </Button>
 
-          <Button style={{ width: '280px', height: '150px', background: '#5374a5', border: '#5374a5', fontSize: '28px'}}
+          {/* Suchen-Button */}
+          <Button variant='none'
+                  className='agens-button-primary'
+                  style={{ width: '280px', height: '150px', fontSize: '28px'}}
                   onClick={() => navigate('suchen')}>
             Fahrrad suchen
           </Button>
+
         </Col>
       </Row>
     </Container>
