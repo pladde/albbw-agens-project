@@ -1,51 +1,101 @@
 // Screen 2
-
 import {useState} from 'react';
-import { Container, Form, Button } from 'react-bootstrap';
+import { Container, Form, Button, Row, Col } from 'react-bootstrap';
+import '../assets/css/custom-style.css';
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
 export const AddFahrrad = () => {
 
+    const [id, setId] = useState<string>('');
     const [marke, setMarke] = useState<string>('');
     const [rahmennummer, setRahmennummer] = useState<string>('');
     const [besonderheiten, setBesonderheiten] = useState<string>('');
     const [bearbeitungsstatus, setBearbeitungsstatus] = useState<string>('');
+    const [date, setDate] = useState<string>('');
 
     return (
-        <Container className='mt-4'>
-            <Form className='mb-3'>
-                <Form.Label>Marke:</Form.Label>
+        <Container className='py-4' >
+            {/* FahrradID + InfoButton */}
+            <Form.Group className='mb-3'>
+                <Form.Label>
+                    Fahrrad-ID
+                    <i 
+                    style={{
+                    fontSize: '12px',
+                    marginLeft: '2px',
+                    verticalAlign: 'super',
+                    color: '#5374a5'
+                    }}
+                    className='bi bi-info-circle-fill'
+                    > 
+                    </i>
+                </Form.Label>
+                <Form.Control
+                    type='text'
+                    value={id}
+                    disabled
+                    style={{ 
+                        width: '140px', // Fest, da klein genug für alle Handys
+                        backgroundColor: '#b3b3b3', 
+                        border: 'none'
+                    }}
+                    >
+                </Form.Control>
+            </Form.Group>
+
+            {/* Marke */}
+            <Form.Group className='mb-3'>
+                <Form.Label>Marke</Form.Label>
                 <Form.Control 
                     type='text' 
                     placeholder='z.B. Canyon'
+                    style={{ width: '100%', maxWidth: '300px' }}
                     value={marke}
                     onChange={(e) => setMarke(e.target.value)} />
-            </Form>
+            </Form.Group>
 
-            <Form className='mb-3'>
-                <Form.Label>Rahmenummer:</Form.Label>
+            {/* Rahmennummer */}
+            <Form.Group className='mb-3'>
+                <Form.Label>Rahmennummer</Form.Label>
                 <Form.Control 
                     type='text' 
                     placeholder='z.B. RH-0815'
+                    style={{ width: '100%', maxWidth: '300px' }}
                     value={rahmennummer}
                     onChange={(e) => setRahmennummer(e.target.value)} />
-            </Form>
+            </Form.Group>
 
-            <Form className='mb-3'>
-                <Form.Label>Besonderheiten:</Form.Label>
-                <Form.Control 
-                    type='text'
-                    placeholder='z.B. Aerolenkeraufsatz'
-                    value={besonderheiten}
-                    onChange={(e) => setBesonderheiten(e.target.value)} /> 
-            </Form>
-
+            {/* Besonderheiten */}
             <Form.Group className='mb-3'>
-            <Form.Label>Bearbeitungsstatus:</Form.Label>
+                <Form.Label>Besonderheiten</Form.Label>
+                <Form.Control 
+                    as='textarea'
+                    rows={5}
+                    placeholder='z.B. Aerolenkeraufsatz'
+                    style={{ width: '100%', maxWidth: '500px' }}
+                    value={besonderheiten}
+                    onChange={(e) => setBesonderheiten(e.target.value)}>
+                </Form.Control>
+            </Form.Group>
+
+            {/* Datum */}
+            <Form.Group className='mb-3'>
+                <Form.Label>Eingangsdatum</Form.Label>
+                <div className="d-flex flex-wrap gap-2">
+                    <Form.Control type="number" placeholder="31" style={{ width: '65px' }} />
+                    <Form.Control type="number" placeholder="12" style={{ width: '65px' }} />
+                    <Form.Control type="number" placeholder="2026" style={{ width: '100px' }} />
+                </div>
+            </Form.Group>
+
+            {/* Bearbeitungsstatus */}
+            <Form.Group className='mb-3'>
+            <Form.Label>Bearbeitungsstatus</Form.Label>
                 <Form.Select
                     value={bearbeitungsstatus}
                     onChange={(e) => setBearbeitungsstatus(e.target.value)}>
 
-                    <option value="" disabled hidden>Status wählen...</option>
+                    <option value='' disabled hidden>Status wählen...</option>
                     <option value='1'>angenommen</option>
                     <option value='2'>in Bearbeitung</option>
                     <option value='3'>verfügbar</option>
@@ -53,10 +103,42 @@ export const AddFahrrad = () => {
                 </Form.Select>
             </Form.Group>
 
-            <Form className='mb-3'>
-                <Button>senden</Button>
-            </Form>
+            {/* Kunde/Einrichtung */}
+            <Form.Group className='mb-3'>
+                <Form.Label>Kunde/Einrichtung</Form.Label>
+                <Row fluid>
+                    <Col xs={12} md={12} lg={5}>
+                        <Form.Select>
+                            <option value='' disabled hidden>Kunden wählen...</option>
+                            <option value='Musterkunde'>Musterkunde</option>
+                            <option value='Mustereinrichtunng'>Mustereinrichtunng</option>
+                        </Form.Select>
+                    </Col>
+
+                    <Col xs={12} md={12} lg={2}>
+                        <Form.Label>oder</Form.Label>
+                    </Col>
+
+                    <Col xs={12} md={12} lg={5}>
+                        <Button variant='none' className='agens-button-secondary' style={{ width: '140px' }}>
+                            neuen Kunden anlegen
+                        </Button>
+                    </Col>
+                </Row>
+            </Form.Group>
+
+            {/* Senden-Button */}
+            <Form.Group className='mt-4'>
+                <Button
+                    variant='none'
+                    className='agens-button-primary' style={{ width: '140px'}}>senden</Button>
+            </Form.Group>
+            <Button 
+                className='agens-button-primary' 
+                style={{ position: 'fixed', bottom: '20px', right: '20px', width: '140px'
+                }}
+                >zurück
+                </Button>
         </Container>
     );
 }
-// Später werde ich noch den Kunden hinzufügen, an dem das Fahrrad geht. Zu Testzwecken wird das noch nicht implementiert.
