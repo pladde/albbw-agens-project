@@ -35,6 +35,24 @@ export const fahrradService = {
         }
     },
 
+    fetchHead: async (): Promise<string[] | null> => {
+        try
+        {
+            const response = await fetch(`${API_URL}/th`);
+            if(!response.ok)
+            {
+                throw new Error('Netzwerk-Fehler (fetchAll)');
+            }
+
+            return await response.json();
+
+        } catch (error)
+        {
+            console.error("Fehler beim Abrufen (fetchHead): " , error);
+            return null;  
+        }
+    },
+
     /**
      * Ruft **alle** vorhandenen **Fahrräder** aus der Datenbank ab.
      * @returns {Promise<IFahrrad[] | null>} Ein Array aller Fahrräder oder `null` bei Fehler.
