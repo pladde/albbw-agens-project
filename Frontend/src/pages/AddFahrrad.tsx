@@ -1,10 +1,14 @@
 // Screen 2
 import {useState} from 'react';
 import { Container, Form, Button, Row, Col } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 import '../assets/css/custom-style.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
+
 export const AddFahrrad = () => {
+    const navigate = useNavigate();
+
 
     const [id, setId] = useState<string>('');
     const [marke, setMarke] = useState<string>('');
@@ -82,14 +86,14 @@ export const AddFahrrad = () => {
             <Form.Group className='mb-3'>
                 <Form.Label>Eingangsdatum</Form.Label>
                 <div className="d-flex flex-wrap gap-2">
-                    <Form.Control type="number" placeholder="31" style={{ width: '65px' }} />
-                    <Form.Control type="number" placeholder="12" style={{ width: '65px' }} />
-                    <Form.Control type="number" placeholder="2026" style={{ width: '100px' }} />
+                    <Form.Control type="number" placeholder='TT' style={{ width: '65px' }} />
+                    <Form.Control type="number" placeholder='MM' style={{ width: '65px' }} />
+                    <Form.Control type="number" placeholder='YYYY'style={{ width: '100px' }} />
                 </div>
             </Form.Group>
 
             {/* Bearbeitungsstatus */}
-            <Form.Group className='mb-3'>
+            <Form.Group className='mb-3' style={{maxWidth: '200px', width: '100%'}}>
             <Form.Label>Bearbeitungsstatus</Form.Label>
                 <Form.Select
                     value={bearbeitungsstatus}
@@ -106,7 +110,7 @@ export const AddFahrrad = () => {
             {/* Kunde/Einrichtung */}
             <Form.Group className='mb-3'>
                 <Form.Label>Kunde/Einrichtung</Form.Label>
-                <Row fluid>
+                <Row style={{maxWidth: '600px', width: '100%'}}>
                     <Col xs={12} md={12} lg={5}>
                         <Form.Select>
                             <option value='' disabled hidden>Kunden wählen...</option>
@@ -115,12 +119,12 @@ export const AddFahrrad = () => {
                         </Form.Select>
                     </Col>
 
-                    <Col xs={12} md={12} lg={2}>
+                    <Col xs={12} md={2} lg={2}>
                         <Form.Label>oder</Form.Label>
                     </Col>
 
                     <Col xs={12} md={12} lg={5}>
-                        <Button variant='none' className='agens-button-secondary' style={{ width: '140px' }}>
+                        <Button variant='none' className='agens-button-secondary' style={{ maxWidth: '200px', width: '100%' }}>
                             neuen Kunden anlegen
                         </Button>
                     </Col>
@@ -137,6 +141,7 @@ export const AddFahrrad = () => {
                 className='agens-button-primary' 
                 style={{ position: 'fixed', bottom: '20px', right: '20px', width: '140px'
                 }}
+                onClick={() => {navigate('/')}}
                 >zurück
                 </Button>
         </Container>
