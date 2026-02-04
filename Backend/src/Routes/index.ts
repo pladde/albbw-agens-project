@@ -2,7 +2,7 @@ import { Router } from 'express';
 import fahrradRoutes from './FahrradRoutes';
 
 import { FahrradRepository } from '../Repository/FahrradRepository';
-import { FahrradService } from '../Service/FahrradService';;
+import { FahrradService } from '../Service/FahrradService';
 import { FahrradController } from '../Controller/FahrradController';
 
 const fahrradRepository = new FahrradRepository();
