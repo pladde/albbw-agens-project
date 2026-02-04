@@ -1,11 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Container, Card, Form, Row, Col, InputGroup, Table, Button, Modal } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import '../services/fahrradService';
 import '../assets/css/custom-style.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
+import { fahrradService } from '../services/fahrradService';
 
 export const SearchFahrrad = () => {
   const navigate = useNavigate();
+  const [fahrraeder, setFahrraeder] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const columns = fahrradService.fetchHead();
 
   return (
     <Container className='py-4'>
@@ -69,16 +75,16 @@ export const SearchFahrrad = () => {
       </Row>
       {/* // #endregion */}
 
+      <div className='text-center'>
+        <Button className='my-4 agens-button-primary'>alle Fahrräder anzeigen</Button>
+      </div>
+
       {/* // #region Tabellen-Bereich (Inhalt der Datenbank) */}
       <Row>
         <Table striped bordered hover className='my-4'>
           <thead>
             <tr>
-              <th className='agens-theme-blue'>Fahrrad-ID</th>
-              <th className='agens-theme-blue'>Marke</th>
-              <th className='agens-theme-blue'>Rahmennummer</th>
-              <th className='agens-theme-blue'>Bearbeitungsstatus</th>
-              <th className='agens-theme-blue'>Datum</th>
+
             </tr>
           </thead>
         </Table>
