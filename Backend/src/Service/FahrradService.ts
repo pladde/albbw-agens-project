@@ -32,6 +32,11 @@ export class FahrradService
         this.fahrradRepository = fahrradRepository;
     }
 
+    public async getTableColumns () : Promise<string[]> {
+            
+        return this.fahrradRepository.getTableColumns();
+    }
+
     /**
      * **Validiert** ein **Fahrrad-Objekt** und übergibt es an das Repository **zum Speichern**.
      * @param fahrrad Das Fahrrad-Objekt, das gespeichert werden soll.
@@ -47,7 +52,7 @@ export class FahrradService
         }
         //#endregion
 
-        return this.fahrradRepository.save(fahrrad);
+        return await this.fahrradRepository.save(fahrrad);
     }
 
     /**

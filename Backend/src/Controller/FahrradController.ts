@@ -33,6 +33,31 @@ export class FahrradController
     }
 
     /**
+     * Ließt alle **Nichtschlüssel-Merkmale** aus und gibt sie als `JSON`-Objekt zurück.
+     * @param res Die Express **Response** (sendet Status 200 bei Erfolg oder 404/500 bei Fehlern)
+     */
+    public async getTableColums (req: Request, res: Response) : Promise<void>
+    {
+        try 
+        {
+            const columns = await this.fahrradService.getTableColumns();
+
+            if(columns.length > 0)
+            {
+                res.status(200).json(columns);
+            }
+            else 
+            {
+                res.status(404).json(`Es wurden keine Nichtschlüssel-Merkmale gefunden.`)
+            }
+        } catch (error) 
+        {
+            console.log(error);
+            res.status(500).json({ error: "Interner Server Fehler" });
+        }
+    }
+
+    /**
      * **Erstellt** aus den Daten im Request-Body einen neuen Datensatz in der Datenbank.
      * @param req Der Express **Request** (erwartet Fahrrad-Attribute im Body).
      * @param res Die Express **Response** (sendet Status 200 bei Erfolg oder 404/500 bei Fehlern).

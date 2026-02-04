@@ -25,7 +25,7 @@ export class FahrradRepository
      * Ruft die **Spaltennamen** der Tabelle 'fahrrad' ab, um **SQL-Injection** bei dynamischen Abfragen zu **verhindern**.
      * @returns Ein Promise mit einem Array der Spaltennamen.
      */
-    private async getTableColumns(): Promise<string[]> 
+    public async getTableColumns(): Promise<string[]> 
     {
         if (this.allowedColumns.length > 0)
         {
