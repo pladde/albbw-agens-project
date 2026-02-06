@@ -36,7 +36,7 @@ export class FahrradController
      * Ließt alle **Nichtschlüssel-Merkmale** aus und gibt sie als `JSON`-Objekt zurück.
      * @param res Die Express **Response** (sendet Status 200 bei Erfolg oder 404/500 bei Fehlern)
      */
-    public async getTableColums (req: Request, res: Response) : Promise<void>
+    public async getTableColumns (req: Request, res: Response) : Promise<void>
     {
         try 
         {
