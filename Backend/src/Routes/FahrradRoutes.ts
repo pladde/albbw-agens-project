@@ -7,7 +7,7 @@ export default function(fahrradController: FahrradController) {
 
     router.post('/', (req, res) => fahrradController.saveFahrrad(req, res));
 
-    router.get('/th', (req, res) => fahrradController.getTableColums(req, res));
+    router.get('/th', (req, res) => fahrradController.getTableColumns(req, res));
 
     router.get('/id/:id', (req, res) => fahrradController.findFahrradById(req, res));
 
