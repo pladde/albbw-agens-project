@@ -32,7 +32,7 @@ export class FahrradService
         this.fahrradRepository = fahrradRepository;
     }
 
-    public async getTableColumns () : Promise<string[]> {
+    public async getTableColumns() : Promise<string[]> {
             
         return this.fahrradRepository.getTableColumns();
     }
