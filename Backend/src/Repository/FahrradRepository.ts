@@ -1,8 +1,6 @@
 import { Fahrrad } from "../Models/Fahrrad";
 import dbPool from "../config/db"
 import { RowToObject } from "../Util/RowToObject";
-import { Pool } from 'mysql2/promise';
-import { error } from "node:console";
 
 /**
  * Das FahrradRepository ist die Datenzugriffsschicht (Data Access Layer - DAL).
@@ -255,13 +253,13 @@ export class FahrradRepository
      * Ruft **alle Datensätze** aus der Tabelle 'fahrrad' ab.
      * @returns Ein Promise mit einem Array der rohen Datensätze (`any[]`) oder `undefined`.
      */
-    public async findAll(): Promise<any[] | undefined>
+    public async findAll(limit: number = 50, offset: number = 0): Promise<any[] | undefined>
     {
         try 
         {
-            const stmt = "SELECT * FROM fahrrad";
+            const stmt = 'SELECT * FROM fahrrad LIMIT ? OFFSET ?';
         
-            const [allResults] = await dbPool.execute(stmt);
+            const [allResults] = await dbPool.execute(stmt, [limit, offset]);
     
             const resultList = allResults as any[];
     
