@@ -8,10 +8,40 @@ import { fahrradService } from '../services/fahrradService';
 
 export const SearchFahrrad = () => {
   const navigate = useNavigate();
-  const [fahrraeder, setFahrraeder] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [columns, setColumns] = useState<string[]>([]);
+  const [load, setLoad] = useState<boolean>(true);
+  const [allFahrraeder, setAllFahrraeder] = useState<Record<string, any>[]>([]);
+  const [fahrraeder, setfahrraeder] = useState<Record<string, any>>([]);
+  const [hasLoaded, setHasLoaded] = useState(false);
 
-  const columns = fahrradService.fetchHead();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [idSearch, setIdSearch] = useState('');
+  const [markeSearch, setMarkeSearch] = useState('');
+  const [rahmennummerSearch, setRahmennummerSearchSearch] = useState('');
+  const [bearbeitungsstatusSearch, setBearbeitungsstatusSearch] = useState('');
+
+  const handleShowAllFahrrader = async () => {
+    const data = await fahrradService.fetchAll();
+    if (data) {
+      setAllFahrraeder(data);
+    }
+    setHasLoaded(true)
+  };
+
+  useEffect(() => {
+    const loadHeader = async () => {
+      const data = await fahrradService.fetchHead();
+      if (data) {
+        setColumns(data)
+      }
+      setLoad(false)
+    };
+    loadHeader();
+  }, []);
+  
+  if (load) {
+    return <div className="spinner-border text-primary"></div>;
+  };
 
   return (
     <Container className='py-4'>
@@ -23,7 +53,11 @@ export const SearchFahrrad = () => {
           <Form.Label>
             Fahrrad-ID
           </Form.Label>
-          <Form.Control placeholder='z.B. NK-001'>
+          <Form.Control 
+            placeholder='z.B. NK-001'
+            value={idSearch}
+            onChange={(e) => setIdSearch(e.target.value)}
+            >
           </Form.Control>
         </Form.Group>
         </Col>
@@ -33,7 +67,10 @@ export const SearchFahrrad = () => {
             <Form.Label>
               Marke
             </Form.Label>
-            <Form.Control placeholder='z.B. Canyon'>
+            <Form.Control placeholder='z.B. Canyon'
+              value={markeSearch}
+              onChange={(e) => setMarkeSearch(e.target.value)}
+              >
             </Form.Control>
           </Form.Group>
         </Col>
@@ -43,7 +80,10 @@ export const SearchFahrrad = () => {
             <Form.Label>
               Rahmennummer
             </Form.Label>
-            <Form.Control>
+            <Form.Control
+              value={rahmennummerSearch}
+              onChange={(e) => setRahmennummerSearchSearch(e.target.value)}
+            >
             </Form.Control>
           </Form.Group>
         </Col>
@@ -53,7 +93,10 @@ export const SearchFahrrad = () => {
             <Form.Label>
               Bearbeitungsstatus
             </Form.Label>
-            <Form.Select>
+            <Form.Select
+              value={bearbeitungsstatusSearch}
+              onChange={(e) => setBearbeitungsstatusSearch(e.target.value)}
+            >
               <option value={0} hidden >Bitte wählen...</option>
               <option value={1}>platzhalter1</option>
             </Form.Select>
@@ -75,32 +118,56 @@ export const SearchFahrrad = () => {
       </Row>
       {/* // #endregion */}
 
-      <div className='text-center'>
-        <Button className='my-4 agens-button-primary'>alle Fahrräder anzeigen</Button>
-      </div>
-
       {/* // #region Tabellen-Bereich (Inhalt der Datenbank) */}
       <Row>
         <Table responsive striped bordered hover className='my-4'>
           <thead>
             <tr>
-            
+              {/* Erstellt den Tabellen-Header */}
+              {columns.map((name) => (
+                <th className='agens-theme-blue' key={name} scope='col'>
+                  {name
+                    .replace('_', '-')
+                    .replace(name.charAt(0), name.charAt(0).toUpperCase())
+                    .replace('-id', '-ID')
+                    }
+                </th>
+              ))}
             </tr>
           </thead>
+          { /* Erstellt und befüllt den Tabellen-Body mit den Fahrrädern aus der Datenbank */}
+          <tbody>
+            {allFahrraeder.map((row, rowIndex) => (
+              <tr key={rowIndex}>
+                {columns.map((colName) => (
+                  <td key={colName}>
+                    {row[colName] !== null ? String(row[colName]): '-'}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
         </Table>
+        {/* // #region Button-Berreich */}
+        <Form.Group className=''>
+          <Button className='agens-button-primary'>
+            bearbeiten
+          </Button>
+          <Button className='agens-button-primary'>
+            löschen
+          </Button>
+        </Form.Group>
+        {/* // #endregion */}
       </Row>
       {/* // #endregion */}
 
-      {/* // #region Tabellen-Bereich (Inhalt der Datenbank) */}
-      <Form.Group className=''>
-        <Button className='agens-button-primary'>
-          bearbeiten
-        </Button>
-        <Button className='agens-button-primary'>
-          löschen
-        </Button>
-      </Form.Group>
-      {/* // #endregion */}
+      <div id='btn-showAll' className='text-center'>
+        {allFahrraeder.length === 0 && (
+          <Button className='my-4 agens-button-primary'
+          onClick={handleShowAllFahrrader}
+          >alle Fahrräder anzeigen</Button>
+        )}
+      </div>
 
       <Button 
         className='agens-button-primary' 
