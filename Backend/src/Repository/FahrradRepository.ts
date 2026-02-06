@@ -19,7 +19,7 @@ import { error } from "node:console";
  */
 export class FahrradRepository 
 {
-    private allowedColumns: string[] = [];
+    private tableColumns: string[] = [];
 
     /**
      * Ruft die **Spaltennamen** der Tabelle 'fahrrad' ab, um **SQL-Injection** bei dynamischen Abfragen zu **verhindern**.
@@ -27,24 +27,19 @@ export class FahrradRepository
      */
     public async getTableColumns(): Promise<string[]> 
     {
-        if (this.allowedColumns.length > 0)
-        {
-            return this.allowedColumns;
-        }
-
         // Gibt nur die Namen der Tabellenspalten zurück
         const stmt = `
-            SELECT column_name 
+            SELECT column_name
             FROM information_schema.columns 
             WHERE table_name = 'fahrrad' 
-            ORDER BY ordinal_position;
+            ORDER BY ordinal_position
             `;
 
             const [rows]: any = await dbPool.execute(stmt);
 
-            this.allowedColumns = rows.map((row: any) => row.COLUMN_NAME);
+            this.tableColumns = rows.map((row: any) => row.column_name);
 
-            return this.allowedColumns;
+            return this.tableColumns;
     }
     
     /**
