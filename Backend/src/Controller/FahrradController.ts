@@ -40,7 +40,7 @@ export class FahrradController
     {
         try 
         {
-            const columns = await this.fahrradService.getTableColumns();
+            const columns: string[] = await this.fahrradService.getTableColumns();
 
             if(columns.length > 0)
             {
