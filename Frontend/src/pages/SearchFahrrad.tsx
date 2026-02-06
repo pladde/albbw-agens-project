@@ -81,10 +81,10 @@ export const SearchFahrrad = () => {
 
       {/* // #region Tabellen-Bereich (Inhalt der Datenbank) */}
       <Row>
-        <Table striped bordered hover className='my-4'>
+        <Table responsive striped bordered hover className='my-4'>
           <thead>
             <tr>
-
+            
             </tr>
           </thead>
         </Table>
