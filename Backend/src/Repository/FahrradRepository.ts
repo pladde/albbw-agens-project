@@ -253,12 +253,15 @@ export class FahrradRepository
      * Ruft **alle Datensätze** aus der Tabelle 'fahrrad' ab.
      * @returns Ein Promise mit einem Array der rohen Datensätze (`any[]`) oder `undefined`.
      */
-    public async findAll(limit: number = 50, offset: number = 0): Promise<any[] | undefined>
+    public async findAll(page: number): Promise<any[] | undefined>
     {
         try 
         {
-            const stmt = 'SELECT * FROM fahrrad LIMIT ? OFFSET ?';
-        
+            const limit = 100;
+            const pageNum = isNaN(page) ? 0 : page;
+            const offset = pageNum * limit;
+
+            const stmt = 'SELECT * FROM fahrrad ORDER BY fahrrad_id ASC LIMIT ? OFFSET ?';
             const [allResults] = await dbPool.execute(stmt, [limit, offset]);
     
             const resultList = allResults as any[];
@@ -269,7 +272,7 @@ export class FahrradRepository
                 return undefined; //Wenn kein Inhalt in der abfrage geliefert wurde.
             }
     
-            return resultList;
+            return resultList || [];
 
         } catch (error)
         {
@@ -285,19 +288,20 @@ export class FahrradRepository
      */
     public async deleteById(fahrrad_id: number) : Promise<any[] | undefined>
     {
+        console.log("REPO LAYER WIRD ERREICHT");
+
         if(!fahrrad_id) 
         {
             throw new Error("Repository: Die übergebene ID ist ungültig!");
         }
 
-        const stmt = "DELETE FROM fahrrad WHERE fahrrad_id = ? ";
-        const value = [fahrrad_id];
+        const stmt = 'DELETE FROM fahrrad WHERE fahrrad_id = ?';
 
-        const [rows] = await dbPool.execute(stmt, [value]);
+        const [rows] = await dbPool.execute(stmt, [fahrrad_id]);
         
-        const result = rows as any[];
+        const result = rows as any;
 
-        if(result.length === 0)
+        if(result.affectedRows === 0)
         {
             return undefined;
         }
