@@ -57,10 +57,10 @@ export const fahrradService = {
      * Ruft **alle** vorhandenen **Fahrräder** aus der Datenbank ab.
      * @returns {Promise<Record<string, any>[] | null>} Ein Array aller Fahrräder oder `null` bei Fehler.
      */
-    fetchAll: async (): Promise<Record<string, any>[] | null> => {
+    fetchAll: async (page: number): Promise<Record<string, any>[] | null> => {
         try
         {
-            const response = await fetch(`${API_URL}`);
+            const response = await fetch(`${API_URL}?page=${page}`);
             if(!response.ok)
             {
                 throw new Error('Netzwerk-Fehler (fetchAll)');
@@ -159,7 +159,7 @@ export const fahrradService = {
 
         try
         {
-            const response = await fetch(`${API_URL}/${id}` ,{ method: 'DELETE'});
+            const response = await fetch(`${API_URL}?=id${id}` ,{ method: 'DELETE'});
 
             if (!response.ok)
             {
