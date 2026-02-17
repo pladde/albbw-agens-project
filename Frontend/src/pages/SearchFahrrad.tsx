@@ -13,6 +13,10 @@ export const SearchFahrrad = () => {
   const [allFahrraeder, setAllFahrraeder] = useState<Record<string, any>[]>([]);
   const [fahrraeder, setfahrraeder] = useState<Record<string, any>>([]);
   const [hasLoaded, setHasLoaded] = useState(false);
+  const [buttonText, setButtonText] = useState('alle Fahrräder anzeigen')
+  const [currentPage, setCurrentPage] = useState(0);
+  const [showButton, setShowButton] = useState(true);
+  const [selectedFahrrad, setSelectedFahrrad] = useState<number | null>(null);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [idSearch, setIdSearch] = useState('');
@@ -20,12 +24,27 @@ export const SearchFahrrad = () => {
   const [rahmennummerSearch, setRahmennummerSearchSearch] = useState('');
   const [bearbeitungsstatusSearch, setBearbeitungsstatusSearch] = useState('');
 
+
   const handleShowAllFahrrader = async () => {
-    const data = await fahrradService.fetchAll();
-    if (data) {
-      setAllFahrraeder(data);
+
+    const data = await fahrradService.fetchAll(currentPage);
+
+    if (data && data.length > 0) {
+      setAllFahrraeder(prev => [...prev, ...data]);
+      
+      // Blendet den Button aus wenn weniger als 100 Einträge zurückkamen
+      if (data.length < 100) {
+        setShowButton(false);
+      }
+
+      setCurrentPage(prev => prev + 1); // Seite für das nächste Mal erhöhen
+      
+      setButtonText('mehr');
+      setHasLoaded(true);
     }
-    setHasLoaded(true)
+    else {
+      setShowButton(false);
+    }   
   };
 
   useEffect(() => {
@@ -39,6 +58,8 @@ export const SearchFahrrad = () => {
     loadHeader();
   }, []);
   
+
+
   if (load) {
     return <div className="spinner-border text-primary"></div>;
   };
@@ -137,23 +158,48 @@ export const SearchFahrrad = () => {
           </thead>
           { /* Erstellt und befüllt den Tabellen-Body mit den Fahrrädern aus der Datenbank */}
           <tbody>
-            {allFahrraeder.map((row, rowIndex) => (
-              <tr key={rowIndex}>
-                {columns.map((colName) => (
-                  <td key={colName}>
-                    {row[colName] !== null ? String(row[colName]): '-'}
-                  </td>
-                ))}
-              </tr>
-            ))}
+            {allFahrraeder.map((row, rowIndex) => {
+              // Prüfen, ob diese Zeile die aktuell ausgewählte ist
+              const isSelected = selectedFahrrad === row.fahrrad_id;
+              console.log(selectedFahrrad + ' ausgewählt.');
+
+              return (
+                <tr
+                  key={rowIndex}
+                  onClick={
+                    () => setSelectedFahrrad(prev => prev === row.fahrrad_id ? null : row.fahrrad_id)
+                  }
+                  className={isSelected ? 'table-primary' : ''}
+                  style={{ cursor: 'pointer' }}
+                >
+                  {columns.map((colName) => (
+                    <td key={colName}>
+                      {row[colName] !== null ? String(row[colName]) : '-'}
+                    </td>
+                  ))}
+                </tr>
+              );
+            })}
           </tbody>
         </Table>
-        {/* // #region Button-Berreich */}
+        {/* // #region Button-Bereich */}
         <Form.Group className=''>
-          <Button className='agens-button-primary'>
+          <Button 
+            className='agens-button-primary'
+            hidden={selectedFahrrad == null}
+            onClick={() => console.log('bearbeiten bla bla')}
+            >
             bearbeiten
           </Button>
-          <Button className='agens-button-primary'>
+          <Button 
+            className='agens-button-primary'
+            hidden={selectedFahrrad == null}
+            onClick={() => {
+              if (selectedFahrrad != null || selectedFahrrad != undefined) {
+                fahrradService.deleteById(selectedFahrrad);
+              }
+            }}
+            >
             löschen
           </Button>
         </Form.Group>
@@ -161,13 +207,16 @@ export const SearchFahrrad = () => {
       </Row>
       {/* // #endregion */}
 
+      {showButton && (
       <div id='btn-showAll' className='text-center'>
-        {allFahrraeder.length === 0 && (
-          <Button className='my-4 agens-button-primary'
+        <Button 
+          className='my-4 agens-button-primary'
           onClick={handleShowAllFahrrader}
-          >alle Fahrräder anzeigen</Button>
-        )}
+        >
+          {buttonText}
+        </Button>
       </div>
+      )}
 
       <Button 
         className='agens-button-primary' 
