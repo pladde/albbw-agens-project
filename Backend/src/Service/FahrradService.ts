@@ -160,13 +160,13 @@ export class FahrradService
      * @returns Ein Promise, das ein Array aller Datensätze oder `undefined` zurückgibt.
      * @throws {Error} Bei Fehlern während der Repository-Abfrage.
      */
-    public async findAllFahrrader() : Promise<any[] | undefined>
+    public async findAllFahrrader(page: number) : Promise<any[] | undefined>
     {
         let result: any[] | undefined = [];
 
         try
         {
-            result = await this.fahrradRepository.findAll();
+            result = await this.fahrradRepository.findAll(page);
 
         } catch (error)
         {
@@ -186,7 +186,7 @@ export class FahrradService
     public async deleteFahrradById(fahrrad_id: number) : Promise<any[] | undefined>
     {
         //#region Guard
-        if (fahrrad_id == null || fahrrad_id <= 0)
+        if (fahrrad_id == null || fahrrad_id < 0)
         {
             throw new Error("Service: Fehler beim löschen eines Fahrrads!");
         }

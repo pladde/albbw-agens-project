@@ -229,7 +229,10 @@ export class FahrradController
     {
         try 
         {
-            const allResults = await this.fahrradService.findAllFahrrader();
+            const pageString = req.query.page as string;
+            const page = parseInt(pageString) || 0;
+            
+            const allResults = await this.fahrradService.findAllFahrrader(page);
 
             if(allResults == undefined) 
             {
@@ -259,16 +262,27 @@ export class FahrradController
     public async deleteFahrradById(req: Request, res: Response) : Promise<void>
     {
         //#region Guard
-        if(!req.params.id)
-        {
-            res.status(400).json({ error: "id ist ein Pflichtfeld!"});
+        const rawId = req.params.id;
+        if (!rawId) {
+            res.status(400).json({ error: "id ist ein Pflichtfeld!" });
+            return;
+        }
+
+        const fahrrad_id = parseInt(rawId);
+
+        if (isNaN(fahrrad_id)) {
+            res.status(400).json({ error: "Die ID muss eine gültige Zahl sein (z.B. /27)!" });
+            return;
         }
         //#endregion
         
         try
         {
-            const result = await this.fahrradService.deleteFahrradById(parseInt(req.params.id));
+            const idString: string = req.query.page as string;
+            const fahrrad_id: number = parseInt(idString) || 0;
 
+            const result = await this.fahrradService.deleteFahrradById(fahrrad_id);
+            
             if (result === undefined) 
             {
                 console.log("Keinen Eintrag gefunden!");
