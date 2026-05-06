@@ -1,0 +1,25 @@
+*********** Anleitung ***********
+
+
+Terminal 1: backend starten
+cd server/
+npm run dev
+
+Terminal 2: frontend starten
+cd frontend/
+npm start (oder npm run dev, wenn Vite genutzt wird)
+
+
+
+*********** Installation ***********
+
+../frontend
+npm install bootstrap
+
+
+../server
+npm install express cors dotenv mysql2
+npm install -D @types/express @types/cors @types/node typescript ts-node nodemon
+npm install --save-dev @types/mysql
+
+
