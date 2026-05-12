@@ -197,8 +197,8 @@ export const DienstleistungErfassenPage: React.FC = () => {
             {/* Senden */}
             <Button
                 onClick={handleSubmit}
+                className="agens-button-primary"
                 style={{
-                    background: '#5374a5',
                     border: 'none',
                     borderRadius: '6px',
                     fontSize: '16px',
@@ -212,7 +212,11 @@ export const DienstleistungErfassenPage: React.FC = () => {
             <div className="d-flex justify-content-end mt-4">
                 <Button
                     onClick={() => navigate(-1)}
-                    style={{ background: '#5374a5', border: 'none', borderRadius: '6px' }}
+                    className="agens-button-primary"
+                    style={{
+                        border: 'none',
+                        borderRadius: '6px'
+                    }}
                 >
                     zurück
                 </Button>

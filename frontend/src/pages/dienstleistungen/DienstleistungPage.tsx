@@ -1,6 +1,7 @@
 import React from 'react';
 import { Container, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import '../../components/custom-style-agens.css'
 
 export const DienstleistungPage: React.FC = () => {
     const navigate = useNavigate();
@@ -13,15 +14,14 @@ export const DienstleistungPage: React.FC = () => {
         >
             <Button
                 onClick={() => navigate('/dienstleistung/erfassen')}
+                className="agens-button-primary"
                 style={{
                     width: '200px',
                     height: '100px',
                     fontSize: '18px',
-                    background: '#5374a5',
                     border: 'none',
                     borderRadius: '10px',
                     marginBottom: '12px',
-                    color: 'white',
                 }}
             >
                 Auftrag erfassen
@@ -29,11 +29,11 @@ export const DienstleistungPage: React.FC = () => {
 
             <Button
                 onClick={() => navigate('/dienstleistung/suchen')}
+                className="agens-button-primary"
                 style={{
                     width: '200px',
                     height: '100px',
                     fontSize: '18px',
-                    background: '#5374a5',
                     border: 'none',
                     borderRadius: '10px',
                     color: 'white',

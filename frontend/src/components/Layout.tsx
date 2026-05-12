@@ -3,9 +3,9 @@ import { Header } from './Header'; // Pfad anpassen, falls nötig
 
 export const Layout: React.FC = () => {
     return (
-        <div>
+        <div style ={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
             <Header />
-            <main style={{ paddingTop: '60px' }}> {/* Abstand für den Header */}
+            <main style={{ flex: 1 }}> {/* Abstand für den Header */}
                 <Outlet /> {/* Hier werden die Routen-Inhalte gerendert */}
             </main>
         </div>

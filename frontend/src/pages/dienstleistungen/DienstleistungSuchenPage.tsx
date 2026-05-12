@@ -14,14 +14,14 @@ interface Auftrag {
 // Mock-Daten – später durch API-Call ersetzen
 const mockDaten: Auftrag[] = [
     {
-        auftragId: 'NK-001',
+        auftragId: '15',
         kategorie: 'Holzwerkstatt',
         kundenname: 'Max Mustermann',
         status: 'Angenommen',
         datum: '20.01.2026',
     },
     {
-        auftragId: 'NK-002',
+        auftragId: '16',
         kategorie: 'Elektronik',
         kundenname: 'Lisa Beispiel',
         status: 'In Bearbeitung',
@@ -82,7 +82,7 @@ export const DienstleistungSuchenPage: React.FC = () => {
                         <Form.Control
                             value={auftragId}
                             onChange={(e) => setAuftragId(e.target.value)}
-                            placeholder="NK-001"
+                            placeholder="15"
                             style={{ width: '130px', ...inputStyle }}
                         />
                         <Search />
@@ -210,14 +210,16 @@ export const DienstleistungSuchenPage: React.FC = () => {
             <div className="mt-3 d-flex gap-2">
                 <Button
                     disabled={!selectedId}
+                    className="agens-button-primary"
                     onClick={() => navigate(`/dienstleistung/erfassen/${selectedId}`)}
-                    style={{ background: '#5374a5', border: 'none', borderRadius: '6px' }}
+                    style={{ border: 'none', borderRadius: '6px' }}
                 >
                     bearbeiten
                 </Button>
                 <Button
                     disabled={!selectedId}
-                    style={{ background: '#5374a5', border: 'none', borderRadius: '6px' }}
+                    className="agens-button-primary"
+                    style={{ border: 'none', borderRadius: '6px' }}
                     onClick={() => {
                         if (window.confirm(`Auftrag ${selectedId} wirklich löschen?`)) {
                             // TODO: DELETE-Anfrage an Backend
@@ -233,7 +235,8 @@ export const DienstleistungSuchenPage: React.FC = () => {
             <div className="d-flex justify-content-end mt-4">
                 <Button
                     onClick={() => navigate('/dienstleistung')}
-                    style={{ background: '#5374a5', border: 'none', borderRadius: '6px' }}
+                    className="agens-button-primary"
+                    style={{ border: 'none', borderRadius: '6px' }}
                 >
                     zurück
                 </Button>
