@@ -1,7 +1,10 @@
 import mysql from 'mysql2/promise'
 import type { PoolConnection } from 'mysql2/promise'
 
+// Datenbankverbindung.ts = Die Verbindung zur Datenbank
 
+
+// pool = ein pool an verbindungen, wie ein Telefonbuch, damit mehrere Anfragen gleichzeitig bearbeitet werden können.
 export const pool = mysql.createPool({
     host: process.env.DB_HOST || 'localhost',
     user: process.env.DB_USER || 'root',

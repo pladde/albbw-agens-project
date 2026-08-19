@@ -5,6 +5,11 @@ import App from './App'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {BrowserRouter} from "react-router-dom";
 
+
+
+// main.tsx = Der Einstiegspunkt der App, wie eine Haustür.
+// Hier wird React gestartet und die App in die HTML-Seite eingefügt.
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
       <BrowserRouter>

@@ -1,12 +1,31 @@
 import express from 'express';
-import { pool } from '../Datenbankverbindung';
+import { pool } from '../Datenbankverbindung.ts';
 
 const router = express.Router();
 
-// GET - Alle Personen abrufen
-router.get('/', async (req, res) => {
+// Route für:
+// GET:
+// Alle Personen abrufen
+// Eine spezifische Person abrufen
+//
+// POST
+// Eine neue Person speichern
+//
+// PUT
+// Eine Person aktualisieren
+//
+// DELETE
+// Eine Person nach ID Löschen
+
+// GET - Alle Personen abrufen (mit Rollen-Beschreibung via JOIN)
+router.get('/', async (_req, res) => {
     try {
-        const [rows] = await pool.query('SELECT * FROM person ORDER BY nachname, vorname');
+        const [rows] = await pool.query(
+            `SELECT p.*, r.beschreibung as rolle_beschreibung
+             FROM person p
+             LEFT JOIN rolle r ON p.r_id = r.rolle_id
+             ORDER BY p.name, p.vorname`
+        );
         res.json(rows);
     } catch (error) {
         console.error('Fehler beim Abrufen der Personen:', error);
@@ -18,11 +37,14 @@ router.get('/', async (req, res) => {
     }
 });
 
-// GET - Einzelne Person abrufen
+// GET - Einzelne Person abrufen (mit Rollen-Beschreibung)
 router.get('/:id', async (req, res) => {
     try {
         const [rows]: any = await pool.query(
-            'SELECT * FROM person WHERE person_id = ?',
+            `SELECT p.*, r.beschreibung as rolle_beschreibung
+             FROM person p
+             LEFT JOIN rolle r ON p.r_id = r.rolle_id
+             WHERE p.person_id = ?`,
             [req.params.id]
         );
         if (rows.length === 0) {
@@ -45,18 +67,32 @@ router.get('/:id', async (req, res) => {
 // POST - Neue Person erstellen
 router.post('/', async (req, res) => {
     try {
-        const { vorname, nachname, email } = req.body;
+        const { r_id, name, vorname, email, telefon, aktiv } = req.body;
 
-        if (!vorname || !nachname || !email) {
+        // Validierung: Pflichtfelder prüfen
+        if (!r_id || !name || !vorname) {
             return res.status(400).json({
                 status: 'error',
-                message: 'Vorname, Nachname und Email sind erforderlich'
+                message: 'Rollen-ID (r_id), Name und Vorname sind erforderlich'
+            });
+        }
+
+        // Validierung: Prüfe ob Rolle existiert (Fremdschlüssel-Validierung)
+        const [rolleExists]: any = await pool.query(
+            'SELECT rolle_id FROM rolle WHERE rolle_id = ?',
+            [r_id]
+        );
+
+        if (rolleExists.length === 0) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Rolle mit dieser ID existiert nicht'
             });
         }
 
         const [result]: any = await pool.query(
-            'INSERT INTO person (vorname, nachname, email) VALUES (?, ?, ?)',
-            [vorname || null, nachname || null, email]
+            'INSERT INTO person (r_id, name, vorname, email, telefon, aktiv) VALUES (?, ?, ?, ?, ?, ?)',
+            [r_id, name, vorname, email || null, telefon || null, aktiv !== undefined ? aktiv : 1]
         );
 
         res.status(201).json({
@@ -64,9 +100,12 @@ router.post('/', async (req, res) => {
             message: 'Person erfolgreich erstellt',
             data: {
                 person_id: result.insertId,
+                r_id,
+                name,
                 vorname,
-                nachname,
-                email
+                email: email || null,
+                telefon: telefon || null,
+                aktiv: aktiv !== undefined ? aktiv : 1
             }
         });
     } catch (error) {
@@ -82,18 +121,32 @@ router.post('/', async (req, res) => {
 // PUT - Person aktualisieren
 router.put('/:id', async (req, res) => {
     try {
-        const { vorname, nachname, email } = req.body;
+        const { r_id, name, vorname, email, telefon, aktiv } = req.body;
 
-        if (!nachname || !vorname || !email) {
+        // Validierung: Pflichtfelder prüfen
+        if (!r_id || !name || !vorname) {
             return res.status(400).json({
                 status: 'error',
-                message: 'Nachname, Vorname und Email sind erforderlich'
+                message: 'Rollen-ID (r_id), Name und Vorname sind erforderlich'
+            });
+        }
+
+        // Validierung: Prüfe ob Rolle existiert
+        const [rolleExists]: any = await pool.query(
+            'SELECT rolle_id FROM rolle WHERE rolle_id = ?',
+            [r_id]
+        );
+
+        if (rolleExists.length === 0) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Rolle mit dieser ID existiert nicht'
             });
         }
 
         const [result]: any = await pool.query(
-            'UPDATE person SET vorname = ?, nachname = ?, email = ? WHERE person_id = ?',
-            [vorname || null, nachname || null, email, req.params.id]
+            'UPDATE person SET r_id = ?, name = ?, vorname = ?, email = ?, telefon = ?, aktiv = ? WHERE person_id = ?',
+            [r_id, name, vorname, email || null, telefon || null, aktiv !== undefined ? aktiv : 1, req.params.id]
         );
 
         if (result.affectedRows === 0) {
@@ -108,9 +161,12 @@ router.put('/:id', async (req, res) => {
             message: 'Person erfolgreich aktualisiert',
             data: {
                 person_id: req.params.id,
+                r_id,
+                name,
                 vorname,
-                nachname,
-                email
+                email: email || null,
+                telefon: telefon || null,
+                aktiv: aktiv !== undefined ? aktiv : 1
             }
         });
     } catch (error) {
@@ -153,5 +209,3 @@ router.delete('/:id', async (req, res) => {
 });
 
 export default router;
-
-

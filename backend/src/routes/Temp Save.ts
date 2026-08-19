@@ -1141,3 +1141,83 @@
 //
 //
 //
+
+
+
+/*
+
+
+
+## 📋 Zusätzliche Routen für Aufträge
+
+### GET – Weitere Abfragen
+
+1. `GET /auftraege/status/:status` – Alle Aufträge mit einem bestimmten Status abrufen (z.B. `/offen`, `/in_bearbeitung`)
+2. `GET /auftraege/nachname/:nachname` – Aufträge nach Bearbeiter-Nachname suchen (Teilsuche mit `LIKE`)
+3. `GET /auftraege/datum/zwischen?von=YYYY-MM-DD&bis=YYYY-MM-DD` – Aufträge in einem Zeitraum (Aufnahmedatum) abrufen
+4. `GET /auftraege/suche?q=suchbegriff` – Volltextsuche über Name/Beschreibung
+5. `GET /auftraege/anzahl` – Anzahl aller Aufträge (für Dashboard/Statistik)
+6. `GET /auftraege/anzahl/status` – Anzahl pro Status (z.B. offen: 5, in_bearbeitung: 3)
+7. `GET /auftraege/statistik` – Statistiken: Ø Bearbeitungszeit, Aufträge pro Monat, etc.
+8. `GET /auftraege/neueste/:limit` – Die neuesten X Aufträge (z.B. `/neueste/5`)
+9. `GET /auftraege/person/:personId` – Aufträge, die einer bestimmten Person zugeordnet sind
+10. `GET /auftraege/:id/verlauf` – Änderungshistorie eines einzelnen Auftrags
+11. `GET /auftraege/:id/qr-code` – QR-Code-Bild/Pfad eines Auftrags abrufen
+12. `GET /auftraege/:id/bild` – Bild eines Auftrags abrufen
+13. `GET /auftraege/export` – Alle Aufträge als CSV/Excel exportieren
+14. `GET /auftraege/pagination?seite=1&limit=10` – Pagination für große Listen
+
+### POST – Weitere Anlegen-Operationen
+
+1. `POST /auftraege/bulk` – Mehrere Aufträge auf einmal anlegen (Array im Body)
+2. `POST /auftraege/:id/qr-code` – QR-Code für einen Auftrag generieren und Speicherpfad setzen
+3. `POST /auftraege/:id/bild` – Bild (Base64 oder Multipart) hochladen und Pfad speichern
+4. `POST /auftraege/:id/kommentar` – Kommentar/Notiz zu einem Auftrag hinzufügen
+5. `POST /auftraege/:id/zuweisen` – Auftrag einer Person/Projekt zuweisen
+6. `POST /auftraege/:id/kopieren` – Auftrag duplizieren (neuer Auftrag mit gleichen Daten)
+
+### PUT – Weitere Aktualisierungen
+
+1. `PUT /auftraege/:id/daten` – Nur die JSON-Daten (`daten`) eines Auftrags ersetzen
+2. `PUT /auftraege/:id/bearbeiter` – Nur den Bearbeiter ändern
+3. `PUT /auftraege/:id/bild` – Bild ersetzen/aktualisieren
+4. `PUT /auftraege/:id/qr-code` – QR-Code-Pfad aktualisieren (falls neu generiert)
+
+### PATCH – Weitere Teil-Aktualisierungen
+
+1. `PATCH /auftraege/:id/name` – Nur Name/Beschreibung aktualisieren
+2. `PATCH /auftraege/:id/bearbeiter` – Nur Bearbeiter aktualisieren
+3. `PATCH /auftraege/:id/aufnahme-datum` – Aufnahmedatum nachträglich ändern
+4. `PATCH /auftraege/:id` – Generisches Teil-Update: Nur übergebene Felder aktualisieren (z.B. nur `{ "sonstiges": "neu" }`)
+5. `PATCH /auftraege/:id/sonstiges` – Nur das Feld `sonstiges` aktualisieren
+
+*Hinweis: `PATCH /auftraege/:id/status` existiert bereits.*
+
+### DELETE – Weitere Lösch-Operationen
+
+1. `DELETE /auftraege/:id/kommentar/:kommentarId` – Einzelnen Kommentar löschen
+2. `DELETE /auftraege/:id/bild` – Bild eines Auftrags löschen
+3. `DELETE /auftraege/:id/qr-code` – QR-Code eines Auftrags löschen
+4. `DELETE /auftraege/bulk` – Mehrere Aufträge auf einmal löschen (IDs im Body: `{ "ids": [1,2,3] }`)
+5. `DELETE /auftraege/projekt/:projektId` – Alle Aufträge eines Projekts löschen
+6. `DELETE /auftraege/status/:status` – Alle Aufträge mit bestimmtem Status löschen (Vorsicht!)
+
+### Zusätzliche sinnvolle Routen-Muster
+
+1. `HEAD /auftraege/:id` – Prüfen ob ein Auftrag existiert (ohne Body)
+2. `GET /auftraege/:id/existiert` – Boolean zurückgeben: `{ "existiert": true }`
+3. `GET /auftraege/naechste-id` – Nächste verfügbare Auftrags-ID abrufen (für Neuanlage im Frontend)
+
+---
+
+### Besonders empfehlenswert für dein Projekt:
+
+    - __`GET /auftraege/status/:status`__ – Sehr nützlich für Filteransichten im Frontend
+- __`GET /auftraege/suche?q=...`__ – Wichtig für die Suchseite (`DienstleistungSuchenPage.tsx`)
+- __`GET /auftraege/pagination?seite=1&limit=10`__ – Wichtig bei großen Datenmengen
+- __`PATCH /auftraege/:id`__ – Generisches Teil-Update, flexibler als der bestehende Status-PATCH
+- __`DELETE /auftraege/bulk`__ – Praktisch für Massenverwaltung
+
+
+
+ */

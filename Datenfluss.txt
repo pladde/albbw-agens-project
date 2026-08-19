@@ -1,0 +1,15 @@
+Der Datenfluss (wie alles zusammenspielt)
+
+Benutzer klickt "Auftrag erfassen"
+↓
+Frontend zeigt Formular (DienstleistungErfassenPage)
+↓
+Benutzer füllt Formular aus und klickt "senden"
+↓
+Frontend sendet Daten an Backend (POST /api/auftrag)
+↓
+Backend speichert in MariaDB-Datenbank
+↓
+Backend antwortet "Erfolgreich erstellt"
+↓
+Frontend zeigt Bestätigung

@@ -1,12 +1,26 @@
 import express from 'express';
-import { pool } from '../Datenbankverbindung';
+import { pool } from '../Datenbankverbindung.ts';
 
 const router = express.Router();
 
+// Route für:
+// GET:
+// Alle Rollen abrufen
+// Eine spezifische Rolle abrufen
+//
+// POST
+// Eine neue Rolle speichern
+//
+// PUT
+// Eine Rolle aktualisieren
+//
+// DELETE
+// Eine Rolle nach ID Löschen
+
 // GET - Alle Rollen abrufen
-router.get('/', async (req, res) => {
+router.get('/', async (_req, res) => {
     try {
-        const [rows] = await pool.query('SELECT * FROM rolle ORDER BY bezeichnung');
+        const [rows] = await pool.query('SELECT * FROM rolle ORDER BY beschreibung');
         res.json(rows);
     } catch (error) {
         console.error('Fehler beim Abrufen der Rollen:', error);
@@ -45,18 +59,18 @@ router.get('/:id', async (req, res) => {
 // POST - Neue Rolle erstellen
 router.post('/', async (req, res) => {
     try {
-        const { bezeichnung } = req.body;
+        const { beschreibung } = req.body;
 
-        if (!bezeichnung) {
+        if (!beschreibung) {
             return res.status(400).json({
                 status: 'error',
-                message: 'Bezeichnung ist erforderlich'
+                message: 'Beschreibung ist erforderlich'
             });
         }
 
         const [result]: any = await pool.query(
-            'INSERT INTO rolle (bezeichnung) VALUES (?)',
-            [bezeichnung]
+            'INSERT INTO rolle (beschreibung) VALUES (?)',
+            [beschreibung]
         );
 
         res.status(201).json({
@@ -64,7 +78,7 @@ router.post('/', async (req, res) => {
             message: 'Rolle erfolgreich erstellt',
             data: {
                 rolle_id: result.insertId,
-                bezeichnung
+                beschreibung
             }
         });
     } catch (error) {
@@ -80,18 +94,18 @@ router.post('/', async (req, res) => {
 // PUT - Rolle aktualisieren
 router.put('/:id', async (req, res) => {
     try {
-        const { bezeichnung } = req.body;
+        const { beschreibung } = req.body;
 
-        if (!bezeichnung) {
+        if (!beschreibung) {
             return res.status(400).json({
                 status: 'error',
-                message: 'Bezeichnung ist erforderlich'
+                message: 'Beschreibung ist erforderlich'
             });
         }
 
         const [result]: any = await pool.query(
-            'UPDATE rolle SET bezeichnung = ? WHERE rolle_id = ?',
-            [bezeichnung, req.params.id]
+            'UPDATE rolle SET beschreibung = ? WHERE rolle_id = ?',
+            [beschreibung, req.params.id]
         );
 
         if (result.affectedRows === 0) {
@@ -106,7 +120,7 @@ router.put('/:id', async (req, res) => {
             message: 'Rolle erfolgreich aktualisiert',
             data: {
                 rolle_id: req.params.id,
-                bezeichnung
+                beschreibung
             }
         });
     } catch (error) {

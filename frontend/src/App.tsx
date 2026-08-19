@@ -7,6 +7,9 @@ import { DienstleistungSuchenPage } from './pages/dienstleistungen/Dienstleistun
 import { DienstleistungErfassenPage } from './pages/dienstleistungen/DienstleistungErfassenPage';
 import {Layout} from "./components/Layout";
 
+// App.tsx = Wegbeschreibung des Clients, wenn eine URL eingegeben wird, wird die Seite X angezeigt.
+
+
 function App() {
     return (
             <Routes>

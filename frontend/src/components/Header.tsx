@@ -3,6 +3,10 @@ import { useLocation, Link } from 'react-router-dom';
 import logo from '../assets/agens_logo.png';
 import profilePicture from '../assets/agens_default_profile_picture.png';
 
+// Header.txt = tägt die Inhalte des Headers, die vom Layout eingefügt werden
+
+
+
 export const Header: React.FC = () => {
     const location = useLocation();
     

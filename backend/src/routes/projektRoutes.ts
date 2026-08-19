@@ -1,10 +1,24 @@
 import express from 'express';
-import { pool } from '../Datenbankverbindung';
+import { pool } from '../Datenbankverbindung.ts';
 
 const router = express.Router();
 
+// Route für:
+// GET:
+// Alle Projekte abrufen
+// Ein spezifisches Projekt abrufen
+//
+// POST
+// Ein neues Projekt speichern
+//
+// PUT
+// Ein Projekt aktualisieren
+//
+// DELETE
+// Ein Projekt nach ID Löschen
+
 // GET - Alle Projekte abrufen
-router.get('/', async (req, res) => {
+router.get('/', async (_req, res) => {
     try {
         const [rows] = await pool.query('SELECT * FROM projekt ORDER BY erstellt_am DESC');
         res.json(rows);
@@ -45,18 +59,18 @@ router.get('/:id', async (req, res) => {
 // POST - Neues Projekt erstellen
 router.post('/', async (req, res) => {
     try {
-        const { name, beschreibung, aktiv } = req.body;
+        const { titel, beschreibung, aktiv } = req.body;
 
-        if (!name) {
+        if (!titel) {
             return res.status(400).json({
                 status: 'error',
-                message: 'Name ist erforderlich'
+                message: 'Titel ist erforderlich'
             });
         }
 
         const [result]: any = await pool.query(
-            'INSERT INTO projekt (name, beschreibung, aktiv) VALUES (?, ?, ?)',
-            [name, beschreibung || null, aktiv !== undefined ? aktiv : 1]
+            'INSERT INTO projekt (titel, beschreibung, aktiv) VALUES (?, ?, ?)',
+            [titel, beschreibung || null, aktiv !== undefined ? aktiv : 1]
         );
 
         res.status(201).json({
@@ -64,7 +78,7 @@ router.post('/', async (req, res) => {
             message: 'Projekt erfolgreich erstellt',
             data: {
                 projekt_id: result.insertId,
-                name,
+                titel,
                 beschreibung,
                 aktiv: aktiv !== undefined ? aktiv : 1
             }
@@ -78,21 +92,22 @@ router.post('/', async (req, res) => {
         });
     }
 });
+
 // PUT - Projekt aktualisieren
 router.put('/:id', async (req, res) => {
     try {
-        const { name, beschreibung, aktiv } = req.body;
+        const { titel, beschreibung, aktiv } = req.body;
 
-        if (!name) {
+        if (!titel) {
             return res.status(400).json({
                 status: 'error',
-                message: 'Name ist erforderlich'
+                message: 'Titel ist erforderlich'
             });
         }
 
         const [result]: any = await pool.query(
-            'UPDATE projekt SET name = ?, beschreibung = ?, aktiv = ? WHERE projekt_id = ?',
-            [name, beschreibung || null, aktiv !== undefined ? aktiv : 1, req.params.id]
+            'UPDATE projekt SET titel = ?, beschreibung = ?, aktiv = ? WHERE projekt_id = ?',
+            [titel, beschreibung || null, aktiv !== undefined ? aktiv : 1, req.params.id]
         );
 
         if (result.affectedRows === 0) {
@@ -107,7 +122,7 @@ router.put('/:id', async (req, res) => {
             message: 'Projekt erfolgreich aktualisiert',
             data: {
                 projekt_id: req.params.id,
-                name,
+                titel,
                 beschreibung,
                 aktiv
             }
