@@ -1,37 +1,36 @@
-import React, { useState } from 'react';
-import { Container, Row, Col, Form, Button, Table } from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
+import { Container, Row, Col, Form, Button, Table, Spinner, Alert } from 'react-bootstrap';
 import { Search } from 'react-bootstrap-icons';
 import { useNavigate } from 'react-router-dom';
 
 interface Auftrag {
-    auftragId: string;
-    kategorie: string;
-    kundenname: string;
-    status: string;
-    datum: string;
+    auftrag_id: number;
+    daten: string | null;
+    erstellt_am: string;
+    p_id: number;
+    bez_id: number;
+    projekt_titel: string | null;
+    bezirk_name: string | null;
 }
 
-// Mock-Daten – später durch API-Call ersetzen
-const mockDaten: Auftrag[] = [
-    {
-        auftragId: '15',
-        kategorie: 'Holzwerkstatt',
-        kundenname: 'Max Mustermann',
-        status: 'Angenommen',
-        datum: '20.01.2026',
-    },
-    {
-        auftragId: '16',
-        kategorie: 'Elektronik',
-        kundenname: 'Lisa Beispiel',
-        status: 'In Bearbeitung',
-        datum: '05.03.2026',
-    },
-];
+// Hilfsfunktion: JSON-Daten aus der daten-Spalte parsen
+function parseDaten(daten: string | null): any {
+    if (!daten) return {};
+    try {
+        return JSON.parse(daten);
+    } catch {
+        return {};
+    }
+}
 
 export const DienstleistungSuchenPage: React.FC = () => {
     const navigate = useNavigate();
 
+    const [auftraege, setAuftraege] = useState<Auftrag[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+
+    // Filter-Felder
     const [auftragId, setAuftragId] = useState('');
     const [kategorie, setKategorie] = useState('');
     const [kundenname, setKundenname] = useState('');
@@ -39,18 +38,51 @@ export const DienstleistungSuchenPage: React.FC = () => {
     const [tag, setTag] = useState('');
     const [monat, setMonat] = useState('');
     const [jahr, setJahr] = useState('');
-    const [selectedId, setSelectedId] = useState<string | null>(null);
+    const [selectedId, setSelectedId] = useState<number | null>(null);
 
-    const gefiltert = mockDaten.filter((a) => {
+
+    //
+
+    // Daten vom Backend laden
+    useEffect(() => {
+        const fetchAuftraege = async () => {
+            try {
+                const response = await fetch('http://localhost:3001/api/auftrag');
+                if (!response.ok) {
+                    throw new Error('Fehler beim Laden der Aufträge');
+                }
+                const data = await response.json();
+                setAuftraege(data);
+            } catch (err) {
+                setError(err instanceof Error ? err.message : 'Unbekannter Fehler');
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchAuftraege();
+    }, []);
+
+    // Filtern
+    const gefiltert = auftraege.filter((a) => {
+        const json = parseDaten(a.daten);
+        const auftragKategorie = json.kategorie || '';
+        const auftragKunde = json.kunde || '';
+        const auftragStatus = json.status || '';
+
+        // Datum-Filter
+        const datum = new Date(a.erstellt_am);
         const datumMatch =
             !tag && !monat && !jahr
                 ? true
-                : a.datum === `${tag.padStart(2, '0')}.${monat.padStart(2, '0')}.${jahr}`;
+                : String(datum.getDate()).padStart(2, '0') === tag.padStart(2, '0') &&
+                  String(datum.getMonth() + 1).padStart(2, '0') === monat.padStart(2, '0') &&
+                  String(datum.getFullYear()) === jahr;
+
         return (
-            a.auftragId.toLowerCase().includes(auftragId.toLowerCase()) &&
-            a.kategorie.toLowerCase().includes(kategorie.toLowerCase()) &&
-            a.kundenname.toLowerCase().includes(kundenname.toLowerCase()) &&
-            (status === '' || a.status === status) &&
+            String(a.auftrag_id).toLowerCase().includes(auftragId.toLowerCase()) &&
+            auftragKategorie.toLowerCase().includes(kategorie.toLowerCase()) &&
+            auftragKunde.toLowerCase().includes(kundenname.toLowerCase()) &&
+            (status === '' || auftragStatus === status) &&
             datumMatch
         );
     });
@@ -69,11 +101,30 @@ export const DienstleistungSuchenPage: React.FC = () => {
 
     const headerBg = '#5374a5';
 
+    // Löschen-Funktion
+    const handleDelete = async (id: number) => {
+        if (!window.confirm(`Auftrag ${id} wirklich löschen?`)) return;
+        try {
+            const response = await fetch(`http://localhost:3001/api/auftrag/${id}`, {
+                method: 'DELETE',
+            });
+            if (!response.ok) {
+                throw new Error('Fehler beim Löschen');
+            }
+            setAuftraege(auftraege.filter((a) => a.auftrag_id !== id));
+            setSelectedId(null);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Unbekannter Fehler');
+        }
+    };
+
     return (
         <Container
             fluid
             style={{ minHeight: 'calc(100vh - 60px)', background: '#e8e8e8', padding: '30px 40px' }}
         >
+            {error && <Alert variant="danger">{error}</Alert>}
+
             {/* Filter-Leiste */}
             <Row className="mb-3 align-items-end g-3">
                 <Col xs="auto">
@@ -172,38 +223,54 @@ export const DienstleistungSuchenPage: React.FC = () => {
                     background: '#e8e8e8',
                 }}
             >
-                <Table hover style={{ marginBottom: 0 }}>
-                    <thead>
-                        <tr style={{ background: headerBg, color: 'white' }}>
-                            <th style={{ background: headerBg, color: 'white' }}>Auftrags-ID</th>
-                            <th style={{ background: headerBg, color: 'white' }}>Kategorie</th>
-                            <th style={{ background: headerBg, color: 'white' }}>Kundenname</th>
-                            <th style={{ background: headerBg, color: 'white' }}>
-                                Bearbeitungsstatus
-                            </th>
-                            <th style={{ background: headerBg, color: 'white' }}>Datum</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {gefiltert.map((a) => (
-                            <tr
-                                key={a.auftragId}
-                                onClick={() => setSelectedId(a.auftragId)}
-                                style={{
-                                    cursor: 'pointer',
-                                    background:
-                                        selectedId === a.auftragId ? '#d0d8e8' : 'transparent',
-                                }}
-                            >
-                                <td>{a.auftragId}</td>
-                                <td>{a.kategorie}</td>
-                                <td>{a.kundenname}</td>
-                                <td>{a.status}</td>
-                                <td>{a.datum}</td>
+                {loading ? (
+                    <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '300px' }}>
+                        <Spinner animation="border" variant="primary" />
+                    </div>
+                ) : (
+                    <Table hover style={{ marginBottom: 0 }}>
+                        <thead>
+                            <tr style={{ background: headerBg, color: 'white' }}>
+                                <th style={{ background: headerBg, color: 'white' }}>Auftrags-ID</th>
+                                <th style={{ background: headerBg, color: 'white' }}>Titel</th>
+                                <th style={{ background: headerBg, color: 'white' }}>Bearbeitungsstatus</th>
+                                <th style={{ background: headerBg, color: 'white' }}>Datum</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </Table>
+                        </thead>
+                        <tbody>
+                            {gefiltert.map((a) => {
+                                const json = parseDaten(a.daten);
+                                const datum = new Date(a.erstellt_am);
+                                return (
+                                    <tr
+                                        key={a.auftrag_id}
+                                        onClick={() => setSelectedId(a.auftrag_id)}
+                                        style={{
+                                            cursor: 'pointer',
+                                            background:
+                                                selectedId === a.auftrag_id ? '#d0d8e8' : 'transparent',
+                                        }}
+                                    >
+                                        <td>{a.auftrag_id}</td>
+                                        <td>{json.kategorie || '-'}</td>
+                                        <td>{json.kunde || '-'}</td>
+                                        <td>{json.status || '-'}</td>
+                                        <td>
+                                            {datum.toLocaleDateString('de-DE')}
+                                        </td>
+                                    </tr>
+                                );
+                            })}
+                            {gefiltert.length === 0 && (
+                                <tr>
+                                    <td colSpan={5} className="text-center py-4">
+                                        Keine Aufträge gefunden
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </Table>
+                )}
             </div>
 
             {/* Aktions-Buttons */}
@@ -220,12 +287,7 @@ export const DienstleistungSuchenPage: React.FC = () => {
                     disabled={!selectedId}
                     className="agens-button-primary"
                     style={{ border: 'none', borderRadius: '6px' }}
-                    onClick={() => {
-                        if (window.confirm(`Auftrag ${selectedId} wirklich löschen?`)) {
-                            // TODO: DELETE-Anfrage an Backend
-                            setSelectedId(null);
-                        }
-                    }}
+                    onClick={() => selectedId && handleDelete(selectedId)}
                 >
                     löschen
                 </Button>

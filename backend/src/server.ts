@@ -1,5 +1,6 @@
 // Import = "Hole aus der Datei xy (die im Order z liegt) das, was dort als Standart-Export (export default) herausgegeben wird, und nenne es hier abc."
 
+import 'dotenv/config' // Lädt die .env-Datei, damit DB_HOST, DB_USER etc. verfügbar sind
 import express from 'express' // Ohne Express müsste man selber coden, wie der Server Anfragen verarbeitet (Header Parsen, Routen erkennen, Antworten formatieren) Express übernimmt das.
 import cors from 'cors'
 import auftragRoutes from "./routes/auftragRoutes.ts";

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Container,
     Row,
@@ -7,6 +7,8 @@ import {
     Button,
     OverlayTrigger,
     Tooltip,
+    Alert,
+    Spinner,
 } from 'react-bootstrap';
 import { InfoCircle } from 'react-bootstrap-icons';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -33,30 +35,142 @@ export const DienstleistungErfassenPage: React.FC = () => {
     const isBearbeiten = Boolean(id);
 
     // Felder
-    const [auftragId] = useState(id ?? 'NK-003'); // read-only, vom Backend generiert
+    const [auftragId, setAuftragId] = useState<string>(''); // read-only, vom Backend generiert
     const [kategorie, setKategorie] = useState('');
     const [beschreibung, setBeschreibung] = useState('');
     const [besonderheiten, setBesonderheiten] = useState('');
-    const [tag, setTag] = useState('10');
-    const [monat, setMonat] = useState('05');
-    const [jahr, setJahr] = useState('2026');
+    const [tag, setTag] = useState('');
+    const [monat, setMonat] = useState('');
+    const [jahr, setJahr] = useState('');
     const [status, setStatus] = useState('Angenommen');
     const [kunde, setKunde] = useState('');
+
+    const [loading, setLoading] = useState(isBearbeiten);
+    const [saving, setSaving] = useState(false);
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
 
     const labelStyle: React.CSSProperties = { fontWeight: 500, marginBottom: 4 };
     const inputStyle: React.CSSProperties = { fontSize: '15px' };
 
-    const handleSubmit = () => {
-        // TODO: POST/PUT an Backend
-        console.log({ auftragId, kategorie, beschreibung, besonderheiten, tag, monat, jahr, status, kunde });
-        navigate('/dienstleistung/suchen');
+    // Wenn eine ID vorhanden ist, lade den Auftrag vom Backend
+    useEffect(() => {
+        if (!id) return;
+
+        const fetchAuftrag = async () => {
+            try {
+                const response = await fetch(`http://localhost:3001/api/auftrag/${id}`);
+                if (!response.ok) {
+                    throw new Error('Auftrag nicht gefunden');
+                }
+                const data = await response.json();
+                setAuftragId(String(data.auftrag_id));
+
+                // JSON-Daten parsen
+                const json = data.daten ? JSON.parse(data.daten) : {};
+                setKategorie(json.kategorie || '');
+                setBeschreibung(json.beschreibung || '');
+                setBesonderheiten(json.besonderheiten || '');
+                setStatus(json.status || 'Angenommen');
+                setKunde(json.kunde || '');
+
+                // Datum aus erstellt_am extrahieren
+                if (data.erstellt_am) {
+                    const datum = new Date(data.erstellt_am);
+                    setTag(String(datum.getDate()).padStart(2, '0'));
+                    setMonat(String(datum.getMonth() + 1).padStart(2, '0'));
+                    setJahr(String(datum.getFullYear()));
+                }
+            } catch (err) {
+                setError(err instanceof Error ? err.message : 'Unbekannter Fehler');
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchAuftrag();
+    }, [id]);
+
+    const handleSubmit = async () => {
+        setSaving(true);
+        setError('');
+        setSuccess('');
+
+        // JSON-Daten für die daten-Spalte zusammenstellen
+        const daten = {
+            kategorie,
+            beschreibung,
+            besonderheiten,
+            status,
+            kunde,
+        };
+
+        // Datum formatieren
+        const eingangsdatum = `${jahr}-${monat}-${tag}`;
+
+        try {
+            if (isBearbeiten) {
+                // PUT - Auftrag aktualisieren
+                const response = await fetch(`http://localhost:3001/api/auftrag/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        p_id: 1, // TODO: Projekt-ID auswählbar machen
+                        bez_id: 10, // TODO: Bezirk-ID auswählbar machen
+                        daten: JSON.stringify(daten),
+                    }),
+                });
+                if (!response.ok) {
+                    const errData = await response.json();
+                    throw new Error(errData.message || 'Fehler beim Aktualisieren');
+                }
+                setSuccess('Auftrag erfolgreich aktualisiert!');
+            } else {
+                // POST - Neuen Auftrag erstellen
+                const response = await fetch('http://localhost:3001/api/auftrag', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        p_id: 1, // TODO: Projekt-ID auswählbar machen
+                        bez_id: 10, // TODO: Bezirk-ID auswählbar machen
+                        daten: JSON.stringify(daten),
+                    }),
+                });
+                if (!response.ok) {
+                    const errData = await response.json();
+                    throw new Error(errData.message || 'Fehler beim Erstellen');
+                }
+                setSuccess('Auftrag erfolgreich erstellt!');
+            }
+
+            // Nach kurzer Verzögerung zur Suchen-Seite navigieren
+            setTimeout(() => navigate('/dienstleistung/suchen'), 1500);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Unbekannter Fehler');
+        } finally {
+            setSaving(false);
+        }
     };
+
+    if (loading) {
+        return (
+            <Container
+                fluid
+                className="d-flex justify-content-center align-items-center"
+                style={{ minHeight: 'calc(100vh - 60px)', background: '#e8e8e8' }}
+            >
+                <Spinner animation="border" variant="primary" />
+            </Container>
+        );
+    }
 
     return (
         <Container
             fluid
             style={{ minHeight: 'calc(100vh - 60px)', background: '#e8e8e8', padding: '30px 40px' }}
         >
+            {error && <Alert variant="danger">{error}</Alert>}
+            {success && <Alert variant="success">{success}</Alert>}
+
             {/* Auftrags-ID (read-only) */}
             <Row className="mb-3">
                 <Col xs={12} md={4}>
@@ -70,7 +184,7 @@ export const DienstleistungErfassenPage: React.FC = () => {
                         </OverlayTrigger>
                     </Form.Label>
                     <Form.Control
-                        value={auftragId}
+                        value={auftragId || (isBearbeiten ? id : 'Wird automatisch vergeben')}
                         readOnly
                         style={{ background: '#c8c8c8', ...inputStyle, width: '160px' }}
                     />
@@ -197,6 +311,7 @@ export const DienstleistungErfassenPage: React.FC = () => {
             {/* Senden */}
             <Button
                 onClick={handleSubmit}
+                disabled={saving}
                 className="agens-button-primary"
                 style={{
                     border: 'none',
@@ -205,7 +320,7 @@ export const DienstleistungErfassenPage: React.FC = () => {
                     padding: '10px 30px',
                 }}
             >
-                senden
+                {saving ? 'Wird gespeichert...' : 'senden'}
             </Button>
 
             {/* Zurück */}

@@ -211,45 +211,6 @@ COMMIT;
 
 
 
--- Beispiel Daten
-
--- 1. Daten für Tabelle `rolle`
-INSERT INTO `rolle` (`rolle_id`, `beschreibung`) VALUES
-                                                     (1, 'Administrator'),
-                                                     (2, 'Projektleiter'),
-                                                     (3, 'Mitarbeiter');
-
--- 2. Daten für Tabelle `bezirk`
-INSERT INTO `bezirk` (`bezirk_id`, `name`, `kuerzel`) VALUES
-                                                          (10, 'Berlin Mitte', 'BE-MIT'),
-                                                          (20, 'Hamburg Nord', 'HH-NOR'),
-                                                          (30, 'München Altstadt', 'BY-MUE');
-
--- 3. Daten für Tabelle `projekt`
-INSERT INTO `projekt` (`projekt_id`, `titel`, `beschreibung`, `aktiv`, `erstellt_am`) VALUES
-                                                                                          (1, 'Website Relaunch', 'Überarbeitung des Firmenauftritts', 1, '2026-08-01 10:00:00'),
-                                                                                          (2, 'App Entwicklung', 'Mobile App für iOS und Android', 1, '2026-08-15 14:30:00'),
-                                                                                          (3, 'Altsystem Wartung', 'Archivierung alter Datenbanken', 0, '2026-01-10 09:15:00');
-
--- 4. Daten für Tabelle `person`
-INSERT INTO `person` (`person_id`, `r_id`, `name`, `vorname`, `email`, `telefon`, `aktiv`, `letzter_login`) VALUES
-                                                                                                                (1, 1, 'Mustermann', 'Max', 'max.mustermann@example.com', '+491701111111', 1, '2026-08-19 11:00:00'),
-                                                                                                                (2, 2, 'Müller', 'Sabine', 'sabine.mueller@example.com', '+491702222222', 1, '2026-08-18 16:45:00'),
-                                                                                                                (3, 3, 'Schmidt', 'Jan', 'jan.schmidt@example.com', '+491703333333', 1, '2026-08-17 08:30:00');
-
--- 5. Daten für Tabelle `projekt_x_person` (Verknüpfungstabelle)
-INSERT INTO `projekt_x_person` (`x_id`, `projekt_id`, `person_id`) VALUES
-                                                                       (1, 1, 1), -- Max arbeitet an Website Relaunch
-                                                                       (2, 1, 2), -- Sabine arbeitet an Website Relaunch
-                                                                       (3, 2, 2); -- Sabine arbeitet auch an App Entwicklung
-
--- 6. Daten für Tabelle `auftrag` (Inklusive gültiger JSON-Daten für die Spalte `daten`)
-INSERT INTO `auftrag` (`auftrag_id`, `daten`, `erstellt_am`, `p_id`, `bez_id`) VALUES
-                                                                                   (1, '{"prioritaet": "hoch", "budget": 5000, "notiz": "Erster Meilenstein"}', '2026-08-19 11:15:00', 1, 10),
-                                                                                   (2, '{"prioritaet": "mittel", "budget": 12000, "notiz": "Kundenfreigabe ausstehend"}', '2026-08-19 11:20:00', 2, 20);
-
-
-
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

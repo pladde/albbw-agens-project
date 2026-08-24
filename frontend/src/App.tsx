@@ -6,6 +6,7 @@ import { DienstleistungPage } from './pages/dienstleistungen/DienstleistungPage'
 import { DienstleistungSuchenPage } from './pages/dienstleistungen/DienstleistungSuchenPage';
 import { DienstleistungErfassenPage } from './pages/dienstleistungen/DienstleistungErfassenPage';
 import {Layout} from "./components/Layout";
+import { HomePage } from './pages/HomePage';
 
 // App.tsx = Wegbeschreibung des Clients, wenn eine URL eingegeben wird, wird die Seite X angezeigt.
 
@@ -14,6 +15,7 @@ function App() {
     return (
             <Routes>
                 <Route  element={<Layout />}>
+                <Route path="/" element={<HomePage />} />
                 <Route path="/dienstleistung" element={<DienstleistungPage />} />
                 <Route path="/dienstleistung/suchen" element={<DienstleistungSuchenPage />} />
                 <Route path="/dienstleistung/erfassen" element={<DienstleistungErfassenPage />} />

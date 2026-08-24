@@ -1,0 +1,22 @@
+DB-Seed anpassen -> Bezirke, Rollen
+
+Front User Interface anpassen
+    -> DienstleistungSuchenPage Spaltennamen, Filternamen
+    -> Header Bezirke zugreifen auf DB Bezirke
+    -> DienstleistungErfassenPage EingabefelderNamen, Bearbeiten
+
+
+
+
+
+
+
+
+@DienstleistungSuchenPage.tsx Zeile 44-60 useEffect() verstehen und in der KI erklären lassen
+-> useEffect ist eine Hook, das bedeutet, sie wird beim laden eines Events ausgelöst.
+    Hier wird useEffect ausgelöst, wenn die seite neu geladen wird.
+    [] bedeutet useEffect wird nur 1 mal ausgeführt.
+    useEffect() löst eine Fetch-Anfrage aus, die der Datenbank einen Auftrag über die URL sendet
+    Die datenbank sendet die Daten zurück im String-format, dass dann über .json() zu einem JSON-Objekt umgewandelt wird.
+    Mit dem jSON kann JS/TS gut arbeiten.
+    Nach dem Fetch wird der status loading "false" gesetzt, um den Spinner zu signalisieren, dass er nicht mehr spinnen braucht.
