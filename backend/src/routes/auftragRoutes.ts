@@ -22,7 +22,7 @@ const router = express.Router();
 router.get('/', async (_req, res) => {
     try {
         const [rows] = await pool.query(
-            `SELECT a.*, p.titel as projekt_titel, b.name as bezirk_name
+            `SELECT a.*, p.titel as titel, b.name as bezirk_name
                 FROM auftrag a
                 LEFT JOIN projekt p ON a.p_id = p.projekt_id
                 LEFT JOIN bezirk b ON a.bez_id = b.bezirk_id
@@ -43,7 +43,7 @@ router.get('/', async (_req, res) => {
 router.get('/:id', async (req, res) => {
     try {
         const [rows]: any = await pool.query(`
-            SELECT a.*, p.titel as projekt_titel, b.name as bezirk_name
+            SELECT a.*, p.titel as titel, b.name as bezirk_name
             FROM auftrag a
             LEFT JOIN projekt p ON a.p_id = p.projekt_id
             LEFT JOIN bezirk b ON a.bez_id = b.bezirk_id
@@ -71,7 +71,7 @@ router.get('/:id', async (req, res) => {
 router.get('/projekt/:projektId', async (req, res) => {
     try {
         const [rows] = await pool.query(`
-            SELECT a.*, p.titel as projekt_titel, b.name as bezirk_name
+            SELECT a.*, p.titel as titel, b.name as bezirk_name
             FROM auftrag a
             LEFT JOIN projekt p ON a.p_id = p.projekt_id
             LEFT JOIN bezirk b ON a.bez_id = b.bezirk_id
@@ -94,7 +94,7 @@ router.get('/projekt/:projektId', async (req, res) => {
 router.get('/bezirk/:bezirkId', async (req, res) => {
     try {
         const [rows] = await pool.query(`
-            SELECT a.*, p.titel as projekt_titel, b.name as bezirk_name
+            SELECT a.*, p.titel as titel, b.name as bezirk_name
             FROM auftrag a
             LEFT JOIN projekt p ON a.p_id = p.projekt_id
             LEFT JOIN bezirk b ON a.bez_id = b.bezirk_id

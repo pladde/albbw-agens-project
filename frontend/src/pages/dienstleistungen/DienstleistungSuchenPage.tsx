@@ -9,7 +9,7 @@ interface Auftrag {
     erstellt_am: string;
     p_id: number;
     bez_id: number;
-    projekt_titel: string | null;
+    titel: string | null;
     bezirk_name: string | null;
 }
 
@@ -30,10 +30,10 @@ export const DienstleistungSuchenPage: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
+
     // Filter-Felder
     const [auftragId, setAuftragId] = useState('');
-    const [kategorie, setKategorie] = useState('');
-    const [kundenname, setKundenname] = useState('');
+    const [titel, setTitel] = useState('');
     const [status, setStatus] = useState('');
     const [tag, setTag] = useState('');
     const [monat, setMonat] = useState('');
@@ -65,8 +65,8 @@ export const DienstleistungSuchenPage: React.FC = () => {
     // Filtern
     const gefiltert = auftraege.filter((a) => {
         const json = parseDaten(a.daten);
-        const auftragKategorie = json.kategorie || '';
-        const auftragKunde = json.kunde || '';
+
+        const auftragTitel = a.titel || '';
         const auftragStatus = json.status || '';
 
         // Datum-Filter
@@ -80,9 +80,8 @@ export const DienstleistungSuchenPage: React.FC = () => {
 
         return (
             String(a.auftrag_id).toLowerCase().includes(auftragId.toLowerCase()) &&
-            auftragKategorie.toLowerCase().includes(kategorie.toLowerCase()) &&
-            auftragKunde.toLowerCase().includes(kundenname.toLowerCase()) &&
             (status === '' || auftragStatus === status) &&
+            (titel === '' || auftragTitel.toLowerCase().includes(titel.toLowerCase())) &&
             datumMatch
         );
     });
@@ -141,32 +140,21 @@ export const DienstleistungSuchenPage: React.FC = () => {
                 </Col>
 
                 <Col xs="auto">
-                    <Form.Label style={{ fontWeight: 500, marginBottom: 4 }}>Kategorie</Form.Label>
+                    <Form.Label style={{ fontWeight: 500, marginBottom: 4 }}>Titel</Form.Label>
                     <div className="d-flex align-items-center gap-1">
                         <Form.Control
-                            value={kategorie}
-                            onChange={(e) => setKategorie(e.target.value)}
+                            value={titel}
+                            onChange={(e) => setTitel(e.target.value)}
                             style={{ width: '140px', ...inputStyle }}
                         />
                         <Search />
                     </div>
                 </Col>
 
-                <Col xs="auto">
-                    <Form.Label style={{ fontWeight: 500, marginBottom: 4 }}>Kundenname</Form.Label>
-                    <div className="d-flex align-items-center gap-1">
-                        <Form.Control
-                            value={kundenname}
-                            onChange={(e) => setKundenname(e.target.value)}
-                            style={{ width: '160px', ...inputStyle }}
-                        />
-                        <Search />
-                    </div>
-                </Col>
 
                 <Col xs="auto">
                     <Form.Label style={{ fontWeight: 500, marginBottom: 4 }}>
-                        Bearbeitungsstatus
+                        status
                     </Form.Label>
                     <Form.Select
                         value={status}
@@ -174,10 +162,8 @@ export const DienstleistungSuchenPage: React.FC = () => {
                         style={{ width: '175px', ...inputStyle }}
                     >
                         <option value="">Bitte wählen...</option>
-                        <option>Angenommen</option>
                         <option>In Bearbeitung</option>
                         <option>Abgeschlossen</option>
-                        <option>Herausgegeben</option>
                     </Form.Select>
                 </Col>
 
@@ -233,7 +219,7 @@ export const DienstleistungSuchenPage: React.FC = () => {
                             <tr style={{ background: headerBg, color: 'white' }}>
                                 <th style={{ background: headerBg, color: 'white' }}>Auftrags-ID</th>
                                 <th style={{ background: headerBg, color: 'white' }}>Titel</th>
-                                <th style={{ background: headerBg, color: 'white' }}>Bearbeitungsstatus</th>
+                                <th style={{ background: headerBg, color: 'white' }}>Status</th>
                                 <th style={{ background: headerBg, color: 'white' }}>Datum</th>
                             </tr>
                         </thead>
@@ -252,8 +238,7 @@ export const DienstleistungSuchenPage: React.FC = () => {
                                         }}
                                     >
                                         <td>{a.auftrag_id}</td>
-                                        <td>{json.kategorie || '-'}</td>
-                                        <td>{json.kunde || '-'}</td>
+                                        <td>{a.titel || '-'}</td>
                                         <td>{json.status || '-'}</td>
                                         <td>
                                             {datum.toLocaleDateString('de-DE')}
@@ -263,7 +248,7 @@ export const DienstleistungSuchenPage: React.FC = () => {
                             })}
                             {gefiltert.length === 0 && (
                                 <tr>
-                                    <td colSpan={5} className="text-center py-4">
+                                    <td colSpan={4} className="text-center py-4">
                                         Keine Aufträge gefunden
                                     </td>
                                 </tr>

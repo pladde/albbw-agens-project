@@ -1,17 +1,16 @@
 DB-Seed anpassen -> Bezirke, Rollen
 
 Front User Interface anpassen
-    -> DienstleistungSuchenPage Spaltennamen, Filternamen
     -> Header Bezirke zugreifen auf DB Bezirke
     -> DienstleistungErfassenPage EingabefelderNamen, Bearbeiten
 
+==>in @DienstleistungSuchenPage.tsx die TableHeader ersetzen mit passender Funktion
 
 
 
 
 
-
-
+    -> DienstleistungSuchenPage Spaltennamen, Filternamen
 @DienstleistungSuchenPage.tsx Zeile 44-60 useEffect() verstehen und in der KI erklären lassen
 -> useEffect ist eine Hook, das bedeutet, sie wird beim laden eines Events ausgelöst.
     Hier wird useEffect ausgelöst, wenn die seite neu geladen wird.
