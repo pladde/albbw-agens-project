@@ -39,34 +39,6 @@ router.get('/', async (_req, res) => {
     }
 });
 
-// GET - einzelnen Auftrag abrufen (mit Projekt-Titel und Bezirk-Name)
-router.get('/:id', async (req, res) => {
-    try {
-        const [rows]: any = await pool.query(`
-            SELECT a.*, p.titel as titel, b.name as bezirk_name
-            FROM auftrag a
-            LEFT JOIN projekt p ON a.p_id = p.projekt_id
-            LEFT JOIN bezirk b ON a.bez_id = b.bezirk_id
-            WHERE a.auftrag_id = ?`,
-            [req.params.id]);
-
-        if (rows.length === 0) {
-            return res.status(404).json({
-                status: 'error',
-                message: 'Auftrag nicht gefunden'
-            });
-        }
-        res.json(rows[0]);
-    } catch (error) {
-        console.error('Fehler beim Abrufen des Auftrags:', error);
-        res.status(500).json({
-            status: 'error',
-            message: 'Fehler beim Abrufen des Auftrags',
-            error: error instanceof Error ? error.message : 'Unbekannter Fehler'
-        });
-    }
-});
-
 // GET - Aufträge nach Projekt abrufen
 router.get('/projekt/:projektId', async (req, res) => {
     try {
@@ -108,6 +80,34 @@ router.get('/bezirk/:bezirkId', async (req, res) => {
         res.status(500).json({
             status: 'error',
             message: 'Fehler beim Abrufen der Aufträge',
+            error: error instanceof Error ? error.message : 'Unbekannter Fehler'
+        });
+    }
+});
+
+// GET - einzelnen Auftrag abrufen (mit Projekt-Titel und Bezirk-Name)
+router.get('/:id', async (req, res) => {
+    try {
+        const [rows]: any = await pool.query(`
+            SELECT a.*, p.titel as titel, b.name as bezirk_name
+            FROM auftrag a
+            LEFT JOIN projekt p ON a.p_id = p.projekt_id
+            LEFT JOIN bezirk b ON a.bez_id = b.bezirk_id
+            WHERE a.auftrag_id = ?`,
+            [req.params.id]);
+
+        if (rows.length === 0) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Auftrag nicht gefunden'
+            });
+        }
+        res.json(rows[0]);
+    } catch (error) {
+        console.error('Fehler beim Abrufen des Auftrags:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Fehler beim Abrufen des Auftrags',
             error: error instanceof Error ? error.message : 'Unbekannter Fehler'
         });
     }

@@ -12,6 +12,7 @@ import {
 } from 'react-bootstrap';
 import { InfoCircle } from 'react-bootstrap-icons';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useBezirk } from '../../contexts/BezirkContext';
 
 const KATEGORIEN = [
     'Holzwerkstatt',
@@ -33,6 +34,9 @@ export const DienstleistungErfassenPage: React.FC = () => {
     const navigate = useNavigate();
     const { id } = useParams<{ id?: string }>();
     const isBearbeiten = Boolean(id);
+
+    // Ausgewählter Bezirk aus dem globalen Context
+    const { bezirkId, selectedBezirk } = useBezirk();
 
     // Felder
     const [auftragId, setAuftragId] = useState<string>(''); // read-only, vom Backend generiert
@@ -115,7 +119,7 @@ export const DienstleistungErfassenPage: React.FC = () => {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         p_id: 1, // TODO: Projekt-ID auswählbar machen
-                        bez_id: 10, // TODO: Bezirk-ID auswählbar machen
+                        bez_id: bezirkId, // Ausgewählter Bezirk aus dem Header-Dropdown
                         daten: JSON.stringify(daten),
                     }),
                 });
@@ -131,7 +135,7 @@ export const DienstleistungErfassenPage: React.FC = () => {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         p_id: 1, // TODO: Projekt-ID auswählbar machen
-                        bez_id: 10, // TODO: Bezirk-ID auswählbar machen
+                        bez_id: bezirkId, // Ausgewählter Bezirk aus dem Header-Dropdown
                         daten: JSON.stringify(daten),
                     }),
                 });
@@ -170,6 +174,11 @@ export const DienstleistungErfassenPage: React.FC = () => {
         >
             {error && <Alert variant="danger">{error}</Alert>}
             {success && <Alert variant="success">{success}</Alert>}
+
+            {/* Hinweis auf den aktuell ausgewählten Bezirk */}
+            <div className="mb-3" style={{ fontWeight: 500, fontSize: '16px', color: '#324360' }}>
+                Aktiver Bezirk: <strong>{selectedBezirk?.name || 'Kein Bezirk ausgewählt'}</strong>
+            </div>
 
             {/* Auftrags-ID (read-only) */}
             <Row className="mb-3">

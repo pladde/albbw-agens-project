@@ -7,12 +7,14 @@ import { DienstleistungSuchenPage } from './pages/dienstleistungen/Dienstleistun
 import { DienstleistungErfassenPage } from './pages/dienstleistungen/DienstleistungErfassenPage';
 import {Layout} from "./components/Layout";
 import { HomePage } from './pages/HomePage';
+import { BezirkProvider } from './contexts/BezirkContext';
 
 // App.tsx = Wegbeschreibung des Clients, wenn eine URL eingegeben wird, wird die Seite X angezeigt.
 
 
 function App() {
     return (
+        <BezirkProvider>
             <Routes>
                 <Route  element={<Layout />}>
                 <Route path="/" element={<HomePage />} />
@@ -22,6 +24,7 @@ function App() {
                 <Route path="/dienstleistung/erfassen/:id" element={<DienstleistungErfassenPage />} />
                 </Route>
             </Routes>
+        </BezirkProvider>
     );
 }
 export default App

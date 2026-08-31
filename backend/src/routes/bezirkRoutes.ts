@@ -20,7 +20,7 @@ const router = express.Router();
 // GET - Alle Bezirke abrufen
 router.get('/', async (_req, res) => {
     try {
-        const [rows] = await pool.query('SELECT * FROM bezirk ORDER BY name');
+        const [rows] = await pool.query('SELECT * FROM bezirk ORDER BY bezirk_id');
         res.json(rows);
     } catch (error) {
         console.error('Fehler beim Abrufen der Bezirke:', error);

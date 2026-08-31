@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Form, Button, Table, Spinner, Alert } from 'react-bootstrap';
 import { Search } from 'react-bootstrap-icons';
 import { useNavigate } from 'react-router-dom';
+import { useBezirk } from '../../contexts/BezirkContext';
 
 interface Auftrag {
     auftrag_id: number;
@@ -26,6 +27,9 @@ function parseDaten(daten: string | null): any {
 export const DienstleistungSuchenPage: React.FC = () => {
     const navigate = useNavigate();
 
+    // Ausgewählter Bezirk aus dem globalen Context
+    const { bezirkId, selectedBezirk } = useBezirk();
+
     const [auftraege, setAuftraege] = useState<Auftrag[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -43,11 +47,20 @@ export const DienstleistungSuchenPage: React.FC = () => {
 
     //
 
-    // Daten vom Backend laden
+    // Daten vom Backend laden – nur Aufträge des ausgewählten Bezirks
     useEffect(() => {
+        if (bezirkId === null) {
+            setAuftraege([]);
+            setLoading(false);
+            return;
+        }
+
+        setLoading(true);
+        setError('');
+
         const fetchAuftraege = async () => {
             try {
-                const response = await fetch('http://localhost:3001/api/auftrag');
+                const response = await fetch(`http://localhost:3001/api/auftrag/bezirk/${bezirkId}`);
                 if (!response.ok) {
                     throw new Error('Fehler beim Laden der Aufträge');
                 }
@@ -60,7 +73,7 @@ export const DienstleistungSuchenPage: React.FC = () => {
             }
         };
         fetchAuftraege();
-    }, []);
+    }, [bezirkId]);
 
     // Filtern
     const gefiltert = auftraege.filter((a) => {
@@ -123,6 +136,11 @@ export const DienstleistungSuchenPage: React.FC = () => {
             style={{ minHeight: 'calc(100vh - 60px)', background: '#e8e8e8', padding: '30px 40px' }}
         >
             {error && <Alert variant="danger">{error}</Alert>}
+
+            {/* Hinweis auf den aktuell ausgewählten Bezirk */}
+            <div className="mb-3" style={{ fontWeight: 500, fontSize: '16px', color: '#324360' }}>
+                Aktiver Bezirk: <strong>{selectedBezirk?.name || 'Kein Bezirk ausgewählt'}</strong>
+            </div>
 
             {/* Filter-Leiste */}
             <Row className="mb-3 align-items-end g-3">

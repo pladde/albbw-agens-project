@@ -3,8 +3,7 @@ DB-Seed anpassen -> Bezirke, Rollen
 Front User Interface anpassen
     -> Header Bezirke zugreifen auf DB Bezirke
     -> DienstleistungErfassenPage EingabefelderNamen, Bearbeiten
-
-==>in @DienstleistungSuchenPage.tsx die TableHeader ersetzen mit passender Funktion
+    => Die Daten der Tabelle sollen nach dem Bezirk sich anpassen, schau in die KI, da wurde schon begonnen
 
 
 
