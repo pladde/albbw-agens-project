@@ -66,11 +66,16 @@ export const Header: React.FC = () => {
                         value={bezirkId !== null ? String(bezirkId) : ''}
                         onChange={(e) => setBezirkId(Number(e.target.value))}
                     >
-                        {bezirke.map(bezirk => (
-                            <option key={bezirk.bezirk_id} value={bezirk.bezirk_id} >
-                                {bezirk.name}
-                            </option>
-                        ))}
+                        {[...bezirke]       /* ... = Kopie erstellen von Array */
+                            .sort((a, b) => a.bezirk_id - b.bezirk_id)
+                            .map(bezirk => (
+                                <option
+                                    key={bezirk.bezirk_id}
+                                    value={bezirk.bezirk_id}
+                                >
+                                    {bezirk.name}
+                                </option>
+                            ))}
                     </Form.Select>
                     <Image 
                         src={profilePicture} 
