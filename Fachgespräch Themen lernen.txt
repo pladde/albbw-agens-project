@@ -1,0 +1,7 @@
+Themen:
+
+Hochsprache Bedeutung
+Const, var,
+
+
+Beim JSON-Speichern im Fachgespräch erklären, warum das keine sinnvolle Idee ist

@@ -8,6 +8,13 @@ Front User Interface anpassen
 
 
 
+JSON flexibilität:
+-> Front end muss Key Value anbieten, kein fließtext
+-> JSON Daten Normalisieren ?
+
+
+
+
 
     -> DienstleistungSuchenPage Spaltennamen, Filternamen
 @DienstleistungSuchenPage.tsx Zeile 44-60 useEffect() verstehen und in der KI erklären lassen

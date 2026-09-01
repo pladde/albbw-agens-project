@@ -66,7 +66,9 @@ export const Header: React.FC = () => {
                         value={bezirkId !== null ? String(bezirkId) : ''}
                         onChange={(e) => setBezirkId(Number(e.target.value))}
                     >
-                        {[...bezirke]       /* ... = Kopie erstellen von Array */
+
+                        {/* BezirkID nach Zahl aufsteigend sortieren & ("..." = Kopie erstellen von Array) */}
+                        {[...bezirke]
                             .sort((a, b) => a.bezirk_id - b.bezirk_id)
                             .map(bezirk => (
                                 <option

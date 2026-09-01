@@ -45,7 +45,6 @@ export const DienstleistungSuchenPage: React.FC = () => {
     const [selectedId, setSelectedId] = useState<number | null>(null);
 
 
-    //
 
     // Daten vom Backend laden – nur Aufträge des ausgewählten Bezirks
     useEffect(() => {
