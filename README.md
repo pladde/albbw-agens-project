@@ -1,7 +1,7 @@
 ## Diese Branch ist für die Fahrradwerkstatt. ##
 
-Hier entsteht meine komplette Neuentwicklung meines Projektes damit ich alle Learnings umsetzen kann und eine qualitativere Lösung als zuvor umsetzen kann.
-
+Hier entsteht meine komplette Neuentwicklung meines Projektes damit ich alle Learnings und eine qualitativere Lösung als zuvor umsetzen kann.
+### Die grundlegenden Funktionen werden hier ausführlich dokumentiert. ###
 
 ## Installieren der Abhängigkeiten: ##
 
