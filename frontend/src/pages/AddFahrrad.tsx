@@ -11,7 +11,7 @@ export const AddFahrrad = () => {
     const [id, setId] = useState<string>('');
     const [marke, setMarke] = useState<string>('');
     const [rahmennummer, setRahmennummer] = useState<string>('');
-    const [besonderheiten, setBesonderheiten] = useState<string>('');
+    const [farbe, setFarbe] = useState<string>('');
     const [bearbeitungsstatus, setBearbeitungsstatus] = useState<string>('');
     //const [date, setDate] = useState<string>('');
 
@@ -67,16 +67,15 @@ export const AddFahrrad = () => {
                     onChange={(e) => setRahmennummer(e.target.value)} />
             </Form.Group>
 
-            {/* Besonderheiten */}
+            {/* Farbe */}
             <Form.Group className='mb-3'>
-                <Form.Label>Besonderheiten</Form.Label>
+                <Form.Label>Farbe</Form.Label>
                 <Form.Control 
-                    as='textarea'
-                    rows={5}
-                    placeholder='z.B. Aerolenkeraufsatz'
-                    style={{ width: '100%', maxWidth: '500px' }}
-                    value={besonderheiten}
-                    onChange={(e) => setBesonderheiten(e.target.value)}>
+                    type='text' 
+                    placeholder='z.B. rot'
+                    style={{ width: '100%', maxWidth: '300px' }}
+                    value={farbe}
+                    onChange={(e) => setFarbe(e.target.value)}>
                 </Form.Control>
             </Form.Group>
 
