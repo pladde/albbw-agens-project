@@ -1,0 +1,42 @@
+/* Gemeinsame Basis für alle Agens-Buttons */
+.agens-button-primary, 
+.agens-button-secondary {
+    display: inline-block;
+    font-weight: 400;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    padding: 0.375rem 0.75rem;
+    border: 1px solid transparent;
+    border-radius: 0.375rem;
+    transition: all 0.2s ease-in-out;
+    text-decoration: none;
+}
+
+/* PRIMARY STYLE (Blau) */
+.agens-button-primary {
+    background-color: #5374a5 !important;
+    border-color: #5374a5 !important;
+    color: #ffffff !important;
+}
+.agens-button-primary:hover {
+    background-color: #384463 !important;
+    border-color: #384463 !important;
+}
+
+/* SECONDARY STYLE (Grau/Outline) */
+.agens-button-secondary {
+    background-color: #b0b0b0 !important;
+    border-color: #515151 !important;
+    color: #515151 !important;
+}
+.agens-button-secondary:hover {
+    background-color: #515151 !important;
+    color: #ffffff !important;
+}
+
+/* Primary-Theme */
+.agens-theme-blue {
+    background-color: #5374a5 !important;
+    color:  #ffffff !important;
+}
