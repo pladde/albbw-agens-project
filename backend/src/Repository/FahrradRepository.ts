@@ -64,7 +64,6 @@ export class FahrradRepository
         const values = [
             fahrrad.getMarke(),
             fahrrad.getRahmennummer(),
-            fahrrad.getBesonderheiten(),
             fahrrad.getBearbeitungsstatus(),
             fahrrad.getErfasstAm(),
             fahrrad.getErfasstVon(),

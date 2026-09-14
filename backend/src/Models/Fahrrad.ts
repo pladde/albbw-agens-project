@@ -12,7 +12,7 @@ export class Fahrrad
     private fahrrad_id?: number;
     private marke?: string;
     private rahmennummer?: string;
-    private besonderheiten?: string;
+    private farbe?: string;
     private bearbeitungsstatus?: string;
     private erfasstAm?: Date;
     private erfasstVon?: string;
@@ -26,7 +26,7 @@ export class Fahrrad
      * * @param id Die eindeutige Kennung (Primärschlüssel) des Fahrrads.
      * @param marke Die Marke des Fahrrads (z.B. Cube, Canyon).
      * @param rahmennummer Die eindeutige Rahmennummer des Fahrrads.
-     * @param besonderheiten Besondere Merkmale oder Anmerkungen zum Fahrrad.
+     * @param farbe Die Farbe des Fahrrads. (Zum Beispiel "rot", "blau")
      * @param bearbeitungsstatus Der aktuelle Bearbeitungsstatus des Fahrrads (z.B. "in Bearbeitung", "Verfügbar").
      * @param erfasstAm Der Zeitpunkt, zu dem das Fahrrad im System erfasst wurde.
      * @param erfasstVon Der Name oder die Kennung der Person, die das Fahrrad erfasst hat.
@@ -37,7 +37,7 @@ export class Fahrrad
             this.fahrrad_id = data.fahrrad_id;
             this.marke = data.marke;
             this.rahmennummer = data.rahmennummer;
-            this.besonderheiten = data.besonderheiten;
+            this.farbe = data.farbe;
             this.bearbeitungsstatus = data.bearbeitungsstatus;
             this.erfasstAm = data.erfasstAm;
             this.erfasstVon = data.erfasstVon;
@@ -104,22 +104,22 @@ export class Fahrrad
         this.rahmennummer = rahmennummer;
     }
 
-    // --- Getter & Setter für 'besonderheiten' ---
+    // --- Getter & Setter für 'farbe' ---
     /**
-     * Ruft besondere Merkmale oder Anmerkungen ab.
-     * @returns Die Besonderheiten oder `undefined`.
+     * Ruft die Farbe des Objektes ab.
+     * @returns Die farbe oder `undefined`.
      */
-    public getBesonderheiten(): string | undefined
+    public getFarbe(): string | undefined
     {
-        return this.besonderheiten;
+        return this.farbe;
     }
     /**
-     * Setzt die besonderen Merkmale oder Anmerkungen.
-     * @param besonderheiten Die zu setzenden Besonderheiten.
+     * Setzt die farbe.
+     * @param farbe Die Farbe die gesetzt wird.
      */
-    public setBesonderheiten(besonderheiten: string): void
+    public setFarbe(farbe: string): void
     {
-        this.besonderheiten = besonderheiten;
+        this.farbe = farbe;
     }
 
     // --- Getter & Setter für 'bearbeitungsstatus' ---

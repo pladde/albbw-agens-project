@@ -4,7 +4,7 @@ import { Fahrrad } from "../Models/Fahrrad";
  * @class RowToObject
  * RowToObject ist eine Utility-Klasse, die für die **Konvertierung von Rohdaten** (typischerweise
  * Datenbankzeilen oder generische Objekte) in das spezifische **Fahrrad-Objekt** (Entity) zuständig ist.
- * Dies wird oft als Data Mapper oder DTO-Mapper bezeichnet.
+ * Dies dient dazu Daten zu mappen. Wahrscheinlich werde ich sie aber später wieder entfernen und die Daten sauber per Interface behandeln.
  */
 export class RowToObject
 {
@@ -21,7 +21,7 @@ export class RowToObject
             fahrrad_id: fahrradData.fahrrad_id,
             marke: fahrradData.marke,
             rahmennummer: fahrradData.rahmennummer,
-            besonderheiten: fahrradData.besonderheiten,
+            farbe: fahrradData.farbe,
             bearbeitungsstatus: fahrradData.bearbeitungsstatus,
             erfasstAm: fahrradData.erfasstAm,
             erfasstVon: fahrradData.erfasstVon,

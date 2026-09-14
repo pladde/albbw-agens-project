@@ -4,7 +4,7 @@ export interface IFahrrad
     fahrrad_id?: number;
     marke?: string;
     rahmennummer?: string;
-    besonderheiten?: string;
+    farbe?: string;
     bearbeitungsstatus?: string;
     erfasstAm?: Date;
     erfasstVon?: string;

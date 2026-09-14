@@ -71,7 +71,7 @@ export class FahrradController
             let fahrrad = new Fahrrad({
                 marke: req.body.marke,
                 rahmennummer: req.body.rahmennummer,
-                besonderheiten: req.body.besonderheiten,
+                farbe: req.body.farbe,
                 bearbeitungsstatus: req.body.bearbeitungsstatus,
                 erfasstAm: req.body.erfasstAm,
                 erfasstVon: req.body.erfasstVon,
