@@ -18,3 +18,15 @@ Navigiere in den Backend-Ordner und installiere die Pakete:
 cd backend
 npm install
 ```
+
+### 3. Backend starten
+Starte die Powershell/das Terminal und starte den Server mit:
+```bash
+npx tsx server.ts
+```
+
+### 4. Frontend starten
+Starte die Powershell/das Terminal und starte das Frontend mit:
+```bash
+npm run dev
+```
