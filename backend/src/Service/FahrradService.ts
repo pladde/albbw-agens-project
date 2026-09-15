@@ -37,21 +37,57 @@ export class FahrradService
         return this.fahrradRepository.getTableColumns();
     }
 
-    public async erstelleFahrrad(fahrrad: Fahrrad)
+    /**
+     * Validiert ein Fahrrad-Objekt und übergibt es an das Repository zum Speichern.
+     * Zuerst werden die Eigenschaften (`Farbe, Marke`) geprüft. Sofern noch keine Einträge dazu in der Datenbank gefunden wurden
+     * werden sie neu angelegt. Dann wird ein Eigenschaften-Datensatz erstellt und mit Marke und Farbe verknüpft. Dieser wird dann 
+     * dem Fahrrad-Objekt hinzugefügt und über `fahrradRepository.save` gespeichert.
+     * @param fahrrad Das Fahrrad-Objekt, das gespeichert werden soll.
+     * @returns Ein Promise, das das gespeicherte `Fahrrad`-Objekt (inkl. ID) oder `undefined` zurückgibt.
+     * @throws {Error} Wenn das Fahrrad-Objekt null oder undefined ist.
+     */
+    public async createFahrrad(fahrrad: Fahrrad): Promise<Fahrrad | undefined>
     {
-        if (fahrrad.getMarke() != undefined)
-        {
-            let fahrradMarke = fahrrad.getMarke();
-            let markeId = await this.fahrradRepository.searchFahrradMarke(fahrradMarke)
-        }        
+        // Marke prüfen oder anlegen
+        const markenName = fahrrad.getMarke();
+        let markeId: number | undefined = undefined;
+
+        if (markenName) {
+            markeId = await this.fahrradRepository.searchFahrradMarke(markenName);
+            
+            if (!markeId) {
+                markeId = await this.fahrradRepository.createMarke(markenName);
+            }
+        }
+
+        // Farbe prüfen oder anlegen
+        const farbName = fahrrad.getFarbe(); 
+        let farbeId: number | null = null;
+
+        if (farbName) {
+            farbeId = await this.fahrradRepository.searchFahrradFarbe(farbName);
+            
+            if (!farbeId) {
+                farbeId = await this.fahrradRepository.createFarbe(farbName);
+            }
+        }
+
+        // Eigenschafts-Datensatz erstellen
+        if (markeId && farbeId) {
+            const eigenschaftId = await this.fahrradRepository.getOrCreateEigenschaftId(markeId, farbeId);
+            
+            fahrrad.setFahrradEigenschaftId(eigenschaftId);
+        }
+
+        return await this.fahrradRepository.save(fahrrad);
     }
 
+    /* ALTES CREATE FAHRRAD
     /**
      * **Validiert** ein **Fahrrad-Objekt** und übergibt es an das Repository **zum Speichern**.
      * @param fahrrad Das Fahrrad-Objekt, das gespeichert werden soll.
      * @returns Ein Promise, das das gespeicherte `Fahrrad`-Objekt (inkl. ID) oder `undefined` zurückgibt.
      * @throws {Error} Wenn das Fahrrad-Objekt null oder undefined ist.
-     */
     public async createNewFahrrad(fahrrad: Fahrrad): Promise<Fahrrad | undefined>
     {
         //#region Guard
@@ -63,7 +99,8 @@ export class FahrradService
 
         return await this.fahrradRepository.save(fahrrad);
     }
-
+    */
+   
     /**
      * **Sucht** ein einzelnes Fahrrad anhand seiner **ID** über das Repository.
      * @param id Die eindeutige ID des Fahrrads.
