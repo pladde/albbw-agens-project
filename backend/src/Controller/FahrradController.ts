@@ -78,7 +78,7 @@ export class FahrradController
                 herausgegebenAn: req.body.herausgegebenAn
         });
             
-            const newBike = await this.fahrradService.createNewFahrrad(fahrrad);
+            const newBike = await this.fahrradService.createFahrrad(fahrrad);
 
             if(newBike != undefined || newBike != null) 
             {
