@@ -4,7 +4,7 @@ export interface IFahrrad
     marke?: string;
     rahmennummer?: string;
     besonderheiten?: string;
-    bearbeitungsstatus: string;
+    farbe: string;
     erfasstAm: Date;
     erfasstVon: number;
     herausgegebenAn?: number;

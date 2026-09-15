@@ -37,6 +37,15 @@ export class FahrradService
         return this.fahrradRepository.getTableColumns();
     }
 
+    public async erstelleFahrrad(fahrrad: Fahrrad)
+    {
+        if (fahrrad.getMarke() != undefined)
+        {
+            let fahrradMarke = fahrrad.getMarke();
+            let markeId = await this.fahrradRepository.searchFahrradMarke(fahrradMarke)
+        }        
+    }
+
     /**
      * **Validiert** ein **Fahrrad-Objekt** und übergibt es an das Repository **zum Speichern**.
      * @param fahrrad Das Fahrrad-Objekt, das gespeichert werden soll.

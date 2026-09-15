@@ -1,12 +1,16 @@
 import { Fahrrad } from "../Models/Fahrrad";
 import dbPool from "../config/db"
 import { RowToObject } from "../Util/RowToObject";
+import { QueryResult } from "mysql2";
 
 /**
  * Das FahrradRepository ist die Datenzugriffsschicht (Data Access Layer - DAL).
  * Es ist direkt für die Kommunikation mit der Datenbank (via SQL-Queries) und 
  * die Konvertierung von Datenbankzeilen in `Fahrrad`-Objekte zuständig.
  * * Diese Klasse stellt folgende Methoden bereit:
+ * @function `async getTableColumns(): Promise<string[]>`
+ * @function `async searchFahrradMarke(marke: string): Promise<number | null>`
+ * @function `async searchFahrradFarbe(farbe: string): Promise<number | null>`
  * @function `async save(fahrrad: Fahrrad) : Promise<Fahrrad | undefined>`
  * @function `async findFahrradById(id: number) : Promise<Fahrrad | undefined>`
  * @function `async findByString(column: string, value: string): Promise<any[] | undefined>`
@@ -20,7 +24,86 @@ export class FahrradRepository
     private tableColumns: string[] = [];
 
     /**
-     * Ruft die **Spaltennamen** der Tabelle 'fahrrad' ab, um **SQL-Injection** bei dynamischen Abfragen zu **verhindern**.
+     * Legt eine neue Marke in der Tabelle `marke` an.
+     * @return die `id` der Marke. 
+     */
+    public async createMarke(marke: string): Promise<number> 
+    {
+        const [result] = await dbPool.execute('INSERT INTO marke (marke) VALUES (?)', [marke]);
+        return (result as any).insertId;
+    }
+
+    /**
+     * Legt eine neue Farbe in der Tabelle `farbe` an.
+     * @return die `id` der Farbe. 
+     */
+    public async createFarbe(farbe: string): Promise<number> 
+    {
+        const [result] = await dbPool.execute('INSERT INTO fahrrad_farbe (farbe) VALUES (?)', [farbe]);
+        return (result as any).insertId;
+    }
+
+    /**
+     * Prüft ob die Kombination aus Farbe und Marke bereits in der fahrrad_eigenschaften vorhanden ist.
+     * @return die `id` des fahrrad_eigenschaft Eintrags. 
+     */
+    public async getOrCreateEigenschaftId(markeId: number, farbeId: number): Promise<number>
+    {
+        // Prüfen ob Kombi schon da ist oder direkt anlegen
+        // (Oder du hast eine Methode dafür. Hier ein vereinfachtes Beispiel:)
+        const stmt = 'INSERT INTO fahrrad_eigenschaft (marke_id, farbe_id) VALUES (?, ?)';
+        const [result] = await dbPool.execute(stmt, [markeId, farbeId]);
+        return (result as any).insertId;
+    }
+
+    /**
+     * Prüft ob der übergebene String (Marke) in der Tabelle "Marke" bereits existiert.
+     * @return die `id` der Marke oder `undefined` wenn kein Eintrag gefunden wurde. 
+     */
+    public async searchFahrradMarke(marke: string): Promise<number | undefined>
+    {   
+        const stmt = `
+        SELECT marke_id
+        FROM marke
+        WHERE marke = ?;
+        `
+
+        const [rows] = await dbPool.execute(stmt, [marke]);
+        
+        if (Array.isArray(rows) && rows.length > 0) 
+        {
+            const row = rows[0] as { marke_id: number };
+            return row.marke_id;
+        }
+
+        return undefined;
+    }
+
+    /**
+     * Prüft ob der übergebene String (Farbe) in der Tabelle "Farbe" bereits existiert.
+     * @return die `id` der Farbe oder `NULL` wenn kein Eintrag gefunden wurde. 
+     */
+    public async searchFahrradFarbe(farbe: string): Promise<number | null>
+    {   
+        const stmt = `
+        SELECT farbe_id
+        FROM farbe
+        WHERE farbe = ?;
+        `
+
+        const [rows] = await dbPool.execute(stmt, [farbe]);
+        
+        if (Array.isArray(rows) && rows.length > 0) 
+        {
+            const row = rows[0] as { farbe_id: number };
+            return row.farbe_id;
+        }
+
+        return null;
+    }
+
+    /**
+     * Ruft die **SpAltennamen** der Tabelle 'fahrrad' ab, um **SQL-Injection** bei dynamischen Abfragen zu **verhindern**.
      * @returns Ein Promise mit einem Array der Spaltennamen.
      */
     public async getTableColumns(): Promise<string[]> 
@@ -59,7 +142,7 @@ export class FahrradRepository
         const stmt = 
         `INSERT INTO fahrrad (marke, rahmennummer, besonderheiten, bearbeitungsstatus, erfasstAm, erfasstVon, herausgegebenAn)
         VALUES(?, ?, ?, ?, ?, ?, ?)`;
-
+        
         // Darf nicht undefined sein und wird falls der Wert nicht definiert wurde auf 'null' gesetzt.
         const values = [
             fahrrad.getMarke(),
