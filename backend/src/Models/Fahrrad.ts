@@ -11,8 +11,9 @@ export class Fahrrad
 
     private fahrrad_id?: number;
     private marke?: string;
-    private rahmennummer?: string;
     private farbe?: string;
+    private fahrradEigenschaftId?: number;
+    private rahmennummer?: string;
     private bearbeitungsstatus?: string;
     private erfasstAm?: Date;
     private erfasstVon?: string;
@@ -23,10 +24,12 @@ export class Fahrrad
      * Erstellt eine Instanz des Fahrrad-Objekts.
      * Alle Parameter sind optional, da ein Objekt entweder neu erstellt (ohne ID) 
      * oder aus der Datenbank geladen (mit allen Werten) werden kann.
-     * * @param id Die eindeutige Kennung (Primärschlüssel) des Fahrrads.
+     * * 
+     * @param id Die eindeutige Kennung (Primärschlüssel) des Fahrrads.
      * @param marke Die Marke des Fahrrads (z.B. Cube, Canyon).
      * @param rahmennummer Die eindeutige Rahmennummer des Fahrrads.
      * @param farbe Die Farbe des Fahrrads. (Zum Beispiel "rot", "blau")
+     * @param eigenschaft
      * @param bearbeitungsstatus Der aktuelle Bearbeitungsstatus des Fahrrads (z.B. "in Bearbeitung", "Verfügbar").
      * @param erfasstAm Der Zeitpunkt, zu dem das Fahrrad im System erfasst wurde.
      * @param erfasstVon Der Name oder die Kennung der Person, die das Fahrrad erfasst hat.
@@ -36,8 +39,9 @@ export class Fahrrad
         {
             this.fahrrad_id = data.fahrrad_id;
             this.marke = data.marke;
-            this.rahmennummer = data.rahmennummer;
             this.farbe = data.farbe;
+            this.fahrradEigenschaftId = data.eigenschaft;
+            this.rahmennummer = data.rahmennummer;
             this.bearbeitungsstatus = data.bearbeitungsstatus;
             this.erfasstAm = data.erfasstAm;
             this.erfasstVon = data.erfasstVon;
@@ -107,7 +111,7 @@ export class Fahrrad
     // --- Getter & Setter für 'farbe' ---
     /**
      * Ruft die Farbe des Objektes ab.
-     * @returns Die farbe oder `undefined`.
+     * @returns Die `farbe` oder `undefined`.
      */
     public getFarbe(): string | undefined
     {
@@ -121,6 +125,24 @@ export class Fahrrad
     {
         this.farbe = farbe;
     }
+
+    /**
+     * Ruft die Eigenschaft-ID auf.
+     * @param eigenschaft Die Eigenschaft-ID oder `undefinied`.
+     */
+    public getFahrradEigenschaftId(): number | undefined
+    {
+        return this.fahrradEigenschaftId;
+    }
+    /**
+     * Setzt die Eigenschaft ID.
+     * @param fahrradEigenschaftId Die Eigenschaft-ID die gesetzt wird.
+     */
+    public setFahrradEigenschaftId(fahrradEigenschaftId: number): void
+    {
+        this.fahrradEigenschaftId = fahrradEigenschaftId;
+    }
+
 
     // --- Getter & Setter für 'bearbeitungsstatus' ---
     /**

@@ -3,8 +3,9 @@ export interface IFahrrad
     // Attribute
     fahrrad_id?: number;
     marke?: string;
-    rahmennummer?: string;
     farbe?: string;
+    eigenschaft? : number;
+    rahmennummer?: string;
     bearbeitungsstatus?: string;
     erfasstAm?: Date;
     erfasstVon?: string;
