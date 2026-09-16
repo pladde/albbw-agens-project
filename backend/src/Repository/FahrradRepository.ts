@@ -140,14 +140,15 @@ export class FahrradRepository
         //#endregion
 
         const stmt = 
-        `INSERT INTO fahrrad (fahrrad_eigenschaft, rahmennummer, erfasst_am, erfasst_von, ausgegeben_an)
-        VALUES(?, ?, ?, ?, ?)`;
+        `INSERT INTO fahrrad 
+        (fahrrad_eigenschaft, rahmennummer, erfasst_am, erfasst_von, ausgegeben_an)
+        VALUES
+        (?, ?, NOW(), ?, ?)`;
         
         // Darf nicht undefined sein und wird falls der Wert nicht definiert wurde auf 'null' gesetzt.
         const values = [
             fahrrad.getFahrradEigenschaftId(),
             fahrrad.getRahmennummer(),
-            fahrrad.getErfasstAm(),
             fahrrad.getErfasstVon(),
             fahrrad.getHerausgegebenAn()
         ].map(val => val === undefined ? null : val);
