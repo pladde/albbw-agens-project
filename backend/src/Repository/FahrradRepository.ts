@@ -43,16 +43,24 @@ export class FahrradRepository
         return (result as any).insertId;
     }
 
-    /**
-     * Prüft ob die Kombination aus Farbe und Marke bereits in der fahrrad_eigenschaften vorhanden ist.
+/**
+     * Prüft ob die Kombination aus Farbe und Marke bereits in der fahrrad_eigenschaft vorhanden ist.
      * @return die `id` des fahrrad_eigenschaft Eintrags. 
      */
     public async getOrCreateEigenschaftId(markeId: number, farbeId: number): Promise<number>
     {
-        // Prüfen ob Kombi schon da ist oder direkt anlegen
-        // (Oder du hast eine Methode dafür. Hier ein vereinfachtes Beispiel:)
-        const stmt = 'INSERT INTO fahrrad_eigenschaft (marke_id, farbe_id) VALUES (?, ?)';
-        const [result] = await dbPool.execute(stmt, [markeId, farbeId]);
+        // Prüft ob die Kombi bereits existiert
+        const selectStmt = 'SELECT fahrrad_eigenschaft_id FROM fahrrad_eigenschaft WHERE marke_id = ? AND farbe_id = ?';
+        const [rows] = await dbPool.execute(selectStmt, [markeId, farbeId]);
+        
+        const existingRows = rows as any[];
+        if (existingRows.length > 0) {
+            return existingRows[0].fahrrad_eigenschaft_id;
+        }
+
+        // Falls nicht vorhanden wird die Eigenschaft neu anglelegt
+        const insertStmt = 'INSERT INTO fahrrad_eigenschaft (marke_id, farbe_id) VALUES (?, ?)';
+        const [result] = await dbPool.execute(insertStmt, [markeId, farbeId]);
         return (result as any).insertId;
     }
 
@@ -62,11 +70,7 @@ export class FahrradRepository
      */
     public async searchFahrradMarke(marke: string): Promise<number | undefined>
     {   
-        const stmt = `
-        SELECT marke_id
-        FROM marke
-        WHERE marke = ?;
-        `
+        const stmt = 'SELECT marke_id FROM marke WHERE marke = ?;'
 
         const [rows] = await dbPool.execute(stmt, [marke]);
         
@@ -85,11 +89,7 @@ export class FahrradRepository
      */
     public async searchFahrradFarbe(farbe: string): Promise<number | null>
     {   
-        const stmt = `
-        SELECT farbe_id
-        FROM farbe
-        WHERE farbe = ?;
-        `
+        const stmt = 'SELECT farbe_id FROM farbe WHERE farbe = ?;'
 
         const [rows] = await dbPool.execute(stmt, [farbe]);
         

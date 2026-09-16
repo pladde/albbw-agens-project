@@ -67,10 +67,9 @@ export class FahrradController
     {
         try 
         {
-            //überabreiten
             let fahrrad = new Fahrrad({
-                marke: req.body.marke,
                 rahmennummer: req.body.rahmennummer,
+                marke: req.body.marke,
                 farbe: req.body.farbe,
                 erfasstAm: req.body.erfasstAm,
                 erfasstVon: req.body.erfasstVon,
