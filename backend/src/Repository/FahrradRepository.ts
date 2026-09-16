@@ -370,11 +370,11 @@ export class FahrradRepository
             const offset = pageNum * limit;
 
             const stmt = `
-            SELECT fahrrad.fahrrad_id, marke.marke, fahrrad_farbe.farbe, fahrrad.rahmennummer, fahrrad.bearbeitungsstatus 
-            FROM fahrrad 
-            LEFT JOIN fahrrad_eigenschaft ON fahrrad.fahrrad_eigenschaft_id = fahrrad_eigenschaft.fahrrad_eigenschaft_id
+            SELECT fahrrad.fahrrad_id, fahrrad.rahmennummer, marke.marke, farbe.farbe, fahrrad.erfasst_am, fahrrad.erfasst_von, fahrrad.ausgang_am, fahrrad.ausgegeben_an
+            FROM fahrrad
+            LEFT JOIN fahrrad_eigenschaft ON fahrrad.fahrrad_eigenschaft = fahrrad_eigenschaft.fahrrad_eigenschaft_id
             LEFT JOIN marke ON fahrrad_eigenschaft.marke_id = marke.marke_id
-            LEFT JOIN fahrrad_farbe ON fahrrad_eigenschaft.farbe_id = fahrrad_farbe.farbe_id
+            LEFT JOIN farbe ON fahrrad_eigenschaft.farbe_id = farbe.farbe_id
 
             ORDER BY fahrrad_id 
             DESC 
