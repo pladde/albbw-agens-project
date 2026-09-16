@@ -32,11 +32,6 @@ export class FahrradService
         this.fahrradRepository = fahrradRepository;
     }
 
-    private getDatetime()
-    {
-        const datetime = Date.now();
-    }
-
     public async getTableColumns() : Promise<string[]> {
             
         return this.fahrradRepository.getTableColumns();
