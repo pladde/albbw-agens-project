@@ -39,7 +39,7 @@ export class FahrradRepository
      */
     public async createFarbe(farbe: string): Promise<number> 
     {
-        const [result] = await dbPool.execute('INSERT INTO fahrrad_farbe (farbe) VALUES (?)', [farbe]);
+        const [result] = await dbPool.execute('INSERT INTO farbe (farbe) VALUES (?)', [farbe]);
         return (result as any).insertId;
     }
 
@@ -140,14 +140,13 @@ export class FahrradRepository
         //#endregion
 
         const stmt = 
-        `INSERT INTO fahrrad (marke, rahmennummer, besonderheiten, bearbeitungsstatus, erfasstAm, erfasstVon, herausgegebenAn)
-        VALUES(?, ?, ?, ?, ?, ?, ?)`;
+        `INSERT INTO fahrrad (fahrrad_eigenschaft, rahmennummer, erfasst_am, erfasst_von, ausgegeben_an)
+        VALUES(?, ?, ?, ?, ?)`;
         
         // Darf nicht undefined sein und wird falls der Wert nicht definiert wurde auf 'null' gesetzt.
         const values = [
-            fahrrad.getMarke(),
+            fahrrad.getFahrradEigenschaftId(),
             fahrrad.getRahmennummer(),
-            fahrrad.getBearbeitungsstatus(),
             fahrrad.getErfasstAm(),
             fahrrad.getErfasstVon(),
             fahrrad.getHerausgegebenAn()

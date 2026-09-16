@@ -72,7 +72,6 @@ export class FahrradController
                 marke: req.body.marke,
                 rahmennummer: req.body.rahmennummer,
                 farbe: req.body.farbe,
-                bearbeitungsstatus: req.body.bearbeitungsstatus,
                 erfasstAm: req.body.erfasstAm,
                 erfasstVon: req.body.erfasstVon,
                 herausgegebenAn: req.body.herausgegebenAn
