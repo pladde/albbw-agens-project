@@ -3,6 +3,18 @@
 * HINWEIS: Enthält noch keine Beziehungen zu Kunden oder Mitarbeiter - TODO:
 */
 
+CREATE TABLE bearbeitungsstatus (
+  bearbeitungsstatus_id INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
+  bezeichnung VARCHAR(100) NOT NULL
+);
+
+INSERT INTO bearbeitungsstatus (bezeichnung) 
+VALUES ('angenommen'),
+('verschrottet'),
+('in Bearbeitung'),
+('verfügbar'),
+('herausgegeben');
+
 CREATE TABLE farbe (
     farbe_id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
 	farbe VARCHAR(100)
@@ -35,9 +47,13 @@ CREATE TABLE fahrrad (
 	erfasst_von INT UNSIGNED NOT NULL,
 	ausgang_am DATETIME,
 	ausgegeben_an INT UNSIGNED,
-    bearbeitungsstatus ENUM('angenommen', 'verschrottet', 'in Bearbeitung', 'verfügbar', 'herausgegeben') NOT NULL DEFAULT 'angenommen',
+    bearbeitungsstatus_id INT UNSIGNED NOT NULL,
 
 	CONSTRAINT fk_eigenschaft
 	FOREIGN KEY (fahrrad_eigenschaft)
-	REFERENCES fahrrad_eigenschaft(fahrrad_eigenschaft_id)
+	REFERENCES fahrrad_eigenschaft(fahrrad_eigenschaft_id),
+
+	CONSTRAINT fk_fahrrad_bearbeitungsstatus
+	FOREIGN KEY (bearbeitungsstatus_id)
+	REFERENCES bearbeitungsstatus(bearbeitungsstatus_id)
 )

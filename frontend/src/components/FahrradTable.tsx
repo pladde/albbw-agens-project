@@ -1,3 +1,5 @@
+// FIXME: DIESE DATEI WIRD AKTUELL NICHT VERWENDET!!
+
 import { useState, useEffect } from 'react';
 import { Container, Form, Row, Table, Button, } from 'react-bootstrap';
 import '../assets/css/custom-style.css';

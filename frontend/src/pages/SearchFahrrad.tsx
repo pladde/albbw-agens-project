@@ -163,7 +163,7 @@ export const SearchFahrrad = () => {
             {allFahrraeder.map((row, rowIndex) => {
               // Prüfen, ob diese Zeile die aktuell ausgewählte ist
               const isSelected = selectedFahrrad === row.fahrrad_id;
-              console.log(selectedFahrrad + ' ausgewählt.');
+              //DEBUG console.log(selectedFahrrad + ' ausgewählt.');
 
               return (
                 <tr

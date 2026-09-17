@@ -113,32 +113,37 @@ export class FahrradRepository
             SELECT column_name, 1 as sort_order
             FROM information_schema.columns 
             WHERE table_name = 'fahrrad' 
-              AND table_schema = 'agens_fahrrad_test' 
-              AND column_name = 'fahrrad_id'
+            AND table_schema = 'agens_fahrrad_test' 
+            AND column_name = 'fahrrad_id'
 
             UNION ALL
 
             SELECT column_name, 2 as sort_order
             FROM information_schema.columns 
             WHERE table_name = 'marke' 
-              AND table_schema = 'agens_fahrrad_test' 
-              AND column_name = 'marke'
+            AND table_schema = 'agens_fahrrad_test' 
+            AND column_name = 'marke'
 
             UNION ALL
 
             SELECT column_name, 3 as sort_order
             FROM information_schema.columns 
             WHERE table_name = 'farbe' 
-              AND table_schema = 'agens_fahrrad_test' 
-              AND column_name = 'farbe'
+            AND table_schema = 'agens_fahrrad_test' 
+            AND column_name = 'farbe'
 
             UNION ALL
 
+            -- Alle anderen Spalten aus fahrrad, aber ohne ID, Eigenschaft und die alte Status-ID
             SELECT column_name, 4 as sort_order
             FROM information_schema.columns 
             WHERE table_name = 'fahrrad' 
-              AND table_schema = 'agens_fahrrad_test' 
-              AND column_name NOT IN ('fahrrad_id', 'fahrrad_eigenschaft')
+            AND table_schema = 'agens_fahrrad_test' 
+            AND column_name NOT IN ('fahrrad_id', 'fahrrad_eigenschaft', 'bearbeitungsstatus_id')
+
+            UNION ALL
+
+            SELECT 'bearbeitungsstatus' as column_name, 5 as sort_order
 
             ORDER BY sort_order;
         `;
@@ -401,11 +406,17 @@ export class FahrradRepository
             const offset = pageNum * limit;
 
             const stmt = `
-            SELECT fahrrad.fahrrad_id, fahrrad.rahmennummer, marke.marke, farbe.farbe, fahrrad.erfasst_am, fahrrad.erfasst_von, fahrrad.ausgang_am, fahrrad.ausgegeben_an
+            SELECT fahrrad.fahrrad_id, fahrrad.rahmennummer, 
+            marke.marke, 
+            farbe.farbe, 
+            fahrrad.erfasst_am, fahrrad.erfasst_von, fahrrad.ausgang_am, fahrrad.ausgegeben_an, 
+            bearbeitungsstatus.bezeichnung AS bearbeitungsstatus 
+            
             FROM fahrrad
             LEFT JOIN fahrrad_eigenschaft ON fahrrad.fahrrad_eigenschaft = fahrrad_eigenschaft.fahrrad_eigenschaft_id
             LEFT JOIN marke ON fahrrad_eigenschaft.marke_id = marke.marke_id
             LEFT JOIN farbe ON fahrrad_eigenschaft.farbe_id = farbe.farbe_id
+            LEFT JOIN bearbeitungsstatus ON fahrrad.bearbeitungsstatus_id = bearbeitungsstatus.bearbeitungsstatus_id
 
             ORDER BY fahrrad_id 
             DESC 
