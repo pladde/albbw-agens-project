@@ -2,17 +2,20 @@ import { Fahrrad } from "../Models/Fahrrad";
 import { FahrradRepository } from "../Repository/FahrradRepository";
 
 /**
- * Der FahrradService enthält die **Geschäftslogik (Business Logic)** für die Verwaltung 
- * von Fahrrad-Objekten. Er fungiert als Vermittler zwischen dem Controller und dem Repository.
+ * Der FahrradService enthält die **Geschäftslogik** für die Verwaltung 
+ * von Fahrrad-Objekten. Er fungiert als Vemrittler zwischen dem Controller und dem Repository.
  * Die Hauptaufgaben sind Validierung und Aufruf der Datenzugriffsmethoden.
- * * Diese Klasse stellt folgende Methoden bereit:
- * @function `async createNewFahrrad(fahrrad: Fahrrad) : Promise<Fahrrad | undefined>`
- * @function `async findFahrradById(id: number) : Promise<Fahrrad | undefined>`
- * @function `async findFahrradByString(column: string, value: string): Promise<any[] | undefined>`
+ * 
+ * Diese Klasse stellt dazu folgende Methoden bereit:
+ * @function `async getTableColumns(): Promise<string[]>`
+ * @function `async createFahrrad(fahrrad: Fahrrad): Promise<Fahrrad | undefined>`
+ * @function `async findFahrradById(id: number): Promise<Fahrrad | undefined>`
+ * @function `async findFahrradByString(searchRow: string, searchValue: string): Promise<any[] | undefined>`
  * @function `async findFahrradByDate(column: string, date: Date): Promise<any[] | undefined>`
- * @function `async findAllFahrrader(): Promise<any[] | undefined>`
- * @function `async deleteFahrradById(id: number) : Promise<any[] | undefined>`
- * @function `async editFahrradById(id: number, column: string, value: string) : Promise<any[] | undefined>`
+ * @function `async findAllFahrrader(page: number): Promise<any[] | undefined>`
+ * @function `async findAllFahrraederWithAttributes(page: number): Promise<any[] | undefined>`
+ * @function `async deleteFahrradById(fahrrad_id: number): Promise<any[] | undefined>`
+ * @function `async editFahrradById(id: number, column: string, value: string): Promise<any[] | undefined>`
  */
 export class FahrradService 
 {
