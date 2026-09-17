@@ -110,11 +110,38 @@ export class FahrradRepository
     {
         // Gibt nur die Namen der Tabellenspalten zurück
         const stmt = `
-            SELECT column_name
-            FROM information_schema.columns
-            WHERE table_name = 'fahrrad'
-            AND TABLE_SCHEMA = 'agens'
-            `;
+            SELECT column_name, 1 as sort_order
+            FROM information_schema.columns 
+            WHERE table_name = 'fahrrad' 
+              AND table_schema = 'agens_fahrrad_test' 
+              AND column_name = 'fahrrad_id'
+
+            UNION ALL
+
+            SELECT column_name, 2 as sort_order
+            FROM information_schema.columns 
+            WHERE table_name = 'marke' 
+              AND table_schema = 'agens_fahrrad_test' 
+              AND column_name = 'marke'
+
+            UNION ALL
+
+            SELECT column_name, 3 as sort_order
+            FROM information_schema.columns 
+            WHERE table_name = 'farbe' 
+              AND table_schema = 'agens_fahrrad_test' 
+              AND column_name = 'farbe'
+
+            UNION ALL
+
+            SELECT column_name, 4 as sort_order
+            FROM information_schema.columns 
+            WHERE table_name = 'fahrrad' 
+              AND table_schema = 'agens_fahrrad_test' 
+              AND column_name NOT IN ('fahrrad_id', 'fahrrad_eigenschaft')
+
+            ORDER BY sort_order;
+        `;
 
             const [rows]: any = await dbPool.execute(stmt);
 
