@@ -141,16 +141,17 @@ export class FahrradRepository
 
         const stmt = 
         `INSERT INTO fahrrad 
-        (fahrrad_eigenschaft, rahmennummer, erfasst_am, erfasst_von, ausgegeben_an)
+        (fahrrad_eigenschaft, rahmennummer, erfasst_am, erfasst_von, ausgegeben_an, bearbeitungsstatus)
         VALUES
-        (?, ?, NOW(), ?, ?)`;
+        (?, ?, NOW(), ?, ?, ?)`;
         
         // Darf nicht undefined sein und wird falls der Wert nicht definiert wurde auf 'null' gesetzt.
         const values = [
             fahrrad.getFahrradEigenschaftId(),
             fahrrad.getRahmennummer(),
             fahrrad.getErfasstVon(),
-            fahrrad.getHerausgegebenAn()
+            fahrrad.getHerausgegebenAn(),
+            fahrrad.getBearbeitungsstatus()
         ].map(val => val === undefined ? null : val);
 
         try 
@@ -161,6 +162,8 @@ export class FahrradRepository
 
             console.log(`Neues Fahrrad unter der ID "${insertResult.insertId}" erfolgreich gespeichert.`);
             fahrrad.setFahrradId(parseInt(insertResult.insertId));
+                    // Debug
+            console.log("Bearbeitungsstand auf : ", fahrrad.getBearbeitungsstatus());
 
             // DEBUG
             console.log("Fahrrad ID: " + fahrrad.getFahrradId());

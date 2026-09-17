@@ -82,7 +82,6 @@ export class FahrradService
             fahrrad.setFahrradEigenschaftId(eigenschaftId);
         }
 
-
         return await this.fahrradRepository.save(fahrrad);
     }
 

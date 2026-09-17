@@ -68,11 +68,12 @@ export class FahrradController
         try 
         {
             let fahrrad = new Fahrrad({
-                rahmennummer: req.body.rahmennummer,
-                marke: req.body.marke,
-                farbe: req.body.farbe,
-                erfasstVon: req.body.erfasstVon,
-                herausgegebenAn: req.body.herausgegebenAn
+                rahmennummer : req.body.rahmennummer,
+                marke : req.body.marke,
+                farbe : req.body.farbe,
+                erfasstVon : req.body.erfasstVon,
+                herausgegebenAn : req.body.herausgegebenAn,
+                bearbeitungsstatus : req.body.bearbeitungsstatus
         });
             
             const newBike = await this.fahrradService.createFahrrad(fahrrad);
