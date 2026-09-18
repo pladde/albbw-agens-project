@@ -211,12 +211,13 @@ export const SearchFahrrad = () => {
             löschen
           </Button>
           <Button
-          className='agens-button-primary'
-          //hidden={selectedFahrrad != null}
-          onClick={() => {
-            pdfService.createPdf();
-          }}
-          > als PDF exportieren
+            className='agens-button-primary'
+            disabled={allFahrraeder.length === 0}
+            onClick={() => {
+              pdfService.exportFahrraederToPdf(columns, allFahrraeder);
+            }}
+          >
+            als PDF exportieren
           </Button>
         </Form.Group>
         {/* // #endregion */}
