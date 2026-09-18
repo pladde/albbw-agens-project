@@ -7,6 +7,7 @@ import { IFahrrad } from "../Interfaces/IFahrrad";
  */
 export class Fahrrad 
 {
+    [x: string]: any;
     //#region Konstruktor
 
     private fahrrad_id?: number;
