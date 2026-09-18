@@ -1,7 +1,6 @@
-/*
-* Diese Datei ist der ausführbare SQL-Script, um die Datenbank anzulegen.
-* HINWEIS: Enthält noch keine Beziehungen zu Kunden oder Mitarbeiter - TODO:
-*/
+CREATE DATABASE agens_fahrrad_test;
+
+USE agens_fahrrad_test;
 
 CREATE TABLE bearbeitungsstatus (
   bearbeitungsstatus_id INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
@@ -15,6 +14,11 @@ VALUES ('angenommen'),
 ('verfügbar'),
 ('herausgegeben');
 
+CREATE TABLE mitarbeiter (
+mitarbeiter_id INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
+vorname varchar(100),
+nachname varchar(100));
+
 CREATE TABLE farbe (
     farbe_id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
 	farbe VARCHAR(100)
@@ -26,7 +30,7 @@ CREATE TABLE marke (
 );
 
 CREATE TABLE fahrrad_eigenschaft (
-    fahrrad_eigenschaft_id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    fahrrad_eigenschaft_id INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
     farbe_id INT UNSIGNED,
 	marke_id INT UNSIGNED,
 
@@ -40,10 +44,10 @@ CREATE TABLE fahrrad_eigenschaft (
 );
 
 CREATE TABLE fahrrad (
-	fahrrad_id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	fahrrad_id INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
 	fahrrad_eigenschaft INT UNSIGNED,
 	rahmennummer VARCHAR(100),
-	erfasst_am DATETIME NOT NULL,
+	erfasst_am DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	erfasst_von INT UNSIGNED NOT NULL,
 	ausgang_am DATETIME,
 	ausgegeben_an INT UNSIGNED,
@@ -55,5 +59,9 @@ CREATE TABLE fahrrad (
 
 	CONSTRAINT fk_fahrrad_bearbeitungsstatus
 	FOREIGN KEY (bearbeitungsstatus_id)
-	REFERENCES bearbeitungsstatus(bearbeitungsstatus_id)
+	REFERENCES bearbeitungsstatus(bearbeitungsstatus_id),
+
+	CONSTRAINT fk_mitarbeiter
+	FOREIGN KEY (erfasst_von)
+	REFERENCES mitarbeiter(mitarbeiter_id)
 )
