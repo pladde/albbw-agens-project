@@ -1,7 +1,6 @@
 import { Fahrrad } from "../Models/Fahrrad";
 import dbPool from "../config/db"
-import { RowToObject } from "../Util/RowToObject";
-import { QueryResult } from "mysql2";
+import { FahrradMapper } from "../Util/FahrradMapper";
 
 /**
  * Das FahrradRepository ist die Datenzugriffsschicht (Data Access Layer - DAL).
@@ -43,7 +42,17 @@ export class FahrradRepository
         return (result as any).insertId;
     }
 
-/**
+    /**
+     * Legt einen neuen Bearbeitungsstatus in der Tabelle `bearbeitungsstatus` an.
+     * @return die `id` des Bearbeitungsstatus. 
+     */
+    public async createBearbeitungsstatus(bearbeitungsstatus: string): Promise <number>
+    {
+        const [result] = await dbPool.execute('INSERT INTO bearbeitungsstatus(bezeichnung) VALUES (?)', [bearbeitungsstatus]);
+        return (result as any).insertId;
+    }
+
+    /**
      * Prüft ob die Kombination aus Farbe und Marke bereits in der fahrrad_eigenschaft vorhanden ist.
      * @return die `id` des fahrrad_eigenschaft Eintrags. 
      */
@@ -51,7 +60,7 @@ export class FahrradRepository
     {
         // Prüft ob die Kombi bereits existiert
         const selectStmt = 'SELECT fahrrad_eigenschaft_id FROM fahrrad_eigenschaft WHERE marke_id = ? AND farbe_id = ?';
-        const [rows] = await dbPool.execute(selectStmt, [markeId, farbeId]);
+        const [rows] = await dbPool.query(selectStmt, [markeId, farbeId]);
         
         const existingRows = rows as any[];
         if (existingRows.length > 0) {
@@ -60,7 +69,7 @@ export class FahrradRepository
 
         // Falls nicht vorhanden wird die Eigenschaft neu anglelegt
         const insertStmt = 'INSERT INTO fahrrad_eigenschaft (marke_id, farbe_id) VALUES (?, ?)';
-        const [result] = await dbPool.execute(insertStmt, [markeId, farbeId]);
+        const [result] = await dbPool.query(insertStmt, [markeId, farbeId]);
         return (result as any).insertId;
     }
 
@@ -72,7 +81,7 @@ export class FahrradRepository
     {   
         const stmt = 'SELECT marke_id FROM marke WHERE marke = ?;'
 
-        const [rows] = await dbPool.execute(stmt, [marke]);
+        const [rows] = await dbPool.query(stmt, [marke]);
         
         if (Array.isArray(rows) && rows.length > 0) 
         {
@@ -91,7 +100,7 @@ export class FahrradRepository
     {   
         const stmt = 'SELECT farbe_id FROM farbe WHERE farbe = ?;'
 
-        const [rows] = await dbPool.execute(stmt, [farbe]);
+        const [rows] = await dbPool.query(stmt, [farbe]);
         
         if (Array.isArray(rows) && rows.length > 0) 
         {
@@ -100,6 +109,25 @@ export class FahrradRepository
         }
 
         return null;
+    }
+
+    /**
+     * Prüft ob der übergebene String (Bearbeitungsstatus) in der Tabelle "bearbeitungsstatus" bereits existiert.
+     * @return die `id` des Bearbeitungsstatus oder `NULL` wenn kein Eintrag gefunden wurde. 
+     */
+    public async searchFahrradBearbeitungsstatus(bearbeitungsstatus: string) : Promise<number | null>
+    {
+        const stmt = 'SELECT bearbeitungsstatus_id FROM bearbeitungsstatus WHERE bezeichnung = ?;'
+
+        const [rows] = await dbPool.query(stmt, [bearbeitungsstatus]);
+        
+        if (Array.isArray(rows) && rows.length > 0) 
+        {
+            const row = rows[0] as { bearbeitungsstatus_id: number };
+            return row.bearbeitungsstatus_id;
+        }
+
+        return null
     }
 
     /**
@@ -134,7 +162,6 @@ export class FahrradRepository
 
             UNION ALL
 
-            -- Alle anderen Spalten aus fahrrad, aber ohne ID, Eigenschaft und die alte Status-ID
             SELECT column_name, 4 as sort_order
             FROM information_schema.columns 
             WHERE table_name = 'fahrrad' 
@@ -148,7 +175,7 @@ export class FahrradRepository
             ORDER BY sort_order;
         `;
 
-            const [rows]: any = await dbPool.execute(stmt);
+            const [rows]: any = await dbPool.query(stmt);
 
             this.tableColumns = rows.map((row: any) => row.column_name);
 
@@ -162,7 +189,7 @@ export class FahrradRepository
      * @returns Gibt das gespeicherte `Fahrrad`-Objekt (mit ID) oder `undefined` zurück.
      * @throws {Error} Wenn das `fahrrad`-Objekt fehlt oder ein Datenbankfehler auftritt.
      */
-    public async save(fahrrad: Fahrrad) : Promise<Fahrrad | undefined>
+    public async save(fahrrad: Fahrrad, bearbeitungsstatusId: number | null) : Promise<Fahrrad | undefined>
     {
         //#region Guard
         if(!fahrrad)
@@ -173,7 +200,7 @@ export class FahrradRepository
 
         const stmt = 
         `INSERT INTO fahrrad 
-        (fahrrad_eigenschaft, rahmennummer, erfasst_am, erfasst_von, ausgegeben_an, bearbeitungsstatus)
+        (fahrrad_eigenschaft, rahmennummer, erfasst_am, erfasst_von, ausgegeben_an, bearbeitungsstatus_id)
         VALUES
         (?, ?, NOW(), ?, ?, ?)`;
         
@@ -183,7 +210,7 @@ export class FahrradRepository
             fahrrad.getRahmennummer(),
             fahrrad.getErfasstVon(),
             fahrrad.getHerausgegebenAn(),
-            fahrrad.getBearbeitungsstatus()
+            bearbeitungsstatusId
         ].map(val => val === undefined ? null : val);
 
         try 
@@ -194,8 +221,6 @@ export class FahrradRepository
 
             console.log(`Neues Fahrrad unter der ID "${insertResult.insertId}" erfolgreich gespeichert.`);
             fahrrad.setFahrradId(parseInt(insertResult.insertId));
-                    // Debug
-            console.log("Bearbeitungsstand auf : ", fahrrad.getBearbeitungsstatus());
 
             // DEBUG
             console.log("Fahrrad ID: " + fahrrad.getFahrradId());
@@ -233,7 +258,7 @@ export class FahrradRepository
             const stmt = 
             "SELECT * FROM fahrrad WHERE `fahrrad_id` = ?";
             
-            const [result] = await dbPool.execute(stmt, [id]); 
+            const [result] = await dbPool.query(stmt, [id]); 
 
             const fahrradRows = result as any[];
 
@@ -245,9 +270,9 @@ export class FahrradRepository
             const fahrradData: any = fahrradRows[0];
             //console.log(fahrradData); // NUR ZUM DEBUGGEN
 
-            const rowToFahrrad = new RowToObject();
+            const mapFahrrad = new FahrradMapper();
 
-            return rowToFahrrad.mapRowToFahrrad(fahrradData);
+            return mapFahrrad.mapFahrrad(fahrradData);
 
         } catch (error)
         {
@@ -287,7 +312,7 @@ export class FahrradRepository
             const stmt =
             `SELECT * FROM fahrrad WHERE \`${searchRow}\` = ?`;
 
-            const [result] = await dbPool.execute(stmt, [searchValue]);
+            const [result] = await dbPool.query(stmt, [searchValue]);
 
             const fahrradRows = result as any[];
 
@@ -298,9 +323,9 @@ export class FahrradRepository
     
             const fahrradData: any = fahrradRows[0];
             //console.log(fahrradData); // NUR ZUM DEBUGGEN
-            const rowToFahrrad = new RowToObject();
+            const rowToFahrrad = new FahrradMapper();
 
-            const fahrradList = fahrradRows.map(row => rowToFahrrad.mapRowToFahrrad(row))
+            const fahrradList = fahrradRows.map(row => rowToFahrrad.mapFahrrad(row))
     
             //return rowToFahrrad.mapRowToFahrrad(fahrradData);
             return fahrradList;
@@ -343,7 +368,7 @@ export class FahrradRepository
             const stmt =
             `SELECT * FROM fahrrad WHERE \`${searchRow}\` = ?`;
 
-            const [result] = await dbPool.execute(stmt, [searchDate]);
+            const [result] = await dbPool.query(stmt, [searchDate]);
 
             const fahrradRows = result as any[];
 
@@ -353,9 +378,9 @@ export class FahrradRepository
             }        
     
             //console.log(fahrradData); // NUR ZUM DEBUGGEN
-            const rowToFahrrad = new RowToObject();
+            const rowToFahrrad = new FahrradMapper();
 
-            const fahrradList = fahrradRows.map(row => rowToFahrrad.mapRowToFahrrad(row))
+            const fahrradList = fahrradRows.map(row => rowToFahrrad.mapFahrrad(row))
     
             //return rowToFahrrad.mapRowToFahrrad(fahrradData);
             return fahrradList;
@@ -379,7 +404,7 @@ export class FahrradRepository
             const offset = pageNum * limit;
 
             const stmt = 'SELECT * FROM fahrrad ORDER BY fahrrad_id DESC LIMIT ? OFFSET ?';
-            const [allResults] = await dbPool.execute(stmt, [limit, offset]);
+            const [allResults] = await dbPool.query(stmt, [limit, offset]);
     
             const resultList = allResults as any[];
     
@@ -421,7 +446,7 @@ export class FahrradRepository
             ORDER BY fahrrad_id 
             DESC 
             LIMIT ? OFFSET ?`;
-            const [allResults] = await dbPool.execute(stmt, [limit, offset]);
+            const [allResults] = await dbPool.query(stmt, [limit, offset]);
     
             const resultList = allResults as any[];
     

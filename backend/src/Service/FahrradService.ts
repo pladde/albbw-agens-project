@@ -75,6 +75,18 @@ export class FahrradService
             }
         }
 
+        // Bearbeitungsstatus prüfen oder anlegen
+        const bearbeitungsstatus = fahrrad.getBearbeitungsstatus(); 
+        let bearbeitungsstatusId: number | null = null;
+
+        if (bearbeitungsstatus) {
+            bearbeitungsstatusId = await this.fahrradRepository.searchFahrradBearbeitungsstatus(bearbeitungsstatus);
+            
+            if (!bearbeitungsstatusId) {
+                bearbeitungsstatusId = await this.fahrradRepository.createBearbeitungsstatus(bearbeitungsstatus);
+            }
+        }
+
         // Eigenschafts-Datensatz erstellen
         if (markeId && farbeId) {
             const eigenschaftId = await this.fahrradRepository.getOrCreateEigenschaftId(markeId, farbeId);
@@ -82,27 +94,8 @@ export class FahrradService
             fahrrad.setFahrradEigenschaftId(eigenschaftId);
         }
 
-        return await this.fahrradRepository.save(fahrrad);
+        return await this.fahrradRepository.save(fahrrad, bearbeitungsstatusId);
     }
-
-    /* ALTES CREATE FAHRRAD
-    /**
-     * **Validiert** ein **Fahrrad-Objekt** und übergibt es an das Repository **zum Speichern**.
-     * @param fahrrad Das Fahrrad-Objekt, das gespeichert werden soll.
-     * @returns Ein Promise, das das gespeicherte `Fahrrad`-Objekt (inkl. ID) oder `undefined` zurückgibt.
-     * @throws {Error} Wenn das Fahrrad-Objekt null oder undefined ist.
-    public async createNewFahrrad(fahrrad: Fahrrad): Promise<Fahrrad | undefined>
-    {
-        //#region Guard
-        if(!fahrrad)
-        {
-            throw new Error(`Service: Das Objekt ${fahrrad} darf nicht null oder leer sein!`)
-        }
-        //#endregion
-
-        return await this.fahrradRepository.save(fahrrad);
-    }
-    */
    
     /**
      * **Sucht** ein einzelnes Fahrrad anhand seiner **ID** über das Repository.
@@ -226,7 +219,8 @@ export class FahrradService
         return result;
     }
 
-    public async findAllFahrraederWithAttributes(page: number) {
+    public async findAllFahrraederWithAttributes(page: number) 
+    {
 
         return await this.fahrradRepository.findAllWithAttributes(page);
     }
