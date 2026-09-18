@@ -3,7 +3,7 @@ import autoTable from 'jspdf-autotable';
 
 export const pdfService = {
   /**
-   * Exportiert die Tabellendaten als übersichtliches, modernes A4-PDF im Querformat.
+   * Diese Datei exportiert die Tabellendaten als A4-PDF im Querformat.
    * @param columns Array der Spaltennamen aus der Datenbank (z.B. ['fahrrad_id', 'marke', ...])
    * @param data Array der geladenen Fahrrad-Objekte
    */
@@ -20,11 +20,11 @@ export const pdfService = {
       format: 'a4',
     });
 
-    // Kopfbereich (Titel & Metadaten)
+    // Header (Titel & Metadaten)
     const title = 'Fahrrad-Bestandsübersicht';
     const dateStr = `Erstellt am: ${new Date().toLocaleDateString('de-DE')} um ${new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })} Uhr`;
 
-    // Haupttitel
+    // Titel
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(16);
     doc.setTextColor(33, 37, 41);
