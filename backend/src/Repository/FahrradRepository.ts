@@ -138,46 +138,47 @@ export class FahrradRepository
     {
         // Gibt nur die Namen der Tabellenspalten zurück
         const stmt = `
-            SELECT column_name, 1 as sort_order
-            FROM information_schema.columns 
-            WHERE table_name = 'fahrrad' 
-            AND table_schema = 'agens_fahrrad_test' 
-            AND column_name = 'fahrrad_id'
+        SELECT column_name AS col_name, 1 AS sort_order
+        FROM information_schema.columns 
+        WHERE table_name = 'fahrrad' 
+        AND table_schema = 'agens_fahrrad_test' 
+        AND column_name = 'fahrrad_id'
 
-            UNION ALL
+        UNION ALL
 
-            SELECT column_name, 2 as sort_order
-            FROM information_schema.columns 
-            WHERE table_name = 'marke' 
-            AND table_schema = 'agens_fahrrad_test' 
-            AND column_name = 'marke'
+        SELECT column_name AS col_name, 2 AS sort_order
+        FROM information_schema.columns 
+        WHERE table_name = 'marke' 
+        AND table_schema = 'agens_fahrrad_test' 
+        AND column_name = 'marke'
 
-            UNION ALL
+        UNION ALL
 
-            SELECT column_name, 3 as sort_order
-            FROM information_schema.columns 
-            WHERE table_name = 'farbe' 
-            AND table_schema = 'agens_fahrrad_test' 
-            AND column_name = 'farbe'
+        SELECT column_name AS col_name, 3 AS sort_order
+        FROM information_schema.columns 
+        WHERE table_name = 'farbe' 
+        AND table_schema = 'agens_fahrrad_test' 
+        AND column_name = 'farbe'
 
-            UNION ALL
+        UNION ALL
 
-            SELECT column_name, 4 as sort_order
-            FROM information_schema.columns 
-            WHERE table_name = 'fahrrad' 
-            AND table_schema = 'agens_fahrrad_test' 
-            AND column_name NOT IN ('fahrrad_id', 'fahrrad_eigenschaft', 'bearbeitungsstatus_id')
+        SELECT column_name AS col_name, 4 AS sort_order
+        FROM information_schema.columns 
+        WHERE table_name = 'fahrrad' 
+        AND table_schema = 'agens_fahrrad_test' 
+        AND column_name NOT IN ('fahrrad_id', 'fahrrad_eigenschaft', 'bearbeitungsstatus_id')
 
-            UNION ALL
+        UNION ALL
 
-            SELECT 'bearbeitungsstatus' as column_name, 5 as sort_order
+        SELECT 'bearbeitungsstatus' AS col_name, 5 AS sort_order
+        FROM DUAL
 
-            ORDER BY sort_order;
+        ORDER BY sort_order;
         `;
 
             const [rows]: any = await dbPool.query(stmt);
 
-            this.tableColumns = rows.map((row: any) => row.column_name);
+            this.tableColumns = rows.map((row: any) => row.col_name);
 
             return this.tableColumns;
     }

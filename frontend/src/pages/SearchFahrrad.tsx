@@ -155,7 +155,7 @@ export const SearchFahrrad = () => {
                     .replace('-id', '-ID')
                     }
                 </th>
-              ))}
+              ))} 
             </tr>
           </thead>
           { /* Erstellt und befüllt den Tabellen-Body mit den Fahrrädern aus der Datenbank */}
