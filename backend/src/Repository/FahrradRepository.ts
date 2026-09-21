@@ -473,7 +473,8 @@ export class FahrradRepository
      */
     public async deleteById(fahrrad_id: number) : Promise<any[] | undefined>
     {
-        console.log("REPO LAYER WIRD ERREICHT");
+        // FIXME: Debug
+        console.log('DEBUG: (REPOSITORY) Lösche Datensatz mit der ID: ', fahrrad_id );
 
         if(!fahrrad_id) 
         {

@@ -1,6 +1,7 @@
 import { Fahrrad } from "../Models/Fahrrad";
 import { Response, Request } from "express";
 import { FahrradService } from "../Service/FahrradService";
+import { raw } from "body-parser";
 
 /**
  * Der FahrradController dient als Schnittstelle zwischen der Anwendungsschicht 
@@ -288,12 +289,16 @@ export class FahrradController
     {
         //#region Guard
         const rawId = req.params.id;
+        // DEBUG
+        console.log('DEBUG: (CONTROLLER) Erhalte ID: ', rawId);
         if (!rawId) {
             res.status(400).json({ error: "id ist ein Pflichtfeld!" });
             return;
         }
 
         const fahrrad_id = parseInt(rawId);
+        // DEBUG
+        console.log('DEBUG: (CONTROLLER) Parse ID zu: ', fahrrad_id);
 
         if (isNaN(fahrrad_id)) {
             res.status(400).json({ error: "Die ID muss eine gültige Zahl sein (z.B. /27)!" });
@@ -303,9 +308,6 @@ export class FahrradController
         
         try
         {
-            const idString: string = req.query.page as string;
-            const fahrrad_id: number = parseInt(idString) || 0;
-
             const result = await this.fahrradService.deleteFahrradById(fahrrad_id);
             
             if (result === undefined) 

@@ -22,11 +22,59 @@ export const SearchFahrrad = () => {
   // State für das Bearbeiten-Modal
   const [editingFahrrad, setEditingFahrrad] = useState<Fahrrad | null>(null);
 
+  // State für das Löschen-Bestätigungsmodal
+  const [deletingFahrrad, setDeletingFahrrad] = useState<Record<string, any> | null>(null);
+
   const [datumSearch, setDatumSearch] = useState('');
   const [idSearch, setIdSearch] = useState('');
   const [markeSearch, setMarkeSearch] = useState('');
   const [rahmennummerSearch, setRahmennummerSearchSearch] = useState('');
   const [bearbeitungsstatusSearch, setBearbeitungsstatusSearch] = useState('');
+
+  // Formatiert die Spaltenköpfe für eine übersichtlichere Anzeige
+  const formatHeaderName = (colName: string): string => {
+    const lower = colName.toLowerCase();
+    if (lower === 'erfasst_am') return 'Eingangsdatum';
+    if (lower === 'ausgang_am') return 'Ausgangsdatum';
+
+    return colName
+      .replace('_', '-')
+      .replace(colName.charAt(0), colName.charAt(0).toUpperCase())
+      .replace('-id', '-ID');
+  };
+
+  // Prüft, ob ein Spaltenname exakt ein Datumsfeld ist (z. B. erfasst_am, ausgang_am, datum)
+  const isDateColumnName = (colName: string): boolean => {
+    const colLower = colName.toLowerCase();
+    return (
+      colLower.endsWith('_am') ||
+      colLower.endsWith('-am') ||
+      colLower.includes('datum') ||
+      colLower.includes('date') ||
+      colLower.includes('created_at') ||
+      colLower.includes('updated_at')
+    );
+  };
+
+  // Formatiert Datumsangaben in das Format "DD.MM.YYYY - HH:mm Uhr"
+  const formatDateValue = (val: any): string => {
+    if (!val) return '-';
+
+    const dateObj = new Date(val);
+    
+    // Prüfen, ob es sich um ein gültiges Datum handelt
+    if (isNaN(dateObj.getTime())) {
+      return String(val);
+    }
+
+    const day = String(dateObj.getDate()).padStart(2, '0');
+    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const year = dateObj.getFullYear();
+    const hours = String(dateObj.getHours()).padStart(2, '0');
+    const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+
+    return `${day}.${month}.${year} - ${hours}:${minutes} Uhr`;
+  };
 
   const handleShowAllFahrrader = async () => {
     const data = await fahrradService.fetchAllWithAttributes(currentPage);
@@ -124,73 +172,43 @@ export const SearchFahrrad = () => {
     }
   };
 
+  // Öffnet das Bestätigungs-Modal zum Löschen
+  const handleDeleteClick = () => {
+    if (selectedFahrrad === null) return;
+    const itemToDelete = allFahrraeder.find(f => f.fahrrad_id === selectedFahrrad);
+    if (itemToDelete) {
+      setDeletingFahrrad(itemToDelete);
+    }
+  };
+
+  // Löschen nach der Bestätigung
+  const handleConfirmDelete = async () => {
+    if (!deletingFahrrad) return;
+
+    const idToDelete = deletingFahrrad.fahrrad_id;
+    console.log('[DEBUG SearchFahrrad] Bestätigtes Löschen geklickt für ID:', idToDelete);
+
+    try {
+      const success = await fahrradService.deleteById(idToDelete);
+
+      if (success) {
+        setAllFahrraeder(prev => prev.filter(f => f.fahrrad_id !== idToDelete));
+        setSelectedFahrrad(null);
+        setDeletingFahrrad(null);
+      } else {
+        alert('Fahrrad konnte nicht gelöscht werden.');
+      }
+    } catch (error) {
+      console.error('[DEBUG SearchFahrrad] Fehler beim Löschen:', error);
+    }
+  };
+
   if (load) {
     return <div className="spinner-border text-primary"></div>;
   }
 
   return (
     <Container className='py-4'>
-
-      {/* Suchfilter-Bereich */}
-      <Row>
-        <Col>
-          <Form.Group>
-            <Form.Label>Fahrrad-ID</Form.Label>
-            <Form.Control 
-              placeholder='z.B. NK-001'
-              value={idSearch}
-              onChange={(e) => setIdSearch(e.target.value)}
-            />
-          </Form.Group>
-        </Col>
-
-        <Col>
-          <Form.Group>
-            <Form.Label>Marke</Form.Label>
-            <Form.Control 
-              placeholder='z.B. Canyon'
-              value={markeSearch}
-              onChange={(e) => setMarkeSearch(e.target.value)}
-            />
-          </Form.Group>
-        </Col>
-
-        <Col>
-          <Form.Group>
-            <Form.Label>Rahmennummer</Form.Label>
-            <Form.Control
-              value={rahmennummerSearch}
-              onChange={(e) => setRahmennummerSearchSearch(e.target.value)}
-            />
-          </Form.Group>
-        </Col>
-
-        <Col>
-          <Form.Group>
-            <Form.Label>Bearbeitungsstatus</Form.Label>
-            <Form.Select
-              value={bearbeitungsstatusSearch}
-              onChange={(e) => setBearbeitungsstatusSearch(e.target.value)}
-            >
-              <option value={0} hidden>Bitte wählen...</option>
-              <option value={1}>platzhalter1</option>
-            </Form.Select>
-          </Form.Group>
-        </Col>
-
-        <Col>
-          <Form.Group>
-            <Form.Label>Datum</Form.Label>
-            <Row>
-              <Form.Control 
-                type="date"
-                value={datumSearch}
-                onChange={(e) => setDatumSearch(e.target.value)}
-              />
-            </Row>
-          </Form.Group>
-        </Col>
-      </Row>
 
       {/* Tabellen-Bereich */}
       <Row>
@@ -199,11 +217,7 @@ export const SearchFahrrad = () => {
             <tr>
               {columns.map((name) => (
                 <th className='agens-theme-blue' key={name} scope='col'>
-                  {name
-                    .replace('_', '-')
-                    .replace(name.charAt(0), name.charAt(0).toUpperCase())
-                    .replace('-id', '-ID')
-                  }
+                  {formatHeaderName(name)}
                 </th>
               ))} 
             </tr>
@@ -222,11 +236,21 @@ export const SearchFahrrad = () => {
                   className={isSelected ? 'table-primary' : ''}
                   style={{ cursor: 'pointer' }}
                 >
-                  {columns.map((colName) => (
-                    <td key={colName}>
-                      {row[colName] !== null ? String(row[colName]) : '-'}
-                    </td>
-                  ))}
+                  {columns.map((colName) => {
+                    const rawValue = row[colName];
+                    const isDateColumn = isDateColumnName(colName);
+
+                    return (
+                      <td key={colName}>
+                        {rawValue !== null && rawValue !== undefined
+                          ? isDateColumn 
+                            ? formatDateValue(rawValue) 
+                            : String(rawValue)
+                          : '-'
+                        }
+                      </td>
+                    );
+                  })}
                 </tr>
               );
             })}
@@ -245,17 +269,7 @@ export const SearchFahrrad = () => {
           <Button 
             className='agens-button-primary'
             hidden={selectedFahrrad == null}
-            onClick={async () => {
-              if (selectedFahrrad != null) {
-                console.log('[DEBUG SearchFahrrad] Löschen geklickt für ID:', selectedFahrrad);
-                const success = await fahrradService.deleteById(selectedFahrrad);
-                
-                if (success) {
-                  setAllFahrraeder(prev => prev.filter(f => f.fahrrad_id !== selectedFahrrad));
-                  setSelectedFahrrad(null);
-                }
-              }
-            }}
+            onClick={handleDeleteClick}
           >
             löschen
           </Button>
@@ -309,6 +323,33 @@ export const SearchFahrrad = () => {
             />
           )}
         </Modal.Body>
+      </Modal>
+
+      {/* MODAL FÜR DAS LÖSCHEN-BESTÄTIGEN */}
+      <Modal 
+        show={deletingFahrrad !== null} 
+        onHide={() => setDeletingFahrrad(null)} 
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Fahrrad löschen</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {deletingFahrrad && (
+            <p>
+              Möchtest du das Fahrrad mit der ID <strong>{deletingFahrrad.fahrrad_id}</strong>
+              {deletingFahrrad.marke ? ` (${deletingFahrrad.marke})` : ''} wirklich löschen?
+            </p>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setDeletingFahrrad(null)}>
+            Abbrechen
+          </Button>
+          <Button variant="danger" onClick={handleConfirmDelete}>
+            Endgültig löschen
+          </Button>
+        </Modal.Footer>
       </Modal>
 
     </Container>

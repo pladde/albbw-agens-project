@@ -200,17 +200,23 @@ export const fahrradService = {
    * @returns {Promise<boolean>} Gibt `true` bei erfolgreicher Löschung zurück, sonst `false`.
    */
   deleteById: async (id: number): Promise<boolean> => {
-    try {
-      // Korrigierte Query-Syntax für DELETE: /api/fahrrad/:id oder Query-Param ?id=...
-      const response = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+    try 
+    {
+      
+      const response = await fetch(`${API_URL}/${id}`, { 
+        method: 'DELETE' 
+      });
 
       if (!response.ok) {
         throw new Error('Netzwerk-Fehler (deleteById)');
       }
 
       return true;
-    } catch (error) {
+
+    } catch (error) 
+    {
       console.error('Fehler beim Löschen (deleteById): ', error);
+
       return false;
     }
   },
