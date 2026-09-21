@@ -74,7 +74,7 @@ export class FahrradController
                 erfasstVon : req.body.erfasstVon,
                 herausgegebenAn : req.body.herausgegebenAn,
                 bearbeitungsstatus : req.body.bearbeitungsstatus
-        });
+            });
             
             const newBike = await this.fahrradService.createFahrrad(fahrrad);
 
@@ -333,7 +333,56 @@ export class FahrradController
      * Falls die `id` oder `col` fehlt, wird ein Status **400 (Bad Request)** gesendet.
      * Falls kein Fahrrad gefunden wird, sollte ein Status **404 (Not Found)** folgen.
      */
-    public async editFahrradById(req: Request, res: Response) : Promise<void>
+    public async updateFahrradById(req: Request, res: Response): Promise<void> 
+    {
+        //#region Guard
+        const id = parseInt(req.params.id, 10);
+
+        if (!req.params.id || isNaN(id)) {
+            res.status(400).json({ error: "Gültige ID ist ein Pflichtfeld." });
+            return;
+        }
+
+        if (!req.body || Object.keys(req.body).length === 0) {
+            res.status(400).json({ error: "Request Body darf nicht leer sein." });
+            return;
+        }
+        //#endregion
+
+        try {
+            const fahrrad = new Fahrrad({
+                rahmennummer: req.body.rahmennummer,
+                marke: req.body.marke,
+                farbe: req.body.farbe,
+                erfasstVon: req.body.erfasstVon,
+                herausgegebenAn: req.body.herausgegebenAn,
+                bearbeitungsstatus: req.body.bearbeitungsstatus
+            });
+
+            const result = await this.fahrradService.updateFahrradById(id, fahrrad);
+
+            if (!result) {
+                res.status(404).json({ message: "Fahrrad nicht gefunden oder keine Änderungen vorgenommen." });
+                return;
+            }
+
+            res.status(200).json(result);
+
+        } catch (error) {
+            console.error("Controller Fehler (updateFahrradById):", error);
+            res.status(500).json({ error: "Interner Server Fehler" });
+        }
+    }
+
+    /**
+     * **Aktualisiert** ein spezifisches Feld eines Fahrrad-Datensatzes.
+     * @param req Der Express **Request** (erwartet `id`, `column` und `value` im Body).
+     * @param res Die Express **Response** (Status 200 bei Erfolg, 404 falls keine Änderung möglich).
+     * @description
+     * Falls die `id` oder `col` fehlt, wird ein Status **400 (Bad Request)** gesendet.
+     * Falls kein Fahrrad gefunden wird, sollte ein Status **404 (Not Found)** folgen.
+     */
+    /*public async editFahrradById(req: Request, res: Response) : Promise<void>
     {
         //#region Guard
         if(!req.params.id)
@@ -366,4 +415,5 @@ export class FahrradController
             res.status(500).json({ error: "Interner Server Fehler" });
         }
     }
+        */
 }

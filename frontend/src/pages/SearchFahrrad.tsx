@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Container, Form, Row, Col, Table, Button} from 'react-bootstrap';
+import { Container, Form, Row, Col, Table, Button, Modal } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import '../services/fahrradService';
 import '../assets/css/custom-style.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import { fahrradService } from '../services/fahrradService';
 import { pdfService } from '../services/pdfService';
+import { FahrradForm } from '../components/FahrradForm';
+import type { Fahrrad } from '../types/Fahrrad';
 
 export const SearchFahrrad = () => {
   const navigate = useNavigate();
@@ -13,10 +14,13 @@ export const SearchFahrrad = () => {
   const [load, setLoad] = useState<boolean>(true);
   const [allFahrraeder, setAllFahrraeder] = useState<Record<string, any>[]>([]);
   const [hasLoaded, setHasLoaded] = useState(false);
-  const [buttonText, setButtonText] = useState('alle Fahrräder anzeigen')
+  const [buttonText, setButtonText] = useState('alle Fahrräder anzeigen');
   const [currentPage, setCurrentPage] = useState(0);
   const [showButton, setShowButton] = useState(true);
   const [selectedFahrrad, setSelectedFahrrad] = useState<number | null>(null);
+
+  // State für das Bearbeiten-Modal
+  const [editingFahrrad, setEditingFahrrad] = useState<Fahrrad | null>(null);
 
   const [datumSearch, setDatumSearch] = useState('');
   const [idSearch, setIdSearch] = useState('');
@@ -25,23 +29,19 @@ export const SearchFahrrad = () => {
   const [bearbeitungsstatusSearch, setBearbeitungsstatusSearch] = useState('');
 
   const handleShowAllFahrrader = async () => {
-
     const data = await fahrradService.fetchAllWithAttributes(currentPage);
 
     if (data && data.length > 0) {
       setAllFahrraeder(prev => [...prev, ...data]);
       
-      // Blendet den Button aus wenn weniger als 100 Einträge zurückkamen
       if (data.length < 100) {
         setShowButton(false);
       }
 
-      setCurrentPage(prev => prev + 1); // Seite für das nächste Mal erhöhen
-      
+      setCurrentPage(prev => prev + 1);
       setButtonText('mehr');
       setHasLoaded(true);
-    }
-    else {
+    } else {
       setShowButton(false);
     }   
   };
@@ -50,74 +50,103 @@ export const SearchFahrrad = () => {
     const loadHeader = async () => {
       const data = await fahrradService.fetchHead();
       if (data) {
-        setColumns(data)
+        setColumns(data);
       }
-      setLoad(false)
+      setLoad(false);
     };
     loadHeader();
   }, []);
-  
 
+  // Öffnet das Modal mit den Daten des ausgewählten Fahrrads
+  const handleEditClick = () => {
+    if (selectedFahrrad === null) return;
+    const itemToEdit = allFahrraeder.find(f => f.fahrrad_id === selectedFahrrad);
+    if (itemToEdit) {
+      // Mapping für das Formular (Fahrrad-Interface)
+      setEditingFahrrad({
+        id: itemToEdit.fahrrad_id,
+        marke: itemToEdit.marke || '',
+        rahmennummer: itemToEdit.rahmennummer || '',
+        farbe: itemToEdit.farbe || '',
+        bearbeitungsstatus: itemToEdit.bearbeitungsstatus || '',
+        kundeId: itemToEdit.kunde_id || ''
+      });
+    }
+  };
+
+  // Speichert die geänderten Daten im Backend & aktualisiert die Tabelle
+  const handleSaveFahrrad = async (updatedData: Fahrrad) => {
+    if (!selectedFahrrad) return;
+
+    try {
+      // Backend Update-Aufruf
+      const success = await fahrradService.update(selectedFahrrad, updatedData);
+
+      if (success) {
+        // Lokalen State der Tabelle sofort aktualisieren
+        setAllFahrraeder(prev =>
+          prev.map(item =>
+            item.fahrrad_id === selectedFahrrad
+              ? { ...item, ...updatedData }
+              : item
+          )
+        );
+        setEditingFahrrad(null); // Modal schließen
+      }
+    } catch (error) {
+      console.error('Fehler beim Aktualisieren des Fahrrads:', error);
+    }
+  };
 
   if (load) {
     return <div className="spinner-border text-primary"></div>;
-  };
+  }
 
   return (
     <Container className='py-4'>
 
-      {/* // #region Suchfilter-Bereich */}
+      {/* Suchfilter-Bereich */}
       <Row>
         <Col>
-        <Form.Group>
-          <Form.Label>
-            Fahrrad-ID
-          </Form.Label>
-          <Form.Control 
-            placeholder='z.B. NK-001'
-            value={idSearch}
-            onChange={(e) => setIdSearch(e.target.value)}
-            >
-          </Form.Control>
-        </Form.Group>
-        </Col>
-
-        <Col>
           <Form.Group>
-            <Form.Label>
-              Marke
-            </Form.Label>
-            <Form.Control placeholder='z.B. Canyon'
-              value={markeSearch}
-              onChange={(e) => setMarkeSearch(e.target.value)}
-              >
-            </Form.Control>
+            <Form.Label>Fahrrad-ID</Form.Label>
+            <Form.Control 
+              placeholder='z.B. NK-001'
+              value={idSearch}
+              onChange={(e) => setIdSearch(e.target.value)}
+            />
           </Form.Group>
         </Col>
 
         <Col>
           <Form.Group>
-            <Form.Label>
-              Rahmennummer
-            </Form.Label>
+            <Form.Label>Marke</Form.Label>
+            <Form.Control 
+              placeholder='z.B. Canyon'
+              value={markeSearch}
+              onChange={(e) => setMarkeSearch(e.target.value)}
+            />
+          </Form.Group>
+        </Col>
+
+        <Col>
+          <Form.Group>
+            <Form.Label>Rahmennummer</Form.Label>
             <Form.Control
               value={rahmennummerSearch}
               onChange={(e) => setRahmennummerSearchSearch(e.target.value)}
-            >
-            </Form.Control>
+            />
           </Form.Group>
         </Col>
 
         <Col>
           <Form.Group>
-            <Form.Label>
-              Bearbeitungsstatus
-            </Form.Label>
+            <Form.Label>Bearbeitungsstatus</Form.Label>
             <Form.Select
               value={bearbeitungsstatusSearch}
               onChange={(e) => setBearbeitungsstatusSearch(e.target.value)}
             >
-              <option value={0} hidden >Bitte wählen...</option>
+              <option value={0} hidden>Bitte wählen...</option>
               <option value={1}>platzhalter1</option>
             </Form.Select>
           </Form.Group>
@@ -125,52 +154,42 @@ export const SearchFahrrad = () => {
 
         <Col>
           <Form.Group>
-            <Form.Label>
-              Datum
-            </Form.Label>
+            <Form.Label>Datum</Form.Label>
             <Row>
               <Form.Control 
                 type="date"
                 value={datumSearch}
                 onChange={(e) => setDatumSearch(e.target.value)}
-              >
-              </Form.Control>
+              />
             </Row>
           </Form.Group>
         </Col>
       </Row>
-      {/* // #endregion */}
 
-      {/* // #region Tabellen-Bereich (Inhalt der Datenbank) */}
+      {/* Tabellen-Bereich */}
       <Row>
         <Table responsive striped bordered hover className='my-4'>
           <thead>
             <tr>
-              {/* Erstellt den Tabellen-Header */}
               {columns.map((name) => (
                 <th className='agens-theme-blue' key={name} scope='col'>
                   {name
                     .replace('_', '-')
                     .replace(name.charAt(0), name.charAt(0).toUpperCase())
                     .replace('-id', '-ID')
-                    }
+                  }
                 </th>
               ))} 
             </tr>
           </thead>
-          { /* Erstellt und befüllt den Tabellen-Body mit den Fahrrädern aus der Datenbank */}
           <tbody>
             {allFahrraeder.map((row, rowIndex) => {
-              // Prüfen, ob diese Zeile die aktuell ausgewählte ist
               const isSelected = selectedFahrrad === row.fahrrad_id;
-              //DEBUG console.log(selectedFahrrad + ' ausgewählt.');
 
               return (
                 <tr
                   key={rowIndex}
-                  onClick={
-                    () => setSelectedFahrrad(prev => prev === row.fahrrad_id ? null : row.fahrrad_id)
-                  }
+                  onClick={() => setSelectedFahrrad(prev => prev === row.fahrrad_id ? null : row.fahrrad_id)}
                   className={isSelected ? 'table-primary' : ''}
                   style={{ cursor: 'pointer' }}
                 >
@@ -185,13 +204,13 @@ export const SearchFahrrad = () => {
           </tbody>
         </Table>
 
-        {/* // #region Button-Bereich */}
-        <Form.Group className=''>
+        {/* Button-Bereich */}
+        <Form.Group className='d-flex gap-2'>
           <Button 
             className='agens-button-primary'
             hidden={selectedFahrrad == null}
-            onClick={() => console.log('bearbeiten bla bla')}
-            >
+            onClick={handleEditClick}
+          >
             bearbeiten
           </Button>
           <Button 
@@ -207,7 +226,7 @@ export const SearchFahrrad = () => {
                 }
               }
             }}
-            >
+          >
             löschen
           </Button>
           <Button
@@ -220,19 +239,17 @@ export const SearchFahrrad = () => {
             als PDF exportieren
           </Button>
         </Form.Group>
-        {/* // #endregion */}
       </Row>
-      {/* // #endregion */}
 
       {showButton && (
-      <div id='btn-showAll' className='text-center'>
-        <Button 
-          className='my-4 agens-button-primary'
-          onClick={handleShowAllFahrrader}
-        >
-          {buttonText}
-        </Button>
-      </div>
+        <div id='btn-showAll' className='text-center'>
+          <Button 
+            className='my-4 agens-button-primary'
+            onClick={handleShowAllFahrrader}
+          >
+            {buttonText}
+          </Button>
+        </div>
       )}
 
       <Button 
@@ -243,9 +260,27 @@ export const SearchFahrrad = () => {
           right: '20px', 
           width: '140px'
         }}
-        onClick={() => {navigate('/')}}
-        >zurück
+        onClick={() => { navigate('/'); }}
+      >
+        zurück
       </Button>
+
+      {/* MODAL FÜR DAS BEARBEITEN */}
+      <Modal show={editingFahrrad !== null} onHide={() => setEditingFahrrad(null)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Fahrrad ID {editingFahrrad?.id} bearbeiten</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {editingFahrrad && (
+            <FahrradForm
+              initialData={editingFahrrad}
+              onSubmit={handleSaveFahrrad}
+              onCancel={() => setEditingFahrrad(null)}
+            />
+          )}
+        </Modal.Body>
+      </Modal>
+
     </Container>
   );
 };

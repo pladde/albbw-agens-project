@@ -263,31 +263,28 @@ export class FahrradService
      * @returns Ein Promise mit dem Ergebnis der Datenbankoperation oder `undefined`.
      * @throws {Error} Wenn die ID oder Spalte nicht angegeben wurde.
      */
-    public async editFahrradById(id: number, column: string, value: string): Promise<any[] | undefined>
+    public async updateFahrradById(id: number, fahrrad: Fahrrad): Promise<any[] | undefined> 
     {
         //#region Guard
-        if(!id)
-        {
-            throw new Error("Service: ID zum editieren eines Objektes darf nicht null oder leer sein!");
+        if (!id) {
+            throw new Error("Service: ID zum Editieren eines Objektes darf nicht null oder leer sein!");
         }
-        if(!column)
-        {
-            throw new Error("Service: Die Zeile zum editieren eines Objektes darf nicht null oder leer sein!");
+        if (!fahrrad) {
+            throw new Error("Service: Das Fahrrad-Objekt zum Editieren darf nicht null oder leer sein!");
         }
         //#endregion
 
-        let result: any[] | undefined;
-
-        try
+        try 
         {
-            result = await this.fahrradRepository.editById(id, column, value);
+            const result = await this.fahrradRepository.updateFahrradById(id, fahrrad);
 
-        } catch(error)
+            return result;
+
+        } catch (error) 
         {
-            console.log(error);
-            throw new Error("Fehler: " + error);
+            console.error("Service Fehler (updateFahrradById):", error);
+            
+            throw error;
         }
-
-        return result;
     }
 }

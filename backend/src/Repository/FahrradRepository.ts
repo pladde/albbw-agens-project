@@ -503,43 +503,40 @@ export class FahrradRepository
      * @throws Falls die übergebene ID oder die übergebene Zeile leer ist, wird ein Error geworfen.
      * @throws Bei einem Fehler in der Datenbank wird der Fehler geworfen.
      */
-    public async editById(id: number, column: string, value: any) : Promise<any[] | undefined>
-    {
+    public async updateFahrradById(fahrrad_id: number, fahrrad: Fahrrad): Promise<any> {
         // #region Guard
-        if (!id)
-        {
-            throw new Error("Repository Fehler: Die ID zum editieren darf nicht null oder leer sein.");
+        if (!fahrrad_id) {
+            throw new Error("Repository Fehler: Die ID zum Editieren darf nicht null oder leer sein.");
         }
-        if(!column)
-        {
-            throw new Error("Repository Fehler: Die Zeile zum editieren darf nicht null oder leer sein.");  
+        if (!fahrrad) {
+            throw new Error("Repository Fehler: Das Fahrrad-Objekt zum Editieren darf nicht null oder leer sein.");  
         }
         //#endregion
 
-        try
+        try 
         {
-            const allowedColumns = await this.getTableColumns();
+            const stmt = `
+                UPDATE fahrrad 
+                SET marke = ?, rahmennummer = ?, farbe = ?, bearbeitungsstatus = ?
+                WHERE fahrrad_id = ?;
+            `;
 
-            if(!allowedColumns.includes(column))
-            {
-                throw new Error("Ungültiger Spaltenname");
-            }
+            const values = [
+                fahrrad.getMarke(),
+                fahrrad.getRahmennummer(),
+                fahrrad.getFarbe(),
+                fahrrad.getBearbeitungsstatus(),
+                fahrrad_id
 
-            const stmt = 
-            `UPDATE fahrrad SET ${column} = ? WHERE fahrrad_id = ?`;
+            ];
 
-            const result = await dbPool.execute(stmt, value);
-
-            if (!result) 
-            {
-                return undefined;
-            }
-
+            const [result] = await dbPool.execute(stmt, values);
+            
             return result;
 
-        } catch (error)
-        {
-            console.log("Fehler: " + error);
+        } catch (error) {
+            console.error("Repository Fehler (updateFahrradById):", error);
+            throw error;
         }
     }
 }
