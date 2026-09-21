@@ -263,10 +263,10 @@ export class FahrradService
      * @returns Ein Promise mit dem Ergebnis der Datenbankoperation oder `undefined`.
      * @throws {Error} Wenn die ID oder Spalte nicht angegeben wurde.
      */
-    public async updateFahrradById(id: number, fahrrad: Fahrrad): Promise<any[] | undefined> 
+    public async updateFahrradById(fahrrad_id: number, fahrrad: Fahrrad): Promise<any[] | undefined> 
     {
         //#region Guard
-        if (!id) {
+        if (!fahrrad_id) {
             throw new Error("Service: ID zum Editieren eines Objektes darf nicht null oder leer sein!");
         }
         if (!fahrrad) {
@@ -276,7 +276,52 @@ export class FahrradService
 
         try 
         {
-            const result = await this.fahrradRepository.updateFahrradById(id, fahrrad);
+
+            // FIXME: Ich habe vergessen die Tabelle der Farbe und Marke abzufragen und/oder zu verknüpfen.
+
+            // Marke prüfen oder anlegen
+            const markenName = fahrrad.getMarke();
+            let markeId: number | undefined = undefined;
+
+            if (markenName) {
+                markeId = await this.fahrradRepository.searchFahrradMarke(markenName);
+                
+                if (!markeId) {
+                    markeId = await this.fahrradRepository.createMarke(markenName);
+                }
+            }
+
+            // Farbe prüfen oder anlegen
+            const farbName = fahrrad.getFarbe(); 
+            let farbeId: number | null = null;
+
+            if (farbName) {
+                farbeId = await this.fahrradRepository.searchFahrradFarbe(farbName);
+                
+                if (!farbeId) {
+                    farbeId = await this.fahrradRepository.createFarbe(farbName);
+                }
+            }
+
+            if (markeId && farbeId) {
+            const eigenschaftId = await this.fahrradRepository.getOrCreateEigenschaftId(markeId, farbeId);
+            
+            fahrrad.setFahrradEigenschaftId(eigenschaftId);
+        }
+
+            // Bearbeitungsstatus prüfen oder anlegen
+            const bearbeitungsstatus = fahrrad.getBearbeitungsstatus(); 
+            let bearbeitungsstatusId: number | null = null;
+
+            if (bearbeitungsstatus) {
+                bearbeitungsstatusId = await this.fahrradRepository.searchFahrradBearbeitungsstatus(bearbeitungsstatus);
+                
+                if (!bearbeitungsstatusId) {
+                    bearbeitungsstatusId = await this.fahrradRepository.createBearbeitungsstatus(bearbeitungsstatus);
+                }
+            }
+
+            const result = await this.fahrradRepository.updateFahrradById(fahrrad_id,  bearbeitungsstatusId, fahrrad);
 
             return result;
 

@@ -497,13 +497,11 @@ export class FahrradRepository
     /**
      * Editiert Daten in einem Datensatz.
      * @param id Die ID des zu editierenden Objektes.
-     * @param column Die zu editierende Zeile des Objektes.
-     * @param value Der neue Datenfeldwert.
      * @returns Gibt das editierte Objekt als Any-Array zurück und undefined falls das Array leer ist.
      * @throws Falls die übergebene ID oder die übergebene Zeile leer ist, wird ein Error geworfen.
      * @throws Bei einem Fehler in der Datenbank wird der Fehler geworfen.
      */
-    public async updateFahrradById(fahrrad_id: number, fahrrad: Fahrrad): Promise<any> {
+    public async updateFahrradById(fahrrad_id : number, bearbeitungsstatusId : number | null, fahrrad: Fahrrad): Promise<any> {
         // #region Guard
         if (!fahrrad_id) {
             throw new Error("Repository Fehler: Die ID zum Editieren darf nicht null oder leer sein.");
@@ -517,17 +515,17 @@ export class FahrradRepository
         {
             const stmt = `
                 UPDATE fahrrad 
-                SET marke = ?, rahmennummer = ?, farbe = ?, bearbeitungsstatus = ?
+                SET fahrrad_eigenschaft = ?,
+                rahmennummer = ?,
+                bearbeitungsstatus_id = ?
                 WHERE fahrrad_id = ?;
             `;
 
             const values = [
-                fahrrad.getMarke(),
+                fahrrad.getFahrradEigenschaftId(),
                 fahrrad.getRahmennummer(),
-                fahrrad.getFarbe(),
-                fahrrad.getBearbeitungsstatus(),
+                bearbeitungsstatusId,
                 fahrrad_id
-
             ];
 
             const [result] = await dbPool.execute(stmt, values);

@@ -59,31 +59,52 @@ export const SearchFahrrad = () => {
 
   // Öffnet das Modal mit den Daten des ausgewählten Fahrrads
   const handleEditClick = () => {
-    if (selectedFahrrad === null) return;
+    console.log('[DEBUG SearchFahrrad] handleEditClick getriggert. Ausgewählte ID:', selectedFahrrad);
+    
+    if (selectedFahrrad === null) {
+      console.warn('[DEBUG SearchFahrrad] Abbruch: selectedFahrrad ist null.');
+      return;
+    }
+
     const itemToEdit = allFahrraeder.find(f => f.fahrrad_id === selectedFahrrad);
+    console.log('[DEBUG SearchFahrrad] Gefundenes Fahrrad aus Tabelle:', itemToEdit);
+
     if (itemToEdit) {
-      // Mapping für das Formular (Fahrrad-Interface)
-      setEditingFahrrad({
+      const formattedFahrrad: Fahrrad = {
         id: itemToEdit.fahrrad_id,
         marke: itemToEdit.marke || '',
         rahmennummer: itemToEdit.rahmennummer || '',
         farbe: itemToEdit.farbe || '',
         bearbeitungsstatus: itemToEdit.bearbeitungsstatus || '',
         kundeId: itemToEdit.kunde_id || ''
-      });
+      };
+
+      console.log('[DEBUG SearchFahrrad] Setze editingFahrrad für Modal auf:', formattedFahrrad);
+      setEditingFahrrad(formattedFahrrad);
+    } else {
+      console.error('[DEBUG SearchFahrrad] Fehler: Kein Eintrag in allFahrraeder mit fahrrad_id ===', selectedFahrrad);
     }
   };
 
   // Speichert die geänderten Daten im Backend & aktualisiert die Tabelle
   const handleSaveFahrrad = async (updatedData: Fahrrad) => {
-    if (!selectedFahrrad) return;
+    console.log('[DEBUG SearchFahrrad] handleSaveFahrrad gestartet.');
+    console.log('[DEBUG SearchFahrrad] Aktuell selectedFahrrad:', selectedFahrrad);
+    console.log('[DEBUG SearchFahrrad] Vom Formular übergebene Daten (updatedData):', updatedData);
+
+    if (!selectedFahrrad) {
+      console.error('[DEBUG SearchFahrrad] Speichern abgebrochen: Keine selectedFahrrad ID vorhanden!');
+      return;
+    }
 
     try {
-      // Backend Update-Aufruf
+      console.log(`[DEBUG SearchFahrrad] Sende UPDATE-Request via fahrradService.update(${selectedFahrrad}, ...)`);
       const success = await fahrradService.update(selectedFahrrad, updatedData);
+      console.log('[DEBUG SearchFahrrad] Rückgabe fahrradService.update success =', success);
 
       if (success) {
-        // Lokalen State der Tabelle sofort aktualisieren
+        console.log('[DEBUG SearchFahrrad] Speichern erfolgreich. Aktualisiere allFahrraeder State...');
+        
         setAllFahrraeder(prev =>
           prev.map(item =>
             item.fahrrad_id === selectedFahrrad
@@ -91,10 +112,15 @@ export const SearchFahrrad = () => {
               : item
           )
         );
-        setEditingFahrrad(null); // Modal schließen
+
+        console.log('[DEBUG SearchFahrrad] Schließe Modal (editingFahrrad = null).');
+        setEditingFahrrad(null);
+      } else {
+        console.warn('[DEBUG SearchFahrrad] Backend meldete keinen Erfolg beim Speichern (success is falsy).');
+        alert('Änderung konnte nicht gespeichert werden.');
       }
     } catch (error) {
-      console.error('Fehler beim Aktualisieren des Fahrrads:', error);
+      console.error('[DEBUG SearchFahrrad] Fehler beim Aufruf von handleSaveFahrrad:', error);
     }
   };
 
@@ -189,7 +215,10 @@ export const SearchFahrrad = () => {
               return (
                 <tr
                   key={rowIndex}
-                  onClick={() => setSelectedFahrrad(prev => prev === row.fahrrad_id ? null : row.fahrrad_id)}
+                  onClick={() => {
+                    console.log('[DEBUG SearchFahrrad] Zeile geklickt. Fahrrad-ID:', row.fahrrad_id);
+                    setSelectedFahrrad(prev => prev === row.fahrrad_id ? null : row.fahrrad_id);
+                  }}
                   className={isSelected ? 'table-primary' : ''}
                   style={{ cursor: 'pointer' }}
                 >
@@ -218,6 +247,7 @@ export const SearchFahrrad = () => {
             hidden={selectedFahrrad == null}
             onClick={async () => {
               if (selectedFahrrad != null) {
+                console.log('[DEBUG SearchFahrrad] Löschen geklickt für ID:', selectedFahrrad);
                 const success = await fahrradService.deleteById(selectedFahrrad);
                 
                 if (success) {
