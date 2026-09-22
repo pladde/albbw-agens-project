@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Container, Form, Row, Col, Table, Button, Modal } from 'react-bootstrap';
+import { Container, Form, Row, Col, Table, Button, Modal, Card, Badge } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import '../assets/css/custom-style.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
@@ -25,6 +25,11 @@ export const SearchFahrrad = () => {
   // State für das Löschen-Bestätigungsmodal
   const [deletingFahrrad, setDeletingFahrrad] = useState<Record<string, any> | null>(null);
 
+  // State für das PDF-Export Modal & Zeitraum
+  const [showPdfModal, setShowPdfModal] = useState<boolean>(false);
+  const [pdfStartDate, setPdfStartDate] = useState<string>('');
+  const [pdfEndDate, setPdfEndDate] = useState<string>('');
+
   const [datumSearch, setDatumSearch] = useState('');
   const [idSearch, setIdSearch] = useState('');
   const [markeSearch, setMarkeSearch] = useState('');
@@ -43,7 +48,7 @@ export const SearchFahrrad = () => {
       .replace('-id', '-ID');
   };
 
-  // Prüft, ob ein Spaltenname exakt ein Datumsfeld ist (z. B. erfasst_am, ausgang_am, datum)
+  // Prüft, ob ein Spaltenname exakt ein Datumsfeld ist
   const isDateColumnName = (colName: string): boolean => {
     const colLower = colName.toLowerCase();
     return (
@@ -62,7 +67,6 @@ export const SearchFahrrad = () => {
 
     const dateObj = new Date(val);
     
-    // Prüfen, ob es sich um ein gültiges Datum handelt
     if (isNaN(dateObj.getTime())) {
       return String(val);
     }
@@ -107,15 +111,9 @@ export const SearchFahrrad = () => {
 
   // Öffnet das Modal mit den Daten des ausgewählten Fahrrads
   const handleEditClick = () => {
-    console.log('[DEBUG SearchFahrrad] handleEditClick getriggert. Ausgewählte ID:', selectedFahrrad);
-    
-    if (selectedFahrrad === null) {
-      console.warn('[DEBUG SearchFahrrad] Abbruch: selectedFahrrad ist null.');
-      return;
-    }
+    if (selectedFahrrad === null) return;
 
     const itemToEdit = allFahrraeder.find(f => f.fahrrad_id === selectedFahrrad);
-    console.log('[DEBUG SearchFahrrad] Gefundenes Fahrrad aus Tabelle:', itemToEdit);
 
     if (itemToEdit) {
       const formattedFahrrad: Fahrrad = {
@@ -127,32 +125,18 @@ export const SearchFahrrad = () => {
         kundeId: itemToEdit.kunde_id || ''
       };
 
-      console.log('[DEBUG SearchFahrrad] Setze editingFahrrad für Modal auf:', formattedFahrrad);
       setEditingFahrrad(formattedFahrrad);
-    } else {
-      console.error('[DEBUG SearchFahrrad] Fehler: Kein Eintrag in allFahrraeder mit fahrrad_id ===', selectedFahrrad);
     }
   };
 
   // Speichert die geänderten Daten im Backend & aktualisiert die Tabelle
   const handleSaveFahrrad = async (updatedData: Fahrrad) => {
-    console.log('[DEBUG SearchFahrrad] handleSaveFahrrad gestartet.');
-    console.log('[DEBUG SearchFahrrad] Aktuell selectedFahrrad:', selectedFahrrad);
-    console.log('[DEBUG SearchFahrrad] Vom Formular übergebene Daten (updatedData):', updatedData);
-
-    if (!selectedFahrrad) {
-      console.error('[DEBUG SearchFahrrad] Speichern abgebrochen: Keine selectedFahrrad ID vorhanden!');
-      return;
-    }
+    if (!selectedFahrrad) return;
 
     try {
-      console.log(`[DEBUG SearchFahrrad] Sende UPDATE-Request via fahrradService.update(${selectedFahrrad}, ...)`);
       const success = await fahrradService.update(selectedFahrrad, updatedData);
-      console.log('[DEBUG SearchFahrrad] Rückgabe fahrradService.update success =', success);
 
       if (success) {
-        console.log('[DEBUG SearchFahrrad] Speichern erfolgreich. Aktualisiere allFahrraeder State...');
-        
         setAllFahrraeder(prev =>
           prev.map(item =>
             item.fahrrad_id === selectedFahrrad
@@ -160,11 +144,8 @@ export const SearchFahrrad = () => {
               : item
           )
         );
-
-        console.log('[DEBUG SearchFahrrad] Schließe Modal (editingFahrrad = null).');
         setEditingFahrrad(null);
       } else {
-        console.warn('[DEBUG SearchFahrrad] Backend meldete keinen Erfolg beim Speichern (success is falsy).');
         alert('Änderung konnte nicht gespeichert werden.');
       }
     } catch (error) {
@@ -186,7 +167,6 @@ export const SearchFahrrad = () => {
     if (!deletingFahrrad) return;
 
     const idToDelete = deletingFahrrad.fahrrad_id;
-    console.log('[DEBUG SearchFahrrad] Bestätigtes Löschen geklickt für ID:', idToDelete);
 
     try {
       const success = await fahrradService.deleteById(idToDelete);
@@ -203,114 +183,253 @@ export const SearchFahrrad = () => {
     }
   };
 
+  // Führt den PDF-Export mit gefiltertem Zeitraum aus
+  const handleConfirmPdfExport = () => {
+    let filteredData = [...allFahrraeder];
+
+    if (pdfStartDate || pdfEndDate) {
+      filteredData = filteredData.filter(row => {
+        // Prüft primär 'erfasst_am' oder verwandte Datumsfelder
+        const rawDate = row.erfasst_am || row.datum || row.created_at;
+        if (!rawDate) return true;
+
+        const rowTime = new Date(rawDate).getTime();
+        const start = pdfStartDate ? new Date(pdfStartDate + 'T00:00:00').getTime() : -Infinity;
+        const end = pdfEndDate ? new Date(pdfEndDate + 'T23:59:59').getTime() : Infinity;
+
+        return rowTime >= start && rowTime <= end;
+      });
+    }
+
+    if (filteredData.length === 0) {
+      alert('Keine Einträge im ausgewählten Zeitraum gefunden.');
+      return;
+    }
+
+    pdfService.exportFahrraederToPdf(columns, filteredData, {
+      startDate: pdfStartDate,
+      endDate: pdfEndDate
+    });
+
+    setShowPdfModal(false);
+  };
+
   if (load) {
-    return <div className="spinner-border text-primary"></div>;
+    return (
+      <div className="d-flex justify-content-center align-items-center vh-100">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Laden...</span>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <Container className='py-4'>
-
-      {/* Tabellen-Bereich */}
-      <Row>
-        <Table responsive striped bordered hover className='my-4'>
-          <thead>
-            <tr>
-              {columns.map((name) => (
-                <th className='agens-theme-blue' key={name} scope='col'>
-                  {formatHeaderName(name)}
-                </th>
-              ))} 
-            </tr>
-          </thead>
-          <tbody>
-            {allFahrraeder.map((row, rowIndex) => {
-              const isSelected = selectedFahrrad === row.fahrrad_id;
-
-              return (
-                <tr
-                  key={rowIndex}
-                  onClick={() => {
-                    console.log('[DEBUG SearchFahrrad] Zeile geklickt. Fahrrad-ID:', row.fahrrad_id);
-                    setSelectedFahrrad(prev => prev === row.fahrrad_id ? null : row.fahrrad_id);
-                  }}
-                  className={isSelected ? 'table-primary' : ''}
-                  style={{ cursor: 'pointer' }}
-                >
-                  {columns.map((colName) => {
-                    const rawValue = row[colName];
-                    const isDateColumn = isDateColumnName(colName);
-
-                    return (
-                      <td key={colName}>
-                        {rawValue !== null && rawValue !== undefined
-                          ? isDateColumn 
-                            ? formatDateValue(rawValue) 
-                            : String(rawValue)
-                          : '-'
-                        }
-                      </td>
-                    );
-                  })}
-                </tr>
-              );
-            })}
-          </tbody>
-        </Table>
-
-        {/* Button-Bereich */}
-        <Form.Group className='d-flex gap-2'>
-          <Button 
-            className='agens-button-primary'
-            hidden={selectedFahrrad == null}
-            onClick={handleEditClick}
-          >
-            bearbeiten
-          </Button>
-          <Button 
-            className='agens-button-primary'
-            hidden={selectedFahrrad == null}
-            onClick={handleDeleteClick}
-          >
-            löschen
-          </Button>
+    <Container className="py-4 pb-5 mb-4">
+      
+      {/* Aktions-Buttons oben */}
+      <Row className="mb-3">
+        <Col className="d-flex flex-wrap gap-2 justify-content-start align-items-center">
+          {selectedFahrrad !== null && (
+            <>
+              <Button 
+                className="agens-button-primary flex-grow-1 flex-sm-grow-0"
+                onClick={handleEditClick}
+              >
+                <i className="bi bi-pencil me-1"></i> Bearbeiten
+              </Button>
+              <Button 
+                className="btn-danger flex-grow-1 flex-sm-grow-0"
+                onClick={handleDeleteClick}
+              >
+                <i className="bi bi-trash me-1"></i> Löschen
+              </Button>
+            </>
+          )}
           <Button
-            className='agens-button-primary'
+            className="agens-button-primary flex-grow-1 flex-sm-grow-0 ms-auto-sm"
             disabled={allFahrraeder.length === 0}
-            onClick={() => {
-              pdfService.exportFahrraederToPdf(columns, allFahrraeder);
-            }}
+            onClick={() => setShowPdfModal(true)}
           >
-            als PDF exportieren
+            <i className="bi bi-file-earmark-pdf me-1"></i> als PDF exportieren
           </Button>
-        </Form.Group>
+        </Col>
       </Row>
 
+      {/* DESKTOP-ANSICHT: Tabelle */}
+      <Row className="d-none d-md-block">
+        <Col>
+          <Table responsive striped bordered hover className="my-2 align-middle">
+            <thead>
+              <tr>
+                {columns.map((name) => (
+                  <th className="agens-theme-blue text-nowrap" key={name} scope="col">
+                    {formatHeaderName(name)}
+                  </th>
+                ))} 
+              </tr>
+            </thead>
+            <tbody>
+              {allFahrraeder.map((row, rowIndex) => {
+                const isSelected = selectedFahrrad === row.fahrrad_id;
+
+                return (
+                  <tr
+                    key={rowIndex}
+                    onClick={() => setSelectedFahrrad(prev => prev === row.fahrrad_id ? null : row.fahrrad_id)}
+                    className={isSelected ? 'table-primary' : ''}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    {columns.map((colName) => {
+                      const rawValue = row[colName];
+                      const isDateColumn = isDateColumnName(colName);
+
+                      return (
+                        <td key={colName} className="text-nowrap">
+                          {rawValue !== null && rawValue !== undefined
+                            ? isDateColumn 
+                              ? formatDateValue(rawValue) 
+                              : String(rawValue)
+                            : '-'
+                          }
+                        </td>
+                      );
+                    })}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </Table>
+        </Col>
+      </Row>
+
+      {/* MOBIL-ANSICHT: Cards */}
+      <Row className="d-md-none g-3">
+        {allFahrraeder.map((row, rowIndex) => {
+          const isSelected = selectedFahrrad === row.fahrrad_id;
+
+          return (
+            <Col xs={12} key={rowIndex}>
+              <Card 
+                className={`shadow-sm border ${isSelected ? 'border-primary bg-light' : ''}`}
+                onClick={() => setSelectedFahrrad(prev => prev === row.fahrrad_id ? null : row.fahrrad_id)}
+                style={{ cursor: 'pointer' }}
+              >
+                <Card.Header className="d-flex justify-content-between align-items-center bg-white fw-bold">
+                  <span>ID: {row.fahrrad_id || '-'}</span>
+                  {isSelected && <Badge bg="primary">Ausgewählt</Badge>}
+                </Card.Header>
+                <Card.Body className="p-3">
+                  <Row className="g-2">
+                    {columns.map((colName) => {
+                      if (colName === 'fahrrad_id') return null;
+                      const rawValue = row[colName];
+                      const isDateColumn = isDateColumnName(colName);
+
+                      return (
+                        <Col xs={6} key={colName} className="mb-1">
+                          <small className="text-muted d-block text-truncate">
+                            {formatHeaderName(colName)}
+                          </small>
+                          <span className="fw-semibold text-break">
+                            {rawValue !== null && rawValue !== undefined
+                              ? isDateColumn 
+                                ? formatDateValue(rawValue) 
+                                : String(rawValue)
+                              : '-'
+                            }
+                          </span>
+                        </Col>
+                      );
+                    })}
+                  </Row>
+                </Card.Body>
+              </Card>
+            </Col>
+          );
+        })}
+      </Row>
+
+      {/* Button: Mehr laden */}
       {showButton && (
-        <div id='btn-showAll' className='text-center'>
-          <Button 
-            className='my-4 agens-button-primary'
-            onClick={handleShowAllFahrrader}
-          >
-            {buttonText}
-          </Button>
-        </div>
+        <Row className="my-4">
+          <Col className="text-center">
+            <Button 
+              className="agens-button-primary px-4"
+              onClick={handleShowAllFahrrader}
+            >
+              {buttonText}
+            </Button>
+          </Col>
+        </Row>
       )}
 
+      {/* Fixierter Zurück-Button */}
       <Button 
-        className='agens-button-primary' 
+        className="agens-button-primary shadow" 
         style={{
           position: 'fixed', 
           bottom: '20px', 
           right: '20px', 
-          width: '140px'
+          zIndex: 1050,
+          minWidth: '120px'
         }}
         onClick={() => { navigate('/'); }}
       >
-        zurück
+        <i className="bi bi-arrow-left me-1"></i> zurück
       </Button>
 
+      {/* MODAL FÜR ZEITRAUM-AUSWAHL BEIM PDF-EXPORT */}
+      <Modal show={showPdfModal} onHide={() => setShowPdfModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title><i className="bi bi-calendar-range me-2"></i>PDF-Export Zeitraum wählen</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Row className="g-3">
+              <Col xs={12} sm={6}>
+                <Form.Group controlId="pdfStartDate">
+                  <Form.Label className="fw-semibold">Von (Eingangsdatum):</Form.Label>
+                  <Form.Control 
+                    type="date" 
+                    value={pdfStartDate}
+                    onChange={(e) => setPdfStartDate(e.target.value)}
+                  />
+                </Form.Group>
+              </Col>
+              <Col xs={12} sm={6}>
+                <Form.Group controlId="pdfEndDate">
+                  <Form.Label className="fw-semibold">Bis (Eingangsdatum):</Form.Label>
+                  <Form.Control 
+                    type="date" 
+                    value={pdfEndDate}
+                    onChange={(e) => setPdfEndDate(e.target.value)}
+                  />
+                </Form.Group>
+              </Col>
+            </Row>
+            <Form.Text className="text-muted mt-2 d-block">
+              Lasse die Felder leer, um alle aktuell geladenen Einträge ohne Datumsfilter zu exportieren.
+            </Form.Text>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer className="flex-nowrap">
+          <Button variant="secondary" className="w-50" onClick={() => setShowPdfModal(false)}>
+            Abbrechen
+          </Button>
+          <Button className="agens-button-primary w-50" onClick={handleConfirmPdfExport}>
+            <i className="bi bi-download me-1"></i> Exportieren
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
       {/* MODAL FÜR DAS BEARBEITEN */}
-      <Modal show={editingFahrrad !== null} onHide={() => setEditingFahrrad(null)} centered>
+      <Modal 
+        show={editingFahrrad !== null} 
+        onHide={() => setEditingFahrrad(null)} 
+        centered
+        fullscreen="sm-down"
+      >
         <Modal.Header closeButton>
           <Modal.Title>Fahrrad ID {editingFahrrad?.id} bearbeiten</Modal.Title>
         </Modal.Header>
@@ -342,11 +461,11 @@ export const SearchFahrrad = () => {
             </p>
           )}
         </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setDeletingFahrrad(null)}>
+        <Modal.Footer className="flex-nowrap">
+          <Button variant="secondary" className="w-50" onClick={() => setDeletingFahrrad(null)}>
             Abbrechen
           </Button>
-          <Button variant="danger" onClick={handleConfirmDelete}>
+          <Button variant="danger" className="w-50" onClick={handleConfirmDelete}>
             Endgültig löschen
           </Button>
         </Modal.Footer>

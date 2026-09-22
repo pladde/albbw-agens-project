@@ -1,19 +1,29 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
+interface DateRange {
+  startDate?: string;
+  endDate?: string;
+}
+
 export const pdfService = {
   /**
-   * Diese Datei exportiert die Tabellendaten als A4-PDF im Querformat.
+   * Exportiert die Tabellendaten als A4-PDF im Querformat.
    * @param columns Array der Spaltennamen aus der Datenbank (z.B. ['fahrrad_id', 'marke', ...])
-   * @param data Array der geladenen Fahrrad-Objekte
+   * @param data Array der geladenen/gefilterten Fahrrad-Objekte
+   * @param dateRange Optionaler Datumsfilter für die Überschrift
    */
-  exportFahrraederToPdf: (columns: string[], data: Record<string, any>[]) => {
+  exportFahrraederToPdf: (
+    columns: string[], 
+    data: Record<string, any>[], 
+    dateRange?: DateRange
+  ) => {
     if (!data || data.length === 0) {
       alert('Keine Daten zum Exportieren vorhanden.');
       return;
     }
 
-    // DIN A4 (Querformat bzw Landscape) initialisieren
+    // DIN A4 (Querformat bzw. Landscape) initialisieren
     const doc = new jsPDF({
       orientation: 'landscape',
       unit: 'mm',
@@ -22,7 +32,18 @@ export const pdfService = {
 
     // Header (Titel & Metadaten)
     const title = 'Fahrrad-Bestandsübersicht';
-    const dateStr = `Erstellt am: ${new Date().toLocaleDateString('de-DE')} um ${new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })} Uhr`;
+    let dateStr = `Erstellt am: ${new Date().toLocaleDateString('de-DE')} um ${new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })} Uhr`;
+
+    // Zeitraum hinzufügen, falls einer gewählt wurde
+    if (dateRange?.startDate || dateRange?.endDate) {
+      const startFormatted = dateRange.startDate 
+        ? new Date(dateRange.startDate).toLocaleDateString('de-DE') 
+        : 'Anfang';
+      const endFormatted = dateRange.endDate 
+        ? new Date(dateRange.endDate).toLocaleDateString('de-DE') 
+        : 'Heute';
+      dateStr += ` | Zeitraum: ${startFormatted} - ${endFormatted}`;
+    }
 
     // Titel
     doc.setFont('helvetica', 'bold');
@@ -34,9 +55,9 @@ export const pdfService = {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(9);
     doc.setTextColor(108, 117, 125); // Muted Gray
-    doc.text(`${dateStr} | Gesamt: ${data.length} Einträge`, 14, 21);
+    doc.text(`${dateStr} | Einträge: ${data.length}`, 14, 21);
 
-    // spaltenüberschriften formatieren
+    // Spaltenüberschriften formatieren
     const formattedHeaders = columns.map((col) =>
       col
         .replace('_', ' ')
@@ -73,7 +94,7 @@ export const pdfService = {
       },
       margin: { top: 25, right: 14, bottom: 15, left: 14 },
       didDrawPage: (dataArg) => {
-        // Fußzeile mit Seitennummerierung auf jeder Seite hinzufügen
+        // Fußzeile mit Seitennummerierung
         const pageCount = doc.getNumberOfPages();
         const pageHeight = doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
         const pageWidth = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
@@ -81,7 +102,7 @@ export const pdfService = {
         doc.setFontSize(8);
         doc.setTextColor(150);
         
-        // Die Trennlinie über der Fußzeile
+        // Trennlinie
         doc.setDrawColor(220);
         doc.line(14, pageHeight - 12, pageWidth - 14, pageHeight - 12);
 
@@ -94,7 +115,7 @@ export const pdfService = {
       },
     });
 
-    // PDF ersetllen und herunterladen
+    // PDF erstellen und herunterladen
     const formattedDate = new Date().toISOString().slice(0, 10);
     doc.save(`fahrrad_bestand_${formattedDate}.pdf`);
   },
