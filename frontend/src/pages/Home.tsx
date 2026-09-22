@@ -1,21 +1,15 @@
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import { User } from '../Models/User';
+import { User } from '../Models/User'; // Hier muss das Token bzw die Daten des Tokens implementiert werden
 
 export const Home = () => {
   const navigate = useNavigate();
 
-  /*
-  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  //TODO: HARDCODE! Später durch echtes Json ersetzen!
-  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  /* Token:
+  //FIXME: HARDCODE! Später durch echtes Json ersetzen!
   */
-  User.berechtigungsstufe = 2;
-  User.projektnummer = "Projekt-0815";
+  const berechtigungsstufe : number = 2;
+  const projektnummer : string = "Projekt-0815";
 
   return (
     <Container 
@@ -26,47 +20,31 @@ export const Home = () => {
         {/* Standard bereich */}
       <Row>
         <Col className="d-flex flex-column align-items-center gap-3">
-          {/* Erfassen-Button */}
+          {/* Fahrradwerkkstatt-Button */}
           <Button variant='none'
             className='agens-button-primary'
             style={{ width: '280px', height: '150px', fontSize: '28px'}}
-            onClick={() => navigate('/erfassen')}
+            onClick={() => navigate('/fahrrad')}
             >
-            Fahrrad erfassen
+            Fahrradwerkstatt
           </Button>
 
-          {/* Suchen-Button */}
+          {/* Kleiderwerkstatt-Button */}
           <Button variant='none'
             className='agens-button-primary'
             style={{ width: '280px', height: '150px', fontSize: '28px'}}
-            onClick={() => navigate('suchen')}
+            onClick={() => navigate('kleiderwerkstatt')} // FIXME: Kleiderwerkstatt-Route Klasse aufrufen
             >
-            Fahrrad suchen
-          </Button>
-        </Col>
-      </Row>
-
-      {/* Standortleiter bereich */}
-      <Row className="m-2">
-        <Col className="d-flex flex-column align-items-center gap-3">
-          {/* Mitarbieter hinzufügen */}
-          <Button variant='none'
-            className='agens-button-primary'
-            hidden={User.berechtigungsstufe != 2}
-            style={{ width: '280px', height: '150px', fontSize: '28px'}}
-            onClick={() => console.log('REFERENZIERT AUF ROUTE: MA HINZUFÜGEN')}  // HARDCODE
-            >
-            Mitarbeiter hinzufügen
+            Kleiderwerkstatt
           </Button>
 
-          {/* Mitarbieter hinzufügen */}
+                    {/* Suchen-Button */}
           <Button variant='none'
             className='agens-button-primary'
-            hidden={User.berechtigungsstufe != 2}
             style={{ width: '280px', height: '150px', fontSize: '28px'}}
-            onClick={() => console.log('REFERENZIERT AUF ROUTE: MA SUCHEN')}     // HARDCODE
+            onClick={() => navigate('holz')} // FIXME: Holzwerkstatt-Route aufrufen
             >
-            Mitarbeiter suchen
+            Holzwerkstatt
           </Button>
         </Col>
       </Row>

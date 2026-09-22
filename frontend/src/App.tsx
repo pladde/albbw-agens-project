@@ -1,7 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Home } from './pages/Home'
 import { AddFahrrad } from './pages/AddFahrrad';
 import { SearchFahrrad } from './pages/SearchFahrrad';
-import { Home } from './pages/Home';
+import { FahrradMain } from './pages/FahrradMain';
 import { Header } from './components/Header';
 
 function App() {
@@ -13,9 +14,10 @@ function App() {
         minHeight: '100vh'          // Mindestens volle Bildschirmhöhe
       }}>
         <Routes>
-          <Route path='/' element={<Home/>} />          
-          <Route path='/erfassen' element={<AddFahrrad />} />
-          <Route path='/suchen' element={<SearchFahrrad />} />
+          <Route path='/' element={<Home/>} />       
+          <Route path='/fahrrad' element={<FahrradMain/>} />          
+          <Route path='/fahrrad/erfassen' element={<AddFahrrad />} />
+          <Route path='/fahrrad/suchen' element={<SearchFahrrad />} />
         </Routes>
       </main>
     </Router>
