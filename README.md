@@ -28,7 +28,7 @@ npm install
 ```
 
 ### 4. Server starten
-Navigiere in den Root-Ordner und führe die start.bat aus.
+Navigiere in den Root-Ordner und führe die `start.bat` aus.
 Diese Datei startet den Frontend- und den Backend-Server
 
 Alternativ führe im Root-Verzeichnis folgenden Befehl aus:
