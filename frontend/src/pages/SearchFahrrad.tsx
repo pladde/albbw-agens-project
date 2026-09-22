@@ -82,6 +82,7 @@ export const SearchFahrrad = () => {
     return `${day}.${month}.${year} - ${hours}:${minutes} Uhr`;
   };
 
+  // Alle Datensätze holen
   const handleShowAllFahrrader = async () => {
     const data = await fahrradService.fetchAllWithAttributes(currentPage);
 
@@ -228,7 +229,7 @@ export const SearchFahrrad = () => {
   return (
     <Container className="py-4 pb-5 mb-4">
       
-      {/* Aktions-Buttons oben */}
+      {/* Buttons oben */}
       <Row className="mb-3">
         <Col className="d-flex flex-wrap gap-2 justify-content-start align-items-center">
           {selectedFahrrad !== null && (
@@ -249,7 +250,7 @@ export const SearchFahrrad = () => {
           )}
           <Button
             className="agens-button-primary flex-grow-1 flex-sm-grow-0 ms-auto-sm"
-            disabled={allFahrraeder.length === 0}
+            hidden={allFahrraeder.length === 0}
             onClick={() => setShowPdfModal(true)}
           >
             <i className="bi bi-file-earmark-pdf me-1"></i> als PDF exportieren
@@ -304,7 +305,7 @@ export const SearchFahrrad = () => {
         </Col>
       </Row>
 
-      {/* MOBIL-ANSICHT: Cards */}
+      {/* MOBIL-ANSICHT: als Cards TODO: (Könnte aber später noch geändert werden) */}
       <Row className="d-md-none g-3">
         {allFahrraeder.map((row, rowIndex) => {
           const isSelected = selectedFahrrad === row.fahrrad_id;

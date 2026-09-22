@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import '../assets/css/custom-style.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import * as service from '../services/fahrradService';
-import { User } from '../Models/User';
 
 export const AddFahrrad = () => {
     const navigate = useNavigate();
@@ -122,7 +121,7 @@ export const AddFahrrad = () => {
                 </Form.Select>
             </Form.Group>
 
-            {/* Kunde/Einrichtung */}
+            {/* Kunde/Einrichtung ausgesetzt TODO: Hier wäre es ratsam, je nach Berechtigungsstufe noch die Möglichkeit zu geben, auf das hinzufügen eines Kundens zu verweisen
             <Form.Group className='mb-3'>
                 <Form.Label>Kunde/Einrichtung</Form.Label>
                 <Row style={{maxWidth: '600px', width: '100%'}}>
@@ -145,6 +144,7 @@ export const AddFahrrad = () => {
                     </Col>
                 </Row>
             </Form.Group>
+            */}
 
             {/* Senden-Button */}
             <Form.Group className='mt-4'>

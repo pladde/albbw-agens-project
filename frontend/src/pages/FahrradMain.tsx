@@ -17,7 +17,7 @@ export const FahrradMain = () => {
           <Button variant='none'
             className='agens-button-primary'
             style={{ width: '280px', height: '150px', fontSize: '28px'}}
-            onClick={() => navigate('/erfassen')}
+            onClick={() => navigate('erfassen')}
             >
             Fahrrad erfassen
           </Button>
