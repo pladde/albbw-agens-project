@@ -19,24 +19,26 @@ export const SearchFahrrad = () => {
   const [showButton, setShowButton] = useState(true);
   const [selectedFahrrad, setSelectedFahrrad] = useState<number | null>(null);
 
-  // State für das Bearbeiten-Modal
+  // States für das Bearbeiten-Modal
   const [editingFahrrad, setEditingFahrrad] = useState<Fahrrad | null>(null);
 
-  // State für das Löschen-Bestätigungsmodal
+  // States für das Löschen-Bestätigungsmodal
   const [deletingFahrrad, setDeletingFahrrad] = useState<Record<string, any> | null>(null);
 
-  // State für das PDF-Export Modal & Zeitraum
+  // States für das PDF-Export Modal & Zeitraum
   const [showPdfModal, setShowPdfModal] = useState<boolean>(false);
   const [pdfStartDate, setPdfStartDate] = useState<string>('');
   const [pdfEndDate, setPdfEndDate] = useState<string>('');
 
+  /* Suchfilter ausgesetzt
   const [datumSearch, setDatumSearch] = useState('');
   const [idSearch, setIdSearch] = useState('');
   const [markeSearch, setMarkeSearch] = useState('');
   const [rahmennummerSearch, setRahmennummerSearchSearch] = useState('');
   const [bearbeitungsstatusSearch, setBearbeitungsstatusSearch] = useState('');
+  */
 
-  // Formatiert die Spaltenköpfe für eine übersichtlichere Anzeige
+  // Spaltenköpfeformation für eine übersichtlichere Anzeige (erfasst oder ausgang zu Eingang oder Ausgang)
   const formatHeaderName = (colName: string): string => {
     const lower = colName.toLowerCase();
     if (lower === 'erfasst_am') return 'Eingangsdatum';
@@ -48,7 +50,7 @@ export const SearchFahrrad = () => {
       .replace('-id', '-ID');
   };
 
-  // Prüft, ob ein Spaltenname exakt ein Datumsfeld ist
+  // Prüfen ob eine Col ein Datum ist
   const isDateColumnName = (colName: string): boolean => {
     const colLower = colName.toLowerCase();
     return (
@@ -61,7 +63,7 @@ export const SearchFahrrad = () => {
     );
   };
 
-  // Formatiert Datumsangaben in das Format "DD.MM.YYYY - HH:mm Uhr"
+  // Datumsformatieirung
   const formatDateValue = (val: any): string => {
     if (!val) return '-';
 
@@ -109,7 +111,7 @@ export const SearchFahrrad = () => {
     loadHeader();
   }, []);
 
-  // Öffnet das Modal mit den Daten des ausgewählten Fahrrads
+  // Hier öffnet sich das Mdoal mit den Daten des ausgewählten Fahrrads
   const handleEditClick = () => {
     if (selectedFahrrad === null) return;
 
@@ -129,7 +131,7 @@ export const SearchFahrrad = () => {
     }
   };
 
-  // Speichert die geänderten Daten im Backend & aktualisiert die Tabelle
+  // Speichert die geänderten Daten im Backend und aktualisiert die Tabelle
   const handleSaveFahrrad = async (updatedData: Fahrrad) => {
     if (!selectedFahrrad) return;
 
@@ -153,7 +155,7 @@ export const SearchFahrrad = () => {
     }
   };
 
-  // Öffnet das Bestätigungs-Modal zum Löschen
+  // Modalöffnung fürs Löschen
   const handleDeleteClick = () => {
     if (selectedFahrrad === null) return;
     const itemToDelete = allFahrraeder.find(f => f.fahrrad_id === selectedFahrrad);
@@ -183,13 +185,12 @@ export const SearchFahrrad = () => {
     }
   };
 
-  // Führt den PDF-Export mit gefiltertem Zeitraum aus
+  // Ausführung des PDF exports für den gewünschten
   const handleConfirmPdfExport = () => {
     let filteredData = [...allFahrraeder];
 
     if (pdfStartDate || pdfEndDate) {
       filteredData = filteredData.filter(row => {
-        // Prüft primär 'erfasst_am' oder verwandte Datumsfelder
         const rawDate = row.erfasst_am || row.datum || row.created_at;
         if (!rawDate) return true;
 
