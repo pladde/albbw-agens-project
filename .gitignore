@@ -1,0 +1,7 @@
+# Node modules
+node_modules/
+
+# Build-Ergebnisse oder Umgebungsvariablen
+dist/
+build/
+.env
