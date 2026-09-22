@@ -7,40 +7,34 @@ Die grundlegenden Funktionen werden im Zuge der Entwicklung hier dokumentiert.
 
 ## Installieren der Abhängigkeiten: ##
 
-### 1. Frontend einrichten
+### 1. Rootverzeichnis einrichten
+Navigiere in den Root-Ordner und führe folgenden Befehl aus:
+```bash
+npm install
+```
+
+### 2. Frontend einrichten
 Navigiere in den Frontend-Ordner und installiere die Pakete:
 ```bash
 cd frontend
 npm install
 ```
 
-### 2. Backend einrichten
+### 3. Backend einrichten
 Navigiere in den Backend-Ordner und installiere die Pakete:
 ```bash
 cd backend
 npm install
 ```
 
-### 3. Backend starten
-Navigiere zuerst in den Backend-Ordner.
-```bash
-cd backend
-```
-Starte dann über die Powershell / das Terminal den Server mit:
-```bash
-npx tsx server.ts
-```
+### 4. Server starten
+Navigiere in den Root-Ordner und führe die start.bat aus.
+Diese Datei startet den Frontend- und den Backend-Server
 
-### 4. Frontend starten
-Navigiere zuerst in den Frontend-Ordner.
-```bash
-cd frontend
-```
-Starte dann über die Powershell / das Terminal das Frontend mit:
+Alternativ führe im Root-Verzeichnis folgenden Befehl aus:
 ```bash
 npm run dev
 ```
-
 
 
 ## Einrichten der Datenbank: ##
