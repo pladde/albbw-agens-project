@@ -1,0 +1,18 @@
+/* custom-style-agens.css - Eigene Styles für die AGENS-Anwendung */
+
+.agens-button-primary {
+    background: linear-gradient(90deg, #5374a5 0%, #324360 100%);
+    color: white;
+    font-weight: 500;
+    transition: opacity 0.2s;
+}
+
+.agens-button-primary:hover {
+    opacity: 0.85;
+    color: white;
+}
+
+.agens-button-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

@@ -14,41 +14,33 @@ import { InfoCircle } from 'react-bootstrap-icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useBezirk } from '../../contexts/BezirkContext';
 
-const KATEGORIEN = [
-    'Holzwerkstatt',
-    'Elektronik',
-    'Fahrrad',
-    'Nähwerkstatt',
-    'Möbel',
-    'Sonstiges',
-];
+interface Projekt {
+    projekt_id: number;
+    titel: string;
+}
 
 const STATUS_OPTIONEN = [
     'Angenommen',
-    'In Bearbeitung',
-    'Abgeschlossen',
-    'Herausgegeben',
+    'Abgeschlossen'
 ];
 
 export const DienstleistungErfassenPage: React.FC = () => {
     const navigate = useNavigate();
     const { id } = useParams<{ id?: string }>();
     const isBearbeiten = Boolean(id);
-
     // Ausgewählter Bezirk aus dem globalen Context
     const { bezirkId, selectedBezirk } = useBezirk();
-
     // Felder
+    const [projektId, setProjektId] = useState<number | ''>('');
+    const [projekte, setProjekte] = useState<Projekt[]>([]);
     const [auftragId, setAuftragId] = useState<string>(''); // read-only, vom Backend generiert
-    const [kategorie, setKategorie] = useState('');
-    const [beschreibung, setBeschreibung] = useState('');
-    const [besonderheiten, setBesonderheiten] = useState('');
     const [tag, setTag] = useState('');
     const [monat, setMonat] = useState('');
     const [jahr, setJahr] = useState('');
     const [status, setStatus] = useState('Angenommen');
-    const [kunde, setKunde] = useState('');
-
+    const [zusatzInfos, setZusatzInfos] = useState<{ key: string; value: string }[]>([
+        { key: '', value: '' },
+    ]);
     const [loading, setLoading] = useState(isBearbeiten);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
@@ -57,30 +49,67 @@ export const DienstleistungErfassenPage: React.FC = () => {
     const labelStyle: React.CSSProperties = { fontWeight: 500, marginBottom: 4 };
     const inputStyle: React.CSSProperties = { fontSize: '15px' };
 
+    // Projekte immer laden (für Neu und Bearbeiten)
+    useEffect(() => {
+
+        const fetchProjekte = async () => {
+            try {
+                const response = await fetch('http://localhost:3001/api/projekt');
+                if (!response.ok) {
+                    throw new Error('Fehler beim Laden der Projekte');
+                }
+                const data = await response.json();
+                // console.log(data);
+                setProjekte(data);
+
+            } catch (err) {
+                setError(err instanceof Error ? err.message : 'Unbekannter Fehler');
+            }
+        };
+        fetchProjekte();
+    }, []);
+
     // Wenn eine ID vorhanden ist, lade den Auftrag vom Backend
     useEffect(() => {
-        if (!id) return;
+        if (!id) {
+            setLoading(false);
+            // Bei einem neuen Auftrag das heutige Datum automatisch vorbelegen
+            const datum = new Date();
+            setTag(String(datum.getDate()).padStart(2, '0'));
+            setMonat(String(datum.getMonth() + 1).padStart(2, '0'));
+            setJahr(String(datum.getFullYear()));
+            return;
+        }
 
         const fetchAuftrag = async () => {
             try {
                 const response = await fetch(`http://localhost:3001/api/auftrag/${id}`);
+                console.log(response)
                 if (!response.ok) {
                     throw new Error('Auftrag nicht gefunden');
                 }
                 const data = await response.json();
                 setAuftragId(String(data.auftrag_id));
+                setProjektId(data.p_id || '');
 
                 // JSON-Daten parsen
                 const json = data.daten ? JSON.parse(data.daten) : {};
-                setKategorie(json.kategorie || '');
-                setBeschreibung(json.beschreibung || '');
-                setBesonderheiten(json.besonderheiten || '');
                 setStatus(json.status || 'Angenommen');
-                setKunde(json.kunde || '');
+
+                // Zusatz-Infos aus JSON laden
+                if (Array.isArray(json.zusatz_infos) && json.zusatz_infos.length > 0) {
+                    setZusatzInfos(json.zusatz_infos);
+                }
 
                 // Datum aus erstellt_am extrahieren
                 if (data.erstellt_am) {
+                    console.log(data.erstellt_am)
                     const datum = new Date(data.erstellt_am);
+                    setTag(String(datum.getDate()).padStart(2, '0'));
+                    setMonat(String(datum.getMonth() + 1).padStart(2, '0'));
+                    setJahr(String(datum.getFullYear()));
+                } else {
+                    const datum = new Date();
                     setTag(String(datum.getDate()).padStart(2, '0'));
                     setMonat(String(datum.getMonth() + 1).padStart(2, '0'));
                     setJahr(String(datum.getFullYear()));
@@ -94,22 +123,53 @@ export const DienstleistungErfassenPage: React.FC = () => {
         fetchAuftrag();
     }, [id]);
 
+
+
+    // Zusatz-Infos (Key-Value) verwalten
+    const handleZusatzInfoChange = (index: number, field: 'key' | 'value', value: string) => {
+        setZusatzInfos((prev) =>
+            prev.map((item, i) => (i === index ? { ...item, [field]: value } : item))
+        );
+    };
+
+    const handleAddZusatzInfo = () => {
+        setZusatzInfos((prev) => [...prev, { key: '', value: '' }]);
+    };
+
+    const handleRemoveZusatzInfo = (index: number) => {
+        setZusatzInfos((prev) => prev.filter((_, i) => i !== index));
+    };
+
+    // Speichern
     const handleSubmit = async () => {
         setSaving(true);
         setError('');
         setSuccess('');
 
-        // JSON-Daten für die daten-Spalte zusammenstellen
-        const daten = {
-            kategorie,
-            beschreibung,
-            besonderheiten,
-            status,
-            kunde,
-        };
+        // Validierung
+        if (!projektId) {
+            setError('Bitte wählen Sie ein Projekt aus.');
+            setSaving(false);
+            return;
+        }
+        if (!bezirkId) {
+            setError('Kein Bezirk ausgewählt. Bitte wählen Sie zuerst einen Bezirk aus.');
+            setSaving(false);
+            return;
+        }
 
         // Datum formatieren
-        const eingangsdatum = `${jahr}-${monat}-${tag}`;
+        const erstellt_am = `${jahr}-${monat}-${tag}`;
+        // console.log(erstellt_am)
+
+
+        // JSON-Daten für die daten-Spalte zusammenstellen
+        const daten = {
+            status,
+            erstellt_am,
+            zusatz_infos: zusatzInfos.filter((zi) => zi.key.trim() !== '' || zi.value.trim() !== ''),
+        };
+        console.log(daten)
 
         try {
             if (isBearbeiten) {
@@ -118,8 +178,8 @@ export const DienstleistungErfassenPage: React.FC = () => {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        p_id: 1, // TODO: Projekt-ID auswählbar machen
-                        bez_id: bezirkId, // Ausgewählter Bezirk aus dem Header-Dropdown
+                        p_id: projektId,
+                        bez_id: bezirkId,
                         daten: JSON.stringify(daten),
                     }),
                 });
@@ -134,8 +194,8 @@ export const DienstleistungErfassenPage: React.FC = () => {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        p_id: 1, // TODO: Projekt-ID auswählbar machen
-                        bez_id: bezirkId, // Ausgewählter Bezirk aus dem Header-Dropdown
+                        p_id: projektId,
+                        bez_id: bezirkId,
                         daten: JSON.stringify(daten),
                     }),
                 });
@@ -155,6 +215,7 @@ export const DienstleistungErfassenPage: React.FC = () => {
         }
     };
 
+    // Spinner
     if (loading) {
         return (
             <Container
@@ -200,49 +261,25 @@ export const DienstleistungErfassenPage: React.FC = () => {
                 </Col>
             </Row>
 
-            {/* Kategorie */}
+            {/* Projekt */}
             <Row className="mb-3">
                 <Col xs={12} md={4}>
-                    <Form.Label style={labelStyle}>Kategorie</Form.Label>
+                    <Form.Label style={labelStyle}>Projekt</Form.Label>
                     <Form.Select
-                        value={kategorie}
-                        onChange={(e) => setKategorie(e.target.value)}
+                        value={projektId}
+                        onChange={(e) => setProjektId(e.target.value ? Number(e.target.value) : '')}
                         style={{ ...inputStyle, maxWidth: '300px' }}
                     >
                         <option value="">Bitte wählen...</option>
-                        {KATEGORIEN.map((k) => (
-                            <option key={k}>{k}</option>
+                        {projekte.map((p) => (
+                            <option key={p.projekt_id} value={p.projekt_id}>
+                                {p.titel}
+                            </option>
                         ))}
                     </Form.Select>
                 </Col>
             </Row>
 
-            {/* Beschreibung */}
-            <Row className="mb-3">
-                <Col xs={12} md={5}>
-                    <Form.Label style={labelStyle}>Beschreibung</Form.Label>
-                    <Form.Control
-                        value={beschreibung}
-                        onChange={(e) => setBeschreibung(e.target.value)}
-                        placeholder="Kurzbeschreibung des Auftrags"
-                        style={inputStyle}
-                    />
-                </Col>
-            </Row>
-
-            {/* Besonderheiten */}
-            <Row className="mb-3">
-                <Col xs={12} md={5}>
-                    <Form.Label style={labelStyle}>Besonderheiten</Form.Label>
-                    <Form.Control
-                        as="textarea"
-                        rows={4}
-                        value={besonderheiten}
-                        onChange={(e) => setBesonderheiten(e.target.value)}
-                        style={inputStyle}
-                    />
-                </Col>
-            </Row>
 
             {/* Eingangsdatum */}
             <Row className="mb-3">
@@ -275,7 +312,7 @@ export const DienstleistungErfassenPage: React.FC = () => {
                 </Col>
             </Row>
 
-            {/* Bearbeitungsstatus */}
+            {/* Status (Aktiv) */}
             <Row className="mb-3">
                 <Col xs={12} md={3}>
                     <Form.Label style={labelStyle}>Bearbeitungsstatus</Form.Label>
@@ -291,31 +328,53 @@ export const DienstleistungErfassenPage: React.FC = () => {
                 </Col>
             </Row>
 
-            {/* Kunde/Einrichtung */}
-            <Row className="mb-4">
-                <Col xs={12} md={5}>
-                    <Form.Label style={labelStyle}>Kunde/Einrichtung</Form.Label>
-                    <div className="d-flex align-items-center gap-3">
-                        <Form.Select
-                            value={kunde}
-                            onChange={(e) => setKunde(e.target.value)}
-                            style={{ ...inputStyle, maxWidth: '300px' }}
-                        >
-                            <option value="">Kunden wählen...</option>
-                            <option>Max Mustermann</option>
-                            <option>Lisa Beispiel</option>
-                        </Form.Select>
-                        <span>oder</span>
-                        <Button
-                            variant="secondary"
-                            style={{ borderRadius: '6px', whiteSpace: 'nowrap' }}
-                            onClick={() => navigate('/kunde/neu')}
-                        >
-                            neuen Kunden anlegen
-                        </Button>
-                    </div>
+            {/* Weitere Informationen (Key-Value) */}
+            <Row className="mb-3">
+                <Col xs={12} md={6}>
+                    <Form.Label style={labelStyle}>Weitere Informationen</Form.Label>
+                    {zusatzInfos.map((info, index) => (
+                        <div key={index} className="d-flex gap-2 mb-2 align-items-center">
+                            <Form.Control
+                                type="text"
+                                placeholder="Schlüssel"
+                                value={info.key}
+                                onChange={(e) => handleZusatzInfoChange(index, 'key', e.target.value)}
+                                style={{ ...inputStyle, maxWidth: '200px' }}
+                            />
+                            <Form.Control
+                                type="text"
+                                placeholder="Wert"
+                                value={info.value}
+                                onChange={(e) => handleZusatzInfoChange(index, 'value', e.target.value)}
+                                style={{ ...inputStyle, maxWidth: '300px' }}
+                            />
+                            {zusatzInfos.length > 1 && (
+                                <Button
+                                    variant="link"
+                                    onClick={() => handleRemoveZusatzInfo(index)}
+                                    style={{ padding: 0, fontSize: '20px', color: '#dc3545', textDecoration: 'none', lineHeight: 1 }}
+                                    title="Zeile entfernen"
+                                >
+                                    ×
+                                </Button>
+                            )}
+                        </div>
+                    ))}
+                    <Button
+                        variant="link"
+                        onClick={handleAddZusatzInfo}
+                        style={{ padding: 0, fontSize: '22px', color: '#5374a5', textDecoration: 'none', lineHeight: 1 }}
+                        title="Weitere Information hinzufügen"
+                    >
+                        +
+                    </Button>
                 </Col>
             </Row>
+
+
+
+
+
 
             {/* Senden */}
             <Button

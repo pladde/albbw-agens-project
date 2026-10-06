@@ -9,6 +9,7 @@ import personRoutes from "./routes/personRoutes.ts";
 import projektRoutes from "./routes/projektRoutes.ts";
 import projekt_x_personRoutes from "./routes/projekt_x_personRoutes.ts";
 import rolleRoutes from "./routes/rolleRoutes.ts";
+//import projektNummerRoutes from "./routes/projektNummerRoutes.ts";
 
 
 // server.ts = Der Hauptserver
@@ -32,6 +33,7 @@ app.use('/api/person', personRoutes);
 app.use('/api/projekt', projektRoutes);
 app.use('/api/projekt_x_person', projekt_x_personRoutes);
 app.use('/api/rolle', rolleRoutes);
+//app.use('/api/projektnummer', projektNummerRoutes)
 
 
 // GET - wenn die Startseite angefragt wird, meldet das backend sich mit hallo

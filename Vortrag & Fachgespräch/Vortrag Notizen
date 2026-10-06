@@ -1,0 +1,15 @@
+Die JSON-Lösung sollte nicht die relationale Datenbank ersetzen.
+Der Grund für die Lösung war, dass die verschiedenen Werkstätten
+unterschiedliche Attribute benötigen.
+
+Für jede Abweichung der Tabellenstruktur, müsste ein Admin die Tabellen manuell anpassen.
+Mit JSON-Daten lassen sich optionale und alternative Kategorien speichern ohne Mehraufwand.
+
+Allerdings lassen JSON Daten nicht mehr klassisch rational modellieren oder abrufen.
+Dadurch werden gezielte Abfragen, Indexierung und durchsetzung von Datenintegrität schwieriger.
+Außerdem erhöht die JSON-Lösung die Nutzungslatenz der Datenbank, sie macht die Nutzung langsamer.
+Das Backend muss die JSON-Struktur selbst parsen und validieren.
+
+Deshalb würde ich heute die Entscheidung nicht als generell bessere Lösung darstellen.
+Für häufig abgefragte oder kritische Daten würde ich eine relationale Struktur bevorzugen.
+JSON würde ich nur für tatsächliche variablen bzw. optionale Daten verwenden.

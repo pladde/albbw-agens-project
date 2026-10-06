@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Datenfluss - AGENS Projekt</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #324360;
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #5374a5;
+            font-size: 1.1em;
+            margin-bottom: 30px;
+        }
+
+        /* ====== ARCHITEKTUR-ÜBERSICHT ====== */
+        .architecture {
+            display: flex;
+            justify-content: center;
+            align-items: stretch;
+            gap: 20px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .arch-box {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            min-width: 250px;
+            flex: 1;
+            max-width: 400px;
+            border-top: 5px solid;
+            transition: transform 0.3s;
+        }
+
+        .arch-box:hover {
+            transform: translateY(-5px);
+        }
+
+        .arch-box.frontend { border-top-color: #61dafb; }
+        .arch-box.backend { border-top-color: #68a063; }
+        .arch-box.database { border-top-color: #f29111; }
+
+        .arch-box h2 {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .arch-box.frontend h2 { color: #0e7a9e; }
+        .arch-box.backend h2 { color: #3d7a3d; }
+        .arch-box.database h2 { color: #c47a0a; }
+
+        .tech-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .tech-list li {
+            padding: 6px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 0.95em;
+            color: #444;
+        }
+
+        .tech-list li:last-child {
+            border-bottom: none;
+        }
+
+        .tech-list li strong {
+            color: #324360;
+        }
+
+        .arrow-connector {
+            display: flex;
+            align-items: center;
+            font-size: 2em;
+            color: #5374a5;
+            font-weight: bold;
+        }
+
+        /* ====== API-ENDPUNKTE ====== */
+        .api-section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
+        }
+
+        .api-section h2 {
+            color: #324360;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .api-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .api-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            background: #fafafa;
+        }
+
+        .api-card h3 {
+            font-size: 1em;
+            color: #324360;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #5374a5;
+            padding-bottom: 5px;
+        }
+
+        .api-method {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: bold;
+            color: white;
+            margin-right: 8px;
+        }
+
+        .method-get { background: #28a745; }
+        .method-post { background: #007bff; }
+        .method-put { background: #ffc107; color: #333; }
+        .method-delete { background: #dc3545; }
+
+        .api-path {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #555;
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .api-desc {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 8px;
+        }
+
+        /* ====== DATENFLUSS-DIAGRAMM ====== */
+        .flow-section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
+        }
+
+        .flow-section h2 {
+            color: #324360;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .flow-diagram {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0;
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            width: 100%;
+            max-width: 900px;
+            padding: 15px;
+            border-radius: 10px;
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .flow-step:hover {
+            border-color: #5374a5;
+            box-shadow: 0 4px 12px rgba(83, 116, 165, 0.2);
+        }
+
+        .flow-step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #5374a5;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+            flex-shrink: 0;
+        }
+
+        .flow-step-icon {
+            font-size: 2em;
+            flex-shrink: 0;
+            width: 50px;
+            text-align: center;
+        }
+
+        .flow-step-content {
+            flex: 1;
+        }
+
+        .flow-step-title {
+            font-weight: bold;
+            color: #324360;
+            font-size: 1.05em;
+            margin-bottom: 4px;
+        }
+
+        .flow-step-desc {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .flow-step-detail {
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            color: #5374a5;
+            background: #eef2f7;
+            padding: 3px 8px;
+            border-radius: 4px;
+            margin-top: 5px;
+            display: inline-block;
+        }
+
+        .flow-arrow {
+            font-size: 1.8em;
+            color: #5374a5;
+            padding: 5px 0;
+            line-height: 1;
+        }
+
+        .flow-arrow-label {
+            font-size: 0.75em;
+            color: #888;
+            text-align: center;
+            margin-top: -5px;
+        }
+
+        /* ====== DATENBANK-SCHEMA ====== */
+        .db-section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
+        }
+
+        .db-section h2 {
+            color: #324360;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .db-tables {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .db-table {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .db-table-header {
+            background: #5374a5;
+            color: white;
+            padding: 10px;
+            font-weight: bold;
+            text-align: center;
+            font-size: 0.95em;
+        }
+
+        .db-table-body {
+            padding: 10px;
+            font-size: 0.85em;
+        }
+
+        .db-table-body .pk {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .db-table-body .fk {
+            color: #007bff;
+            font-style: italic;
+        }
+
+        .db-table-body .json {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .db-table-body div {
+            padding: 3px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .db-table-body div:last-child {
+            border-bottom: none;
+        }
+
+        .db-relations {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        .db-relations h3 {
+            color: #324360;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .db-relations ul {
+            list-style: none;
+            padding-left: 10px;
+        }
+
+        .db-relations li {
+            padding: 4px 0;
+        }
+
+        .db-relations li::before {
+            content: "→ ";
+            color: #5374a5;
+            font-weight: bold;
+        }
+
+        /* ====== HYBRID-MODELL ====== */
+        .hybrid-section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
+        }
+
+        .hybrid-section h2 {
+            color: #324360;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .hybrid-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .hybrid-box {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            background: #fafafa;
+        }
+
+        .hybrid-box h3 {
+            color: #324360;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .hybrid-box pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 6px;
+            font-size: 0.85em;
+            overflow-x: auto;
+            line-height: 1.5;
+        }
+
+        .hybrid-box .json-key { color: #66d9ef; }
+        .hybrid-box .json-string { color: #a6e22e; }
+        .hybrid-box .json-number { color: #ae81ff; }
+
+        /* ====== LEGENDE ====== */
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .legend-color.frontend { background: #61dafb; }
+        .legend-color.backend { background: #68a063; }
+        .legend-color.database { background: #f29111; }
+
+        /* ====== RESPONSIVE ====== */
+        @media (max-width: 768px) {
+            .architecture {
+                flex-direction: column;
+            }
+            .arrow-connector {
+                transform: rotate(90deg);
+                justify-content: center;
+            }
+            .hybrid-grid {
+                grid-template-columns: 1fr;
+            }
+            .flow-step {
+                flex-direction: column;
+                text-align: center;
+            }
+            .flow-step-detail {
+                display: block;
+            }
+        }
+
+        /* ====== PRINT ====== */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .arch-box, .api-section, .flow-section, .db-section, .hybrid-section {
+                box-shadow: none;
+                border: 1px solid #ccc;
+                break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Datenfluss-Architektur</h1>
+        <p class="subtitle">AGENS – Holz & Spielwaren | Auftragsverwaltung (Hybrid-Modell: SQL + JSON)</p>
+
+        <!-- ====== 1. ARCHITEKTUR-ÜBERSICHT ====== -->
+        <div class="architecture">
+            <div class="arch-box frontend">
+                <h2>🖥️ Frontend</h2>
+                <ul class="tech-list">
+                    <li><strong>React 19</strong> + TypeScript</li>
+                    <li><strong>Vite</strong> Build-Tool</li>
+                    <li><strong>React Router</strong> (Navigation)</li>
+                    <li><strong>React Bootstrap</strong> (UI)</li>
+                    <li><strong>Context API</strong> (Globaler State)</li>
+                    <li>Port: <strong>5173</strong> (Dev)</li>
+                </ul>
+            </div>
+
+            <div class="arrow-connector">⟷</div>
+
+            <div class="arch-box backend">
+                <h2>⚙️ Backend</h2>
+                <ul class="tech-list">
+                    <li><strong>Express 5</strong> (Node.js)</li>
+                    <li><strong>TypeScript</strong></li>
+                    <li><strong>CORS</strong> Middleware</li>
+                    <li><strong>JSON</strong> Body-Parser</li>
+                    <li><strong>mysql2</strong> (DB-Client)</li>
+                    <li>Port: <strong>3001</strong></li>
+                </ul>
+            </div>
+
+            <div class="arrow-connector">⟷</div>
+
+            <div class="arch-box database">
+                <h2>🗄️ Datenbank</h2>
+                <ul class="tech-list">
+                    <li><strong>MariaDB / MySQL</strong></li>
+                    <li>Datenbank: <strong>json_hybrid_db</strong></li>
+                    <li><strong>6 Tabellen</strong></li>
+                    <li><strong>JSON-Spalte</strong> in Auftrag</li>
+                    <li>Connection-Pool (max. 10)</li>
+                    <li>Port: <strong>3306</strong></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ====== 2. API-ENDPUNKTE ====== -->
+        <div class="api-section">
+            <h2>🔌 API-Endpunkte (Backend → Datenbank)</h2>
+            <div class="api-grid">
+                <div class="api-card">
+                    <h3>Aufträge</h3>
+                    <div><span class="api-method method-get">GET</span><span class="api-path">/api/auftrag</span></div>
+                    <div class="api-desc">Alle Aufträge (mit JOIN auf Projekt & Bezirk)</div>
+                    <div style="margin-top:8px;"><span class="api-method method-get">GET</span><span class="api-path">/api/auftrag/:id</span></div>
+                    <div class="api-desc">Einzelnen Auftrag abrufen</div>
+                    <div style="margin-top:8px;"><span class="api-method method-get">GET</span><span class="api-path">/api/auftrag/bezirk/:bezirkId</span></div>
+                    <div class="api-desc">Aufträge nach Bezirk filtern</div>
+                    <div style="margin-top:8px;"><span class="api-method method-get">GET</span><span class="api-path">/api/auftrag/projekt/:projektId</span></div>
+                    <div class="api-desc">Aufträge nach Projekt filtern</div>
+                    <div style="margin-top:8px;"><span class="api-method method-post">POST</span><span class="api-path">/api/auftrag</span></div>
+                    <div class="api-desc">Neuen Auftrag erstellen (mit JSON-Daten)</div>
+                    <div style="margin-top:8px;"><span class="api-method method-put">PUT</span><span class="api-path">/api/auftrag/:id</span></div>
+                    <div class="api-desc">Auftrag aktualisieren</div>
+                    <div style="margin-top:8px;"><span class="api-method method-delete">DELETE</span><span class="api-path">/api/auftrag/:id</span></div>
+                    <div class="api-desc">Auftrag löschen</div>
+                </div>
+
+                <div class="api-card">
+                    <h3>Bezirke</h3>
+                    <div><span class="api-method method-get">GET</span><span class="api-path">/api/bezirk</span></div>
+                    <div class="api-desc">Alle Bezirke abrufen</div>
+                    <div style="margin-top:8px;"><span class="api-method method-get">GET</span><span class="api-path">/api/bezirk/:id</span></div>
+                    <div class="api-desc">Einzelnen Bezirk abrufen</div>
+                    <div style="margin-top:8px;"><span class="api-method method-post">POST</span><span class="api-path">/api/bezirk</span></div>
+                    <div class="api-desc">Neuen Bezirk erstellen</div>
+                    <div style="margin-top:8px;"><span class="api-method method-put">PUT</span><span class="api-path">/api/bezirk/:id</span></div>
+                    <div class="api-desc">Bezirk aktualisieren</div>
+                    <div style="margin-top:8px;"><span class="api-method method-delete">DELETE</span><span class="api-path">/api/bezirk/:id</span></div>
+                    <div class="api-desc">Bezirk löschen</div>
+                </div>
+
+                <div class="api-card">
+                    <h3>Projekte</h3>
+                    <div><span class="api-method method-get">GET</span><span class="api-path">/api/projekt</span></div>
+                    <div class="api-desc">Alle Projekte abrufen</div>
+                    <div style="margin-top:8px;"><span class="api-method method-get">GET</span><span class="api-path">/api/projekt/:id</span></div>
+                    <div class="api-desc">Einzelnes Projekt abrufen</div>
+                    <div style="margin-top:8px;"><span class="api-method method-post">POST</span><span class="api-path">/api/projekt</span></div>
+                    <div class="api-desc">Neues Projekt erstellen</div>
+                    <div style="margin-top:8px;"><span class="api-method method-put">PUT</span><span class="api-path">/api/projekt/:id</span></div>
+                    <div class="api-desc">Projekt aktualisieren</div>
+                    <div style="margin-top:8px;"><span class="api-method method-delete">DELETE</span><span class="api-path">/api/projekt/:id</span></div>
+                    <div class="api-desc">Projekt löschen</div>
+                </div>
+
+                <div class="api-card">
+                    <h3>Personen & Rollen</h3>
+                    <div><span class="api-method method-get">GET</span><span class="api-path">/api/person</span></div>
+                    <div class="api-desc">Alle Personen (mit Rollen-JOIN)</div>
+                    <div style="margin-top:8px;"><span class="api-method method-post">POST</span><span class="api-path">/api/person</span></div>
+                    <div class="api-desc">Neue Person erstellen</div>
+                    <div style="margin-top:8px;"><span class="api-method method-get">GET</span><span class="api-path">/api/rolle</span></div>
+                    <div class="api-desc">Alle Rollen abrufen</div>
+                    <div style="margin-top:8px;"><span class="api-method method-post">POST</span><span class="api-path">/api/rolle</span></div>
+                    <div class="api-desc">Neue Rolle erstellen</div>
+                </div>
+
+                <div class="api-card">
+                    <h3>Projekt ↔ Person (n:m)</h3>
+                    <div><span class="api-method method-get">GET</span><span class="api-path">/api/projekt_x_person</span></div>
+                    <div class="api-desc">Alle Zuordnungen</div>
+                    <div style="margin-top:8px;"><span class="api-method method-get">GET</span><span class="api-path">/api/projekt_x_person/projekt/:id/personen</span></div>
+                    <div class="api-desc">Personen eines Projekts</div>
+                    <div style="margin-top:8px;"><span class="api-method method-get">GET</span><span class="api-path">/api/projekt_x_person/person/:id/projekte</span></div>
+                    <div class="api-desc">Projekte einer Person</div>
+                    <div style="margin-top:8px;"><span class="api-method method-post">POST</span><span class="api-path">/api/projekt_x_person</span></div>
+                    <div class="api-desc">Person zu Projekt zuordnen</div>
+                    <div style="margin-top:8px;"><span class="api-method method-delete">DELETE</span><span class="api-path">/api/projekt_x_person/:id</span></div>
+                    <div class="api-desc">Zuordnung löschen</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====== 3. DATENFLUSS-DIAGRAMM ====== -->
+        <div class="flow-section">
+            <h2>🔄 Datenfluss: "Auftrag erfassen" (End-to-End)</h2>
+            <div class="flow-diagram">
+                <!-- Schritt 1 -->
+                <div class="flow-step">
+                    <div class="flow-step-number">1</div>
+                    <div class="flow-step-icon">🖥️</div>
+                    <div class="flow-step-content">
+                        <div class="flow-step-title">Benutzer öffnet die App</div>
+                        <div class="flow-step-desc">Browser lädt React-App über Vite Dev-Server (Port 5173)</div>
+                        <div class="flow-step-detail">main.tsx → App.tsx → BrowserRouter → BezirkProvider</div>
+                    </div>
+                </div>
+                <div class="flow-arrow">↓</div>
+
+                <!-- Schritt 2 -->
+                <div class="flow-step">
+                    <div class="flow-step-number">2</div>
+                    <div class="flow-step-icon">🌍</div>
+                    <div class="flow-step-content">
+                        <div class="flow-step-title">BezirkContext lädt Bezirke</div>
+                        <div class="flow-step-desc">Beim App-Start werden alle Bezirke vom Backend geladen (für das Header-Dropdown)</div>
+                        <div class="flow-step-detail">GET http://localhost:3001/api/bezirk</div>
+                    </div>
+                </div>
+                <div class="flow-arrow">↓</div>
+
+                <!-- Schritt 3 -->
+                <div class="flow-step">
+                    <div class="flow-step-number">3</div>
+                    <div class="flow-step-icon">⚙️</div>
+                    <div class="flow-step-content">
+                        <div class="flow-step-title">Backend verarbeitet GET-Request</div>
+                        <div class="flow-step-desc">Express-Router empfängt Anfrage → bezirkRoutes.ts → SQL-Query</div>
+                        <div class="flow-step-detail">SELECT * FROM bezirk ORDER BY bezirk_id</div>
+                    </div>
+                </div>
+                <div class="flow-arrow">↓</div>
+
+                <!-- Schritt 4 -->
+                <div class="flow-step">
+                    <div class="flow-step-number">4</div>
+                    <div class="flow-step-icon">🗄️</div>
+                    <div class="flow-step-content">
+                        <div class="flow-step-title">Datenbank liefert Bezirke</div>
+                        <div class="flow-step-desc">MariaDB führt Query aus und gibt JSON-Array zurück</div>
+                        <div class="flow-step-detail">[{bezirk_id: 1, name: "Bezirk A", kuerzel: "BA"}, ...]</div>
+                    </div>
+                </div>
+                <div class="flow-arrow">↓</div>
+
+                <!-- Schritt 5 -->
+                <div class="flow-step">
+                    <div class="flow-step-number">5</div>
+                    <div class="flow-step-icon">🖥️</div>
+                    <div class="flow-step-content">
+                        <div class="flow-step-title">Frontend speichert Bezirke im Context</div>
+                        <div class="flow-step-desc">BezirkContext speichert Bezirke im globalen State → Header-Dropdown zeigt sie an</div>
+                        <div class="flow-step-detail">useState → setBezirke(data) → Header rendert Dropdown</div>
+                    </div>
+                </div>
+                <div class="flow-arrow">↓</div>
+
+                <!-- Schritt 6 -->
+                <div class="flow-step">
+                    <div class="flow-step-number">6</div>
+                    <div class="flow-step-icon">📝</div>
+                    <div class="flow-step-content">
+                        <div class="flow-step-title">Benutzer klickt "Auftrag erfassen"</div>
+                        <div class="flow-step-desc">Navigation zu /dienstleistung/erfassen → Formular wird angezeigt</div>
+                        <div class="flow-step-detail">DienstleistungErfassenPage.tsx</div>
+                    </div>
+                </div>
+                <div class="flow-arrow">↓</div>
+
+                <!-- Schritt 7 -->
+                <div class="flow-step">
+                    <div class="flow-step-number">7</div>
+                    <div class="flow-step-icon">📥</div>
+                    <div class="flow-step-content">
+                        <div class="flow-step-title">Formular lädt Projekte</div>
+                        <div class="flow-step-desc">Projekt-Dropdown wird mit Daten vom Backend befüllt</div>
+                        <div class="flow-step-detail">GET http://localhost:3001/api/projekt</div>
+                    </div>
+                </div>
+                <div class="flow-arrow">↓</div>
+
+                <!-- Schritt 8 -->
+                <div class="flow-step">
+                    <div class="flow-step-number">8</div>
+                    <div class="flow-step-icon">✍️</div>
+                    <div class="flow-step-content">
+                        <div class="flow-step-title">Benutzer füllt Formular aus</div>
+                        <div class="flow-step-desc">Projekt wählen, Datum, Status, Zusatz-Infos (Key-Value-Paare)</div>
+                        <div class="flow-step-detail">Zusatz-Infos werden als JSON-Objekt aufgebaut</div>
+                    </div>
+                </div>
+                <div class="flow-arrow">↓</div>
+
+                <!-- Schritt 9 -->
+                <div class="flow-step">
+                    <div class="flow-step-number">9</div>
+                    <div class="flow-step-icon">📤</div>
+                    <div class="flow-step-content">
+                        <div class="flow-step-title">Frontend sendet POST-Request</div>
+                        <div class="flow-step-desc">Formulardaten werden als JSON an das Backend gesendet</div>
+                        <div class="flow-step-detail">POST http://localhost:3001/api/auftrag</div>
+                    </div>
+                </div>
+                <div class="flow-arrow">↓</div>
+
+                <!-- Schritt 10 -->
+                <div class="flow-step">
+                    <div class="flow-step-number">10</div>
+                    <div class="flow-step-icon">⚙️</div>
+                    <div class="flow-step-content">
+                        <div class="flow-step-title">Backend validiert und speichert</div>
+                        <div class="flow-step-desc">auftragRoutes.ts prüft Fremdschlüssel (Projekt & Bezirk existieren) und führt INSERT aus</div>
+                        <div class="flow-step-detail">INSERT INTO auftrag (p_id, bez_id, daten) VALUES (?, ?, ?)</div>
+                    </div>
+                </div>
+                <div class="flow-arrow">↓</div>
+
+                <!-- Schritt 11 -->
+                <div class="flow-step">
+                    <div class="flow-step-number">11</div>
+                    <div class="flow-step-icon">🗄️</div>
+                    <div class="flow-step-content">
+                        <div class="flow-step-title">Datenbank speichert Auftrag</div>
+                        <div class="flow-step-desc">Auftrag wird mit JSON-Daten in der "daten"-Spalte gespeichert (Hybrid-Modell)</div>
+                        <div class="flow-step-detail">auftrag_id wird automatisch generiert (AUTO_INCREMENT)</div>
+                    </div>
+                </div>
+                <div class="flow-arrow">↓</div>
+
+                <!-- Schritt 12 -->
+                <div class="flow-step">
+                    <div class="flow-step-number">12</div>
+                    <div class="flow-step-icon">✅</div>
+                    <div class="flow-step-content">
+                        <div class="flow-step-title">Backend antwortet mit Erfolg</div>
+                        <div class="flow-step-desc">HTTP 201 Created mit Status "success" und der neuen Auftrags-ID</div>
+                        <div class="flow-step-detail">{status: "success", message: "Auftrag erfolgreich erstellt", data: {auftrag_id: 15, ...}}</div>
+                    </div>
+                </div>
+                <div class="flow-arrow">↓</div>
+
+                <!-- Schritt 13 -->
+                <div class="flow-step">
+                    <div class="flow-step-number">13</div>
+                    <div class="flow-step-icon">🎉</div>
+                    <div class="flow-step-content">
+                        <div class="flow-step-title">Frontend zeigt Bestätigung</div>
+                        <div class="flow-step-desc">Erfolgsmeldung wird angezeigt → nach 1,5s Navigation zur Suchen-Seite</div>
+                        <div class="flow-step-detail">navigate('/dienstleistung/suchen')</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====== 4. DATENBANK-SCHEMA ====== -->
+        <div class="db-section">
+            <h2>🗄️ Datenbank-Schema (json_hybrid_db)</h2>
+            <div class="db-tables">
+                <div class="db-table">
+                    <div class="db-table-header">rolle</div>
+                    <div class="db-table-body">
+                        <div><span class="pk">🔑 rolle_id</span> INT PK</div>
+                        <div>beschreibung VARCHAR(100)</div>
+                    </div>
+                </div>
+
+                <div class="db-table">
+                    <div class="db-table-header">bezirk</div>
+                    <div class="db-table-body">
+                        <div><span class="pk">🔑 bezirk_id</span> INT PK</div>
+                        <div>name VARCHAR(50)</div>
+                        <div>kuerzel VARCHAR(50) UNIQUE</div>
+                    </div>
+                </div>
+
+                <div class="db-table">
+                    <div class="db-table-header">person</div>
+                    <div class="db-table-body">
+                        <div><span class="pk">🔑 person_id</span> INT PK</div>
+                        <div><span class="fk">🔗 r_id</span> FK → rolle</div>
+                        <div>name VARCHAR(50)</div>
+                        <div>vorname VARCHAR(50)</div>
+                        <div>email VARCHAR(100)</div>
+                        <div>telefon VARCHAR(25)</div>
+                        <div>aktiv TINYINT(1)</div>
+                        <div>letzter_login DATETIME</div>
+                    </div>
+                </div>
+
+                <div class="db-table">
+                    <div class="db-table-header">projekt</div>
+                    <div class="db-table-body">
+                        <div><span class="pk">🔑 projekt_id</span> INT PK</div>
+                        <div>titel VARCHAR(100)</div>
+                        <div>beschreibung TEXT</div>
+                        <div>aktiv TINYINT(1)</div>
+                        <div>erstellt_am DATETIME</div>
+                    </div>
+                </div>
+
+                <div class="db-table">
+                    <div class="db-table-header">projekt_x_person</div>
+                    <div class="db-table-body">
+                        <div><span class="pk">🔑 x_id</span> INT PK</div>
+                        <div><span class="fk">🔗 projekt_id</span> FK → projekt</div>
+                        <div><span class="fk">🔗 person_id</span> FK → person</div>
+                    </div>
+                </div>
+
+                <div class="db-table">
+                    <div class="db-table-header">auftrag</div>
+                    <div class="db-table-body">
+                        <div><span class="pk">🔑 auftrag_id</span> INT PK</div>
+                        <div><span class="json">📦 daten</span> JSON</div>
+                        <div>erstellt_am DATETIME</div>
+                        <div><span class="fk">🔗 p_id</span> FK → projekt</div>
+                        <div><span class="fk">🔗 bez_id</span> FK → bezirk</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="db-relations">
+                <h3>Beziehungen</h3>
+                <ul>
+                    <li><strong>person</strong> (n:1) → <strong>rolle</strong> – Jede Person hat genau eine Rolle</li>
+                    <li><strong>projekt_x_person</strong> (n:m) – Verknüpfungstabelle zwischen Projekt und Person</li>
+                    <li><strong>auftrag</strong> (n:1) → <strong>projekt</strong> – Jeder Auftrag gehört zu einem Projekt</li>
+                    <li><strong>auftrag</strong> (n:1) → <strong>bezirk</strong> – Jeder Auftrag gehört zu einem Bezirk</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ====== 5. HYBRID-MODELL ====== -->
+        <div class="hybrid-section">
+            <h2>📦 Hybrid-Modell: SQL + JSON</h2>
+            <div class="hybrid-grid">
+                <div class="hybrid-box">
+                    <h3>Strukturierte Spalten (SQL)</h3>
+                    <pre>
+<span class="json-key">auftrag_id</span>: <span class="json-number">15</span>      <span class="json-key">←</span> Primärschlüssel
+<span class="json-key">p_id</span>: <span class="json-number">3</span>          <span class="json-key">←</span> Fremdschlüssel → projekt
+<span class="json-key">bez_id</span>: <span class="json-number">1</span>         <span class="json-key">←</span> Fremdschlüssel → bezirk
+<span class="json-key">erstellt_am</span>: <span class="json-string">"2026-09-27 18:00:00"</span>
+                    </pre>
+                </div>
+                <div class="hybrid-box">
+                    <h3>Flexible JSON-Spalte (daten)</h3>
+                    <pre>
+{
+  <span class="json-key">"status"</span>: <span class="json-string">"Angenommen"</span>,
+  <span class="json-key">"erstellt_am"</span>: <span class="json-string">"2026-09-27"</span>,
+  <span class="json-key">"zusatz_infos"</span>: [
+    { <span class="json-key">"key"</span>: <span class="json-string">"Lieferdatum"</span>,
+      <span class="json-key">"value"</span>: <span class="json-string">"01.10.2026"</span> },
+    { <span class="json-key">"key"</span>: <span class="json-string">"Menge"</span>,
+      <span class="json-key">"value"</span>: <span class="json-string">"50 Stück"</span> }
+  ]
+}
+                    </pre>
+                </div>
+            </div>
+            <div style="margin-top:15px; padding:15px; background:#eef2f7; border-radius:8px; font-size:0.9em; color:#555;">
+                <strong>💡 Vorteil:</strong> Strukturierte Daten (IDs, Datum) bleiben in SQL-Spalten für schnelle Abfragen & JOINs. Flexible, projektspezifische Zusatzfelder werden als JSON gespeichert – ohne Schema-Änderungen bei neuen Anforderungen.
+            </div>
+        </div>
+
+        <!-- ====== LEGENDE ====== -->
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color frontend"></div>
+                <span>Frontend (React)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color backend"></div>
+                <span>Backend (Express)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color database"></div>
+                <span>Datenbank (MariaDB)</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

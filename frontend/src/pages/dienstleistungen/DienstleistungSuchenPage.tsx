@@ -96,7 +96,9 @@ export const DienstleistungSuchenPage: React.FC = () => {
             (titel === '' || auftragTitel.toLowerCase().includes(titel.toLowerCase())) &&
             datumMatch
         );
-    });
+    })
+        .sort((a, b) => new Date(b.erstellt_am).getTime() - new Date(a.erstellt_am).getTime())
+    ;
 
     const inputStyle: React.CSSProperties = {
         height: '38px',

@@ -1,21 +1,62 @@
 DB-Seed anpassen -> Bezirke, Rollen
 
 Front User Interface anpassen
+
+
+
+
+
+
+zu tun:
+
+- Datenfluss darstellen
+
+    => Berlin (Gesamt) zeigt noch nicht alle Aufträge an
+    -> wie werden die json-daten validiert und vor dem eingang in die datenbank auf ihr korrektes schema geprüft?
+
+
+in bearbeitung:
+
+
+geschafft:
+- datensätze in tabelle werden nach datum autosortiert
+- auftragsdaten (key-value) können hinzugefügt werden. weitere auftragsdaten können über ein (+) zeichen hinzugefügt werden
+- DienstleistungErfassenPage EingabefelderNamen, Bearbeiten
+- Datenbank neu entwerfen
+
+
+für später:
+- gesamtanzeige (berlin) zeigt alle datensätze an. Alle anderen die nachfolgenden
+
+
+
+############## PRÄSENTATION ################
+Vorstellung meiner Person/Firma
+Was war das Problem darstellen
+Was war mein Lösungsansatz?
+Zusammenfassung
+Fazit
+Hier gab es dann Probleme mit der Datenbank, und so sollte es eigentlich aussehen
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fertig
     -> Header Bezirke zugreifen auf DB Bezirke
-    -> DienstleistungErfassenPage EingabefelderNamen, Bearbeiten
     => Die Daten der Tabelle sollen nach dem Bezirk sich anpassen, schau in die KI, da wurde schon begonnen
-
-
-
-
-JSON flexibilität:
--> Front end muss Key Value anbieten, kein fließtext
--> JSON Daten Normalisieren ?
-
-
-
-
-
     -> DienstleistungSuchenPage Spaltennamen, Filternamen
 @DienstleistungSuchenPage.tsx Zeile 44-60 useEffect() verstehen und in der KI erklären lassen
 -> useEffect ist eine Hook, das bedeutet, sie wird beim laden eines Events ausgelöst.
