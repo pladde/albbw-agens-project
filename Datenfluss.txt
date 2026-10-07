@@ -1,15 +1,114 @@
 Der Datenfluss (wie alles zusammenspielt)
 
-Benutzer klickt "Auftrag erfassen"
+ARCHITEKTUR-ÜBERSICHT:
+
+┌─────────────────┐     HTTP/JSON      ┌─────────────────┐     SQL      ┌─────────────────┐
+│   FRONTEND      │  ────────────────► │    BACKEND      │ ───────────► │   DATENBANK     │
+│   React 19      │  ◄──────────────── │    Express 5    │ ◄─────────── │   MariaDB       │
+│   Port 5173     │     JSON-Antwort   │    Port 3001    │   Datensätze │   agens_service │
+└─────────────────┘                    └─────────────────┘              └─────────────────┘
+
+
+1. APP-START (Bezirke laden):
+Benutzer öffnet die App
 ↓
-Frontend zeigt Formular (DienstleistungErfassenPage)
+BezirkContext (frontend/src/contexts/BezirkContext.tsx) lädt beim Start alle Bezirke
 ↓
-Benutzer füllt Formular aus und klickt "senden"
+GET http://localhost:3001/api/bezirk
 ↓
-Frontend sendet Daten an Backend (POST /api/auftrag)
+Backend: bezirkRoutes.ts → SELECT * FROM bezirk ORDER BY bezirk_id
 ↓
-Backend speichert in MariaDB-Datenbank
+Datenbank liefert JSON-Array zurück
 ↓
-Backend antwortet "Erfolgreich erstellt"
+Frontend speichert Bezirke im globalen Context → Header-Dropdown zeigt sie an
+
+
+2. AUFTRAG ERFASSEN (POST):
+Benutzer wählt Bezirk im Header-Dropdown (setBezirkId → globaler State)
 ↓
-Frontend zeigt Bestätigung
+Benutzer klickt "Auftrag erfassen" → Navigation zu /dienstleistung/erfassen
+↓
+DienstleistungErfassenPage lädt Dropdown-Daten parallel:
+  GET /api/service-bereich
+  GET /api/mitarbeiter
+  GET /api/status
+  (Promise.all)
+↓
+Benutzer füllt Formular aus (Service-Bereich, Mitarbeiter, Status, Titel, Beschreibung, Datum)
+↓
+Frontend sendet POST http://localhost:3001/api/auftrag
+  Body: { service_bereich_id, bezirk_id, mitarbeiter_id, status_id, titel, beschreibung, erstellt_am, abgeschlossen_am }
+↓
+Backend: auftragRoutes.ts
+  1. Validierung: Pflichtfelder prüfen
+  2. Fremdschlüssel-Validierung: Existiert Service-Bereich? Bezirk? Mitarbeiter? Status?
+  3. INSERT INTO auftrag (service_bereich_id, bezirk_id, mitarbeiter_id, status_id, titel, beschreibung, erstellt_am, abgeschlossen_am)
+↓
+Datenbank speichert Auftrag (auftrag_id wird automatisch generiert)
+↓
+Backend antwortet: HTTP 201 { status: "success", message: "Auftrag erfolgreich erstellt", data: { auftrag_id, ... } }
+↓
+Frontend zeigt Bestätigung → nach 1,5s Navigation zu /dienstleistung/suchen
+
+
+3. AUFTRAG SUCHEN (GET):
+DienstleistungSuchenPage lädt nur Aufträge des ausgewählten Bezirks:
+  GET http://localhost:3001/api/auftrag/bezirk/:bezirkId
+↓
+Backend: auftragRoutes.ts → SQL-Query mit JOINs:
+  SELECT a.*, b.name as bezirk_name, m.vorname, m.nachname,
+         sb.name as service_bereich_name, s.status as status_name
+  FROM auftrag a
+  LEFT JOIN bezirk b ON a.bezirk_id = b.bezirk_id
+  LEFT JOIN mitarbeiter m ON a.mitarbeiter_id = m.mitarbeiter_id
+  LEFT JOIN service_bereich sb ON a.service_bereich_id = sb.service_bereich_id
+  LEFT JOIN status s ON a.status_id = s.status_id
+  WHERE a.bezirk_id = ?
+↓
+Frontend zeigt Tabelle mit Filtern (Auftrags-ID, Titel, Status, Datum)
+
+
+4. AUFTRAG BEARBEITEN (PUT):
+Benutzer wählt Auftrag in Tabelle → klickt "bearbeiten"
+↓
+Navigation zu /dienstleistung/erfassen/:id
+↓
+Frontend lädt Auftrag: GET /api/auftrag/:id
+↓
+Formular wird mit vorhandenen Daten befüllt
+↓
+Benutzer ändert Daten → klickt "senden"
+↓
+Frontend sendet PUT http://localhost:3001/api/auftrag/:id
+↓
+Backend: Validierung + UPDATE auftrag SET ... WHERE auftrag_id = ?
+↓
+Antwort: { status: "success", message: "Auftrag erfolgreich aktualisiert" }
+
+
+5. AUFTRAG LÖSCHEN (DELETE):
+Benutzer wählt Auftrag in Tabelle → klickt "löschen" (mit Bestätigungsdialog)
+↓
+Frontend sendet DELETE http://localhost:3001/api/auftrag/:id
+↓
+Backend: DELETE FROM auftrag WHERE auftrag_id = ?
+↓
+Antwort: { status: "success", message: "Auftrag erfolgreich gelöscht" }
+↓
+Frontend entfernt Auftrag aus der Tabelle
+
+
+DATENBANK-SCHEMA (agens_service):
+
+bezirk          (bezirk_id PK, name, kürzel)
+mitarbeiter     (mitarbeiter_id PK, vorname, nachname, email, telefon)
+service_bereich (service_bereich_id PK, name, beschreibung, aktiv)
+status          (status_id PK, status ENUM)
+projekt_nummer  (projekt_nummer_id PK, projekt_nummer)
+auftrag         (auftrag_id PK, service_bereich_id FK, bezirk_id FK, mitarbeiter_id FK, status_id FK, titel, beschreibung, erstellt_am, abgeschlossen_am)
+
+Beziehungen:
+auftrag (n:1) → service_bereich
+auftrag (n:1) → bezirk
+auftrag (n:1) → mitarbeiter
+auftrag (n:1) → status

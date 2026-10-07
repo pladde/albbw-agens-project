@@ -328,11 +328,6 @@
             font-style: italic;
         }
 
-        .db-table-body .json {
-            color: #28a745;
-            font-weight: bold;
-        }
-
         .db-table-body div {
             padding: 3px 0;
             border-bottom: 1px solid #f0f0f0;
@@ -371,54 +366,6 @@
             color: #5374a5;
             font-weight: bold;
         }
-
-        /* ====== HYBRID-MODELL ====== */
-        .hybrid-section {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            margin-bottom: 40px;
-        }
-
-        .hybrid-section h2 {
-            color: #324360;
-            margin-bottom: 20px;
-            font-size: 1.5em;
-        }
-
-        .hybrid-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        .hybrid-box {
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 15px;
-            background: #fafafa;
-        }
-
-        .hybrid-box h3 {
-            color: #324360;
-            margin-bottom: 10px;
-            font-size: 1.1em;
-        }
-
-        .hybrid-box pre {
-            background: #2d2d2d;
-            color: #f8f8f2;
-            padding: 15px;
-            border-radius: 6px;
-            font-size: 0.85em;
-            overflow-x: auto;
-            line-height: 1.5;
-        }
-
-        .hybrid-box .json-key { color: #66d9ef; }
-        .hybrid-box .json-string { color: #a6e22e; }
-        .hybrid-box .json-number { color: #ae81ff; }
 
         /* ====== LEGENDE ====== */
         .legend {
@@ -459,9 +406,6 @@
                 transform: rotate(90deg);
                 justify-content: center;
             }
-            .hybrid-grid {
-                grid-template-columns: 1fr;
-            }
             .flow-step {
                 flex-direction: column;
                 text-align: center;
@@ -477,7 +421,7 @@
                 background: white;
                 padding: 0;
             }
-            .arch-box, .api-section, .flow-section, .db-section, .hybrid-section {
+            .arch-box, .api-section, .flow-section, .db-section {
                 box-shadow: none;
                 border: 1px solid #ccc;
                 break-inside: avoid;
@@ -488,7 +432,7 @@
 <body>
     <div class="container">
         <h1>📊 Datenfluss-Architektur</h1>
-        <p class="subtitle">AGENS – Holz & Spielwaren | Auftragsverwaltung (Hybrid-Modell: SQL + JSON)</p>
+        <p class="subtitle">AGENS – Holz & Spielwaren | Auftragsverwaltung (Relationale MariaDB-Datenbank)</p>
 
         <!-- ====== 1. ARCHITEKTUR-ÜBERSICHT ====== -->
         <div class="architecture">
@@ -499,7 +443,7 @@
                     <li><strong>Vite</strong> Build-Tool</li>
                     <li><strong>React Router</strong> (Navigation)</li>
                     <li><strong>React Bootstrap</strong> (UI)</li>
-                    <li><strong>Context API</strong> (Globaler State)</li>
+                    <li><strong>Context API</strong> (Globaler State: BezirkContext)</li>
                     <li>Port: <strong>5173</strong> (Dev)</li>
                 </ul>
             </div>
@@ -513,7 +457,7 @@
                     <li><strong>TypeScript</strong></li>
                     <li><strong>CORS</strong> Middleware</li>
                     <li><strong>JSON</strong> Body-Parser</li>
-                    <li><strong>mysql2</strong> (DB-Client)</li>
+                    <li><strong>mysql2</strong> (DB-Client mit Connection-Pool)</li>
                     <li>Port: <strong>3001</strong></li>
                 </ul>
             </div>
@@ -524,9 +468,8 @@
                 <h2>🗄️ Datenbank</h2>
                 <ul class="tech-list">
                     <li><strong>MariaDB / MySQL</strong></li>
-                    <li>Datenbank: <strong>json_hybrid_db</strong></li>
+                    <li>Datenbank: <strong>agens_service</strong></li>
                     <li><strong>6 Tabellen</strong></li>
-                    <li><strong>JSON-Spalte</strong> in Auftrag</li>
                     <li>Connection-Pool (max. 10)</li>
                     <li>Port: <strong>3306</strong></li>
                 </ul>
@@ -535,20 +478,22 @@
 
         <!-- ====== 2. API-ENDPUNKTE ====== -->
         <div class="api-section">
-            <h2>🔌 API-Endpunkte (Backend → Datenbank)</h2>
+            <h2>🔌 API-Endpunkte (Frontend → Backend)</h2>
             <div class="api-grid">
                 <div class="api-card">
                     <h3>Aufträge</h3>
                     <div><span class="api-method method-get">GET</span><span class="api-path">/api/auftrag</span></div>
-                    <div class="api-desc">Alle Aufträge (mit JOIN auf Projekt & Bezirk)</div>
+                    <div class="api-desc">Alle Aufträge (mit JOIN auf Bezirk, Mitarbeiter, Service-Bereich, Status)</div>
                     <div style="margin-top:8px;"><span class="api-method method-get">GET</span><span class="api-path">/api/auftrag/:id</span></div>
                     <div class="api-desc">Einzelnen Auftrag abrufen</div>
                     <div style="margin-top:8px;"><span class="api-method method-get">GET</span><span class="api-path">/api/auftrag/bezirk/:bezirkId</span></div>
                     <div class="api-desc">Aufträge nach Bezirk filtern</div>
-                    <div style="margin-top:8px;"><span class="api-method method-get">GET</span><span class="api-path">/api/auftrag/projekt/:projektId</span></div>
-                    <div class="api-desc">Aufträge nach Projekt filtern</div>
+                    <div style="margin-top:8px;"><span class="api-method method-get">GET</span><span class="api-path">/api/auftrag/service-bereich/:id</span></div>
+                    <div class="api-desc">Aufträge nach Service-Bereich filtern</div>
+                    <div style="margin-top:8px;"><span class="api-method method-get">GET</span><span class="api-path">/api/auftrag/status/:id</span></div>
+                    <div class="api-desc">Aufträge nach Status filtern</div>
                     <div style="margin-top:8px;"><span class="api-method method-post">POST</span><span class="api-path">/api/auftrag</span></div>
-                    <div class="api-desc">Neuen Auftrag erstellen (mit JSON-Daten)</div>
+                    <div class="api-desc">Neuen Auftrag erstellen (mit Fremdschlüssel-Validierung)</div>
                     <div style="margin-top:8px;"><span class="api-method method-put">PUT</span><span class="api-path">/api/auftrag/:id</span></div>
                     <div class="api-desc">Auftrag aktualisieren</div>
                     <div style="margin-top:8px;"><span class="api-method method-delete">DELETE</span><span class="api-path">/api/auftrag/:id</span></div>
@@ -558,7 +503,7 @@
                 <div class="api-card">
                     <h3>Bezirke</h3>
                     <div><span class="api-method method-get">GET</span><span class="api-path">/api/bezirk</span></div>
-                    <div class="api-desc">Alle Bezirke abrufen</div>
+                    <div class="api-desc">Alle Bezirke abrufen (für Header-Dropdown & Context)</div>
                     <div style="margin-top:8px;"><span class="api-method method-get">GET</span><span class="api-path">/api/bezirk/:id</span></div>
                     <div class="api-desc">Einzelnen Bezirk abrufen</div>
                     <div style="margin-top:8px;"><span class="api-method method-post">POST</span><span class="api-path">/api/bezirk</span></div>
@@ -570,43 +515,45 @@
                 </div>
 
                 <div class="api-card">
-                    <h3>Projekte</h3>
-                    <div><span class="api-method method-get">GET</span><span class="api-path">/api/projekt</span></div>
-                    <div class="api-desc">Alle Projekte abrufen</div>
-                    <div style="margin-top:8px;"><span class="api-method method-get">GET</span><span class="api-path">/api/projekt/:id</span></div>
-                    <div class="api-desc">Einzelnes Projekt abrufen</div>
-                    <div style="margin-top:8px;"><span class="api-method method-post">POST</span><span class="api-path">/api/projekt</span></div>
-                    <div class="api-desc">Neues Projekt erstellen</div>
-                    <div style="margin-top:8px;"><span class="api-method method-put">PUT</span><span class="api-path">/api/projekt/:id</span></div>
-                    <div class="api-desc">Projekt aktualisieren</div>
-                    <div style="margin-top:8px;"><span class="api-method method-delete">DELETE</span><span class="api-path">/api/projekt/:id</span></div>
-                    <div class="api-desc">Projekt löschen</div>
+                    <h3>Mitarbeiter</h3>
+                    <div><span class="api-method method-get">GET</span><span class="api-path">/api/mitarbeiter</span></div>
+                    <div class="api-desc">Alle Mitarbeiter abrufen (für Dropdown im Formular)</div>
+                    <div style="margin-top:8px;"><span class="api-method method-get">GET</span><span class="api-path">/api/mitarbeiter/:id</span></div>
+                    <div class="api-desc">Einzelnen Mitarbeiter abrufen</div>
+                    <div style="margin-top:8px;"><span class="api-method method-post">POST</span><span class="api-path">/api/mitarbeiter</span></div>
+                    <div class="api-desc">Neuen Mitarbeiter erstellen</div>
+                    <div style="margin-top:8px;"><span class="api-method method-put">PUT</span><span class="api-path">/api/mitarbeiter/:id</span></div>
+                    <div class="api-desc">Mitarbeiter aktualisieren</div>
+                    <div style="margin-top:8px;"><span class="api-method method-delete">DELETE</span><span class="api-path">/api/mitarbeiter/:id</span></div>
+                    <div class="api-desc">Mitarbeiter löschen</div>
                 </div>
 
                 <div class="api-card">
-                    <h3>Personen & Rollen</h3>
-                    <div><span class="api-method method-get">GET</span><span class="api-path">/api/person</span></div>
-                    <div class="api-desc">Alle Personen (mit Rollen-JOIN)</div>
-                    <div style="margin-top:8px;"><span class="api-method method-post">POST</span><span class="api-path">/api/person</span></div>
-                    <div class="api-desc">Neue Person erstellen</div>
-                    <div style="margin-top:8px;"><span class="api-method method-get">GET</span><span class="api-path">/api/rolle</span></div>
-                    <div class="api-desc">Alle Rollen abrufen</div>
-                    <div style="margin-top:8px;"><span class="api-method method-post">POST</span><span class="api-path">/api/rolle</span></div>
-                    <div class="api-desc">Neue Rolle erstellen</div>
+                    <h3>Service-Bereiche</h3>
+                    <div><span class="api-method method-get">GET</span><span class="api-path">/api/service-bereich</span></div>
+                    <div class="api-desc">Alle Service-Bereiche abrufen (für Dropdown im Formular)</div>
+                    <div style="margin-top:8px;"><span class="api-method method-get">GET</span><span class="api-path">/api/service-bereich/:id</span></div>
+                    <div class="api-desc">Einzelnen Service-Bereich abrufen</div>
+                    <div style="margin-top:8px;"><span class="api-method method-post">POST</span><span class="api-path">/api/service-bereich</span></div>
+                    <div class="api-desc">Neuen Service-Bereich erstellen</div>
+                    <div style="margin-top:8px;"><span class="api-method method-put">PUT</span><span class="api-path">/api/service-bereich/:id</span></div>
+                    <div class="api-desc">Service-Bereich aktualisieren</div>
+                    <div style="margin-top:8px;"><span class="api-method method-delete">DELETE</span><span class="api-path">/api/service-bereich/:id</span></div>
+                    <div class="api-desc">Service-Bereich löschen</div>
                 </div>
 
                 <div class="api-card">
-                    <h3>Projekt ↔ Person (n:m)</h3>
-                    <div><span class="api-method method-get">GET</span><span class="api-path">/api/projekt_x_person</span></div>
-                    <div class="api-desc">Alle Zuordnungen</div>
-                    <div style="margin-top:8px;"><span class="api-method method-get">GET</span><span class="api-path">/api/projekt_x_person/projekt/:id/personen</span></div>
-                    <div class="api-desc">Personen eines Projekts</div>
-                    <div style="margin-top:8px;"><span class="api-method method-get">GET</span><span class="api-path">/api/projekt_x_person/person/:id/projekte</span></div>
-                    <div class="api-desc">Projekte einer Person</div>
-                    <div style="margin-top:8px;"><span class="api-method method-post">POST</span><span class="api-path">/api/projekt_x_person</span></div>
-                    <div class="api-desc">Person zu Projekt zuordnen</div>
-                    <div style="margin-top:8px;"><span class="api-method method-delete">DELETE</span><span class="api-path">/api/projekt_x_person/:id</span></div>
-                    <div class="api-desc">Zuordnung löschen</div>
+                    <h3>Status</h3>
+                    <div><span class="api-method method-get">GET</span><span class="api-path">/api/status</span></div>
+                    <div class="api-desc">Alle Status abrufen (für Dropdown im Formular)</div>
+                    <div style="margin-top:8px;"><span class="api-method method-get">GET</span><span class="api-path">/api/status/:id</span></div>
+                    <div class="api-desc">Einzelnen Status abrufen</div>
+                    <div style="margin-top:8px;"><span class="api-method method-post">POST</span><span class="api-path">/api/status</span></div>
+                    <div class="api-desc">Neuen Status erstellen</div>
+                    <div style="margin-top:8px;"><span class="api-method method-put">PUT</span><span class="api-path">/api/status/:id</span></div>
+                    <div class="api-desc">Status aktualisieren</div>
+                    <div style="margin-top:8px;"><span class="api-method method-delete">DELETE</span><span class="api-path">/api/status/:id</span></div>
+                    <div class="api-desc">Status löschen</div>
                 </div>
             </div>
         </div>
@@ -658,7 +605,7 @@
                     <div class="flow-step-content">
                         <div class="flow-step-title">Datenbank liefert Bezirke</div>
                         <div class="flow-step-desc">MariaDB führt Query aus und gibt JSON-Array zurück</div>
-                        <div class="flow-step-detail">[{bezirk_id: 1, name: "Bezirk A", kuerzel: "BA"}, ...]</div>
+                        <div class="flow-step-detail">[{bezirk_id: 1, name: "Bezirk A", kürzel: "BA"}, ...]</div>
                     </div>
                 </div>
                 <div class="flow-arrow">↓</div>
@@ -680,9 +627,9 @@
                     <div class="flow-step-number">6</div>
                     <div class="flow-step-icon">📝</div>
                     <div class="flow-step-content">
-                        <div class="flow-step-title">Benutzer klickt "Auftrag erfassen"</div>
-                        <div class="flow-step-desc">Navigation zu /dienstleistung/erfassen → Formular wird angezeigt</div>
-                        <div class="flow-step-detail">DienstleistungErfassenPage.tsx</div>
+                        <div class="flow-step-title">Benutzer wählt Bezirk & klickt "Auftrag erfassen"</div>
+                        <div class="flow-step-desc">Bezirk wird global im Context gesetzt → Navigation zu /dienstleistung/erfassen</div>
+                        <div class="flow-step-detail">setBezirkId(id) → navigate('/dienstleistung/erfassen')</div>
                     </div>
                 </div>
                 <div class="flow-arrow">↓</div>
@@ -692,9 +639,9 @@
                     <div class="flow-step-number">7</div>
                     <div class="flow-step-icon">📥</div>
                     <div class="flow-step-content">
-                        <div class="flow-step-title">Formular lädt Projekte</div>
-                        <div class="flow-step-desc">Projekt-Dropdown wird mit Daten vom Backend befüllt</div>
-                        <div class="flow-step-detail">GET http://localhost:3001/api/projekt</div>
+                        <div class="flow-step-title">Formular lädt Dropdown-Daten</div>
+                        <div class="flow-step-desc">Service-Bereiche, Mitarbeiter und Status werden parallel vom Backend geladen</div>
+                        <div class="flow-step-detail">GET /api/service-bereich + GET /api/mitarbeiter + GET /api/status (Promise.all)</div>
                     </div>
                 </div>
                 <div class="flow-arrow">↓</div>
@@ -705,8 +652,8 @@
                     <div class="flow-step-icon">✍️</div>
                     <div class="flow-step-content">
                         <div class="flow-step-title">Benutzer füllt Formular aus</div>
-                        <div class="flow-step-desc">Projekt wählen, Datum, Status, Zusatz-Infos (Key-Value-Paare)</div>
-                        <div class="flow-step-detail">Zusatz-Infos werden als JSON-Objekt aufgebaut</div>
+                        <div class="flow-step-desc">Service-Bereich, Mitarbeiter, Status, Titel, Beschreibung, Eingangsdatum, Abschlussdatum</div>
+                        <div class="flow-step-detail">Formular-State in DienstleistungErfassenPage.tsx</div>
                     </div>
                 </div>
                 <div class="flow-arrow">↓</div>
@@ -717,7 +664,7 @@
                     <div class="flow-step-icon">📤</div>
                     <div class="flow-step-content">
                         <div class="flow-step-title">Frontend sendet POST-Request</div>
-                        <div class="flow-step-desc">Formulardaten werden als JSON an das Backend gesendet</div>
+                        <div class="flow-step-desc">Formulardaten werden als JSON an das Backend gesendet (bezirk_id aus Context)</div>
                         <div class="flow-step-detail">POST http://localhost:3001/api/auftrag</div>
                     </div>
                 </div>
@@ -728,9 +675,9 @@
                     <div class="flow-step-number">10</div>
                     <div class="flow-step-icon">⚙️</div>
                     <div class="flow-step-content">
-                        <div class="flow-step-title">Backend validiert und speichert</div>
-                        <div class="flow-step-desc">auftragRoutes.ts prüft Fremdschlüssel (Projekt & Bezirk existieren) und führt INSERT aus</div>
-                        <div class="flow-step-detail">INSERT INTO auftrag (p_id, bez_id, daten) VALUES (?, ?, ?)</div>
+                        <div class="flow-step-title">Backend validiert Fremdschlüssel</div>
+                        <div class="flow-step-desc">auftragRoutes.ts prüft, ob Service-Bereich, Bezirk, Mitarbeiter und Status existieren</div>
+                        <div class="flow-step-detail">SELECT ... FROM service_bereich / bezirk / mitarbeiter / status WHERE id = ?</div>
                     </div>
                 </div>
                 <div class="flow-arrow">↓</div>
@@ -741,8 +688,8 @@
                     <div class="flow-step-icon">🗄️</div>
                     <div class="flow-step-content">
                         <div class="flow-step-title">Datenbank speichert Auftrag</div>
-                        <div class="flow-step-desc">Auftrag wird mit JSON-Daten in der "daten"-Spalte gespeichert (Hybrid-Modell)</div>
-                        <div class="flow-step-detail">auftrag_id wird automatisch generiert (AUTO_INCREMENT)</div>
+                        <div class="flow-step-desc">INSERT mit allen Feldern in die Tabelle auftrag</div>
+                        <div class="flow-step-detail">INSERT INTO auftrag (service_bereich_id, bezirk_id, mitarbeiter_id, status_id, titel, ...) VALUES (?, ?, ?, ?, ?, ...)</div>
                     </div>
                 </div>
                 <div class="flow-arrow">↓</div>
@@ -769,61 +716,80 @@
                         <div class="flow-step-detail">navigate('/dienstleistung/suchen')</div>
                     </div>
                 </div>
+                <div class="flow-arrow">↓</div>
+
+                <!-- Schritt 14 -->
+                <div class="flow-step">
+                    <div class="flow-step-number">14</div>
+                    <div class="flow-step-icon">🔍</div>
+                    <div class="flow-step-content">
+                        <div class="flow-step-title">Suchen-Seite lädt Aufträge des Bezirks</div>
+                        <div class="flow-step-desc">Nur Aufträge des im Context ausgewählten Bezirks werden geladen (mit JOIN-Namen)</div>
+                        <div class="flow-step-detail">GET http://localhost:3001/api/auftrag/bezirk/:bezirkId</div>
+                    </div>
+                </div>
+                <div class="flow-arrow">↓</div>
+
+                <!-- Schritt 15 -->
+                <div class="flow-step">
+                    <div class="flow-step-number">15</div>
+                    <div class="flow-step-icon">✏️</div>
+                    <div class="flow-step-content">
+                        <div class="flow-step-title">Bearbeiten oder Löschen</div>
+                        <div class="flow-step-desc">Benutzer kann Auftrag bearbeiten (Formular mit Daten befüllt) oder löschen</div>
+                        <div class="flow-step-detail">PUT /api/auftrag/:id  |  DELETE /api/auftrag/:id</div>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- ====== 4. DATENBANK-SCHEMA ====== -->
         <div class="db-section">
-            <h2>🗄️ Datenbank-Schema (json_hybrid_db)</h2>
+            <h2>🗄️ Datenbank-Schema (agens_service)</h2>
             <div class="db-tables">
-                <div class="db-table">
-                    <div class="db-table-header">rolle</div>
-                    <div class="db-table-body">
-                        <div><span class="pk">🔑 rolle_id</span> INT PK</div>
-                        <div>beschreibung VARCHAR(100)</div>
-                    </div>
-                </div>
-
                 <div class="db-table">
                     <div class="db-table-header">bezirk</div>
                     <div class="db-table-body">
                         <div><span class="pk">🔑 bezirk_id</span> INT PK</div>
                         <div>name VARCHAR(50)</div>
-                        <div>kuerzel VARCHAR(50) UNIQUE</div>
+                        <div>kürzel VARCHAR(25)</div>
                     </div>
                 </div>
 
                 <div class="db-table">
-                    <div class="db-table-header">person</div>
+                    <div class="db-table-header">mitarbeiter</div>
                     <div class="db-table-body">
-                        <div><span class="pk">🔑 person_id</span> INT PK</div>
-                        <div><span class="fk">🔗 r_id</span> FK → rolle</div>
-                        <div>name VARCHAR(50)</div>
+                        <div><span class="pk">🔑 mitarbeiter_id</span> INT PK</div>
                         <div>vorname VARCHAR(50)</div>
+                        <div>nachname VARCHAR(50)</div>
                         <div>email VARCHAR(100)</div>
-                        <div>telefon VARCHAR(25)</div>
-                        <div>aktiv TINYINT(1)</div>
-                        <div>letzter_login DATETIME</div>
+                        <div>telefon VARCHAR(50)</div>
                     </div>
                 </div>
 
                 <div class="db-table">
-                    <div class="db-table-header">projekt</div>
+                    <div class="db-table-header">service_bereich</div>
                     <div class="db-table-body">
-                        <div><span class="pk">🔑 projekt_id</span> INT PK</div>
-                        <div>titel VARCHAR(100)</div>
-                        <div>beschreibung TEXT</div>
-                        <div>aktiv TINYINT(1)</div>
-                        <div>erstellt_am DATETIME</div>
+                        <div><span class="pk">🔑 service_bereich_id</span> INT PK</div>
+                        <div>name VARCHAR(50)</div>
+                        <div>beschreibung VARCHAR(500)</div>
+                        <div>aktiv TINYINT</div>
                     </div>
                 </div>
 
                 <div class="db-table">
-                    <div class="db-table-header">projekt_x_person</div>
+                    <div class="db-table-header">status</div>
                     <div class="db-table-body">
-                        <div><span class="pk">🔑 x_id</span> INT PK</div>
-                        <div><span class="fk">🔗 projekt_id</span> FK → projekt</div>
-                        <div><span class="fk">🔗 person_id</span> FK → person</div>
+                        <div><span class="pk">🔑 status_id</span> INT PK</div>
+                        <div>status ENUM('angenommen','in-bearbeitung','angelehnt','abgeschlossen')</div>
+                    </div>
+                </div>
+
+                <div class="db-table">
+                    <div class="db-table-header">projekt_nummer</div>
+                    <div class="db-table-body">
+                        <div><span class="pk">🔑 projekt_nummer_id</span> INT PK</div>
+                        <div>projekt_nummer INT</div>
                     </div>
                 </div>
 
@@ -831,10 +797,14 @@
                     <div class="db-table-header">auftrag</div>
                     <div class="db-table-body">
                         <div><span class="pk">🔑 auftrag_id</span> INT PK</div>
-                        <div><span class="json">📦 daten</span> JSON</div>
+                        <div><span class="fk">🔗 service_bereich_id</span> FK → service_bereich</div>
+                        <div><span class="fk">🔗 bezirk_id</span> FK → bezirk</div>
+                        <div><span class="fk">🔗 mitarbeiter_id</span> FK → mitarbeiter</div>
+                        <div><span class="fk">🔗 status_id</span> FK → status</div>
+                        <div>titel VARCHAR(50)</div>
+                        <div>beschreibung VARCHAR(500)</div>
                         <div>erstellt_am DATETIME</div>
-                        <div><span class="fk">🔗 p_id</span> FK → projekt</div>
-                        <div><span class="fk">🔗 bez_id</span> FK → bezirk</div>
+                        <div>abgeschlossen_am DATETIME</div>
                     </div>
                 </div>
             </div>
@@ -842,45 +812,11 @@
             <div class="db-relations">
                 <h3>Beziehungen</h3>
                 <ul>
-                    <li><strong>person</strong> (n:1) → <strong>rolle</strong> – Jede Person hat genau eine Rolle</li>
-                    <li><strong>projekt_x_person</strong> (n:m) – Verknüpfungstabelle zwischen Projekt und Person</li>
-                    <li><strong>auftrag</strong> (n:1) → <strong>projekt</strong> – Jeder Auftrag gehört zu einem Projekt</li>
+                    <li><strong>auftrag</strong> (n:1) → <strong>service_bereich</strong> – Jeder Auftrag gehört zu einem Service-Bereich</li>
                     <li><strong>auftrag</strong> (n:1) → <strong>bezirk</strong> – Jeder Auftrag gehört zu einem Bezirk</li>
+                    <li><strong>auftrag</strong> (n:1) → <strong>mitarbeiter</strong> – Jeder Auftrag ist einem Mitarbeiter zugeordnet</li>
+                    <li><strong>auftrag</strong> (n:1) → <strong>status</strong> – Jeder Auftrag hat einen Status</li>
                 </ul>
-            </div>
-        </div>
-
-        <!-- ====== 5. HYBRID-MODELL ====== -->
-        <div class="hybrid-section">
-            <h2>📦 Hybrid-Modell: SQL + JSON</h2>
-            <div class="hybrid-grid">
-                <div class="hybrid-box">
-                    <h3>Strukturierte Spalten (SQL)</h3>
-                    <pre>
-<span class="json-key">auftrag_id</span>: <span class="json-number">15</span>      <span class="json-key">←</span> Primärschlüssel
-<span class="json-key">p_id</span>: <span class="json-number">3</span>          <span class="json-key">←</span> Fremdschlüssel → projekt
-<span class="json-key">bez_id</span>: <span class="json-number">1</span>         <span class="json-key">←</span> Fremdschlüssel → bezirk
-<span class="json-key">erstellt_am</span>: <span class="json-string">"2026-09-27 18:00:00"</span>
-                    </pre>
-                </div>
-                <div class="hybrid-box">
-                    <h3>Flexible JSON-Spalte (daten)</h3>
-                    <pre>
-{
-  <span class="json-key">"status"</span>: <span class="json-string">"Angenommen"</span>,
-  <span class="json-key">"erstellt_am"</span>: <span class="json-string">"2026-09-27"</span>,
-  <span class="json-key">"zusatz_infos"</span>: [
-    { <span class="json-key">"key"</span>: <span class="json-string">"Lieferdatum"</span>,
-      <span class="json-key">"value"</span>: <span class="json-string">"01.10.2026"</span> },
-    { <span class="json-key">"key"</span>: <span class="json-string">"Menge"</span>,
-      <span class="json-key">"value"</span>: <span class="json-string">"50 Stück"</span> }
-  ]
-}
-                    </pre>
-                </div>
-            </div>
-            <div style="margin-top:15px; padding:15px; background:#eef2f7; border-radius:8px; font-size:0.9em; color:#555;">
-                <strong>💡 Vorteil:</strong> Strukturierte Daten (IDs, Datum) bleiben in SQL-Spalten für schnelle Abfragen & JOINs. Flexible, projektspezifische Zusatzfelder werden als JSON gespeichert – ohne Schema-Änderungen bei neuen Anforderungen.
             </div>
         </div>
 
