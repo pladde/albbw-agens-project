@@ -3,25 +3,23 @@ import { Container, Row, Col, Form, Button, Table, Spinner, Alert } from 'react-
 import { Search } from 'react-bootstrap-icons';
 import { useNavigate } from 'react-router-dom';
 import { useBezirk } from '../../contexts/BezirkContext';
+import '../../components/custom-style-agens.css';
 
 interface Auftrag {
     auftrag_id: number;
-    daten: string | null;
+    service_bereich_id: number;
+    bezirk_id: number;
+    mitarbeiter_id: number;
+    status_id: number;
+    titel: string;
+    beschreibung: string | null;
     erstellt_am: string;
-    p_id: number;
-    bez_id: number;
-    titel: string | null;
+    abgeschlossen_am: string | null;
     bezirk_name: string | null;
-}
-
-// Hilfsfunktion: JSON-Daten aus der daten-Spalte parsen
-function parseDaten(daten: string | null): any {
-    if (!daten) return {};
-    try {
-        return JSON.parse(daten);
-    } catch {
-        return {};
-    }
+    mitarbeiter_vorname: string | null;
+    mitarbeiter_nachname: string | null;
+    service_bereich_name: string | null;
+    status_name: string | null;
 }
 
 export const DienstleistungSuchenPage: React.FC = () => {
@@ -34,7 +32,6 @@ export const DienstleistungSuchenPage: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
-
     // Filter-Felder
     const [auftragId, setAuftragId] = useState('');
     const [titel, setTitel] = useState('');
@@ -43,8 +40,6 @@ export const DienstleistungSuchenPage: React.FC = () => {
     const [monat, setMonat] = useState('');
     const [jahr, setJahr] = useState('');
     const [selectedId, setSelectedId] = useState<number | null>(null);
-
-
 
     // Daten vom Backend laden – nur Aufträge des ausgewählten Bezirks
     useEffect(() => {
@@ -76,10 +71,8 @@ export const DienstleistungSuchenPage: React.FC = () => {
 
     // Filtern
     const gefiltert = auftraege.filter((a) => {
-        const json = parseDaten(a.daten);
-
         const auftragTitel = a.titel || '';
-        const auftragStatus = json.status || '';
+        const auftragStatus = a.status_name || '';
 
         // Datum-Filter
         const datum = new Date(a.erstellt_am);
@@ -170,10 +163,9 @@ export const DienstleistungSuchenPage: React.FC = () => {
                     </div>
                 </Col>
 
-
                 <Col xs="auto">
                     <Form.Label style={{ fontWeight: 500, marginBottom: 4 }}>
-                        status
+                        Status
                     </Form.Label>
                     <Form.Select
                         value={status}
@@ -181,8 +173,10 @@ export const DienstleistungSuchenPage: React.FC = () => {
                         style={{ width: '175px', ...inputStyle }}
                     >
                         <option value="">Bitte wählen...</option>
-                        <option>In Bearbeitung</option>
-                        <option>Abgeschlossen</option>
+                        <option>angenommen</option>
+                        <option>in-bearbeitung</option>
+                        <option>angelehnt</option>
+                        <option>abgeschlossen</option>
                     </Form.Select>
                 </Col>
 
@@ -244,7 +238,6 @@ export const DienstleistungSuchenPage: React.FC = () => {
                         </thead>
                         <tbody>
                             {gefiltert.map((a) => {
-                                const json = parseDaten(a.daten);
                                 const datum = new Date(a.erstellt_am);
                                 return (
                                     <tr
@@ -258,7 +251,7 @@ export const DienstleistungSuchenPage: React.FC = () => {
                                     >
                                         <td>{a.auftrag_id}</td>
                                         <td>{a.titel || '-'}</td>
-                                        <td>{json.status || '-'}</td>
+                                        <td>{a.status_name || '-'}</td>
                                         <td>
                                             {datum.toLocaleDateString('de-DE')}
                                         </td>

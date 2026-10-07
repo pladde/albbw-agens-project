@@ -5,11 +5,9 @@ import express from 'express' // Ohne Express müsste man selber coden, wie der 
 import cors from 'cors'
 import auftragRoutes from "./routes/auftragRoutes.ts";
 import bezirkRoutes from "./routes/bezirkRoutes.ts";
-import personRoutes from "./routes/personRoutes.ts";
-import projektRoutes from "./routes/projektRoutes.ts";
-import projekt_x_personRoutes from "./routes/projekt_x_personRoutes.ts";
-import rolleRoutes from "./routes/rolleRoutes.ts";
-//import projektNummerRoutes from "./routes/projektNummerRoutes.ts";
+import mitarbeiterRoutes from "./routes/mitarbeiterRoutes.ts";
+import serviceBereichRoutes from "./routes/serviceBereichRoutes.ts";
+import statusRoutes from "./routes/statusRoutes.ts";
 
 
 // server.ts = Der Hauptserver
@@ -29,11 +27,9 @@ app.use(express.json())
 // Hier werden die modularen Routes registriert:
 app.use('/api/auftrag', auftragRoutes);
 app.use('/api/bezirk', bezirkRoutes);
-app.use('/api/person', personRoutes);
-app.use('/api/projekt', projektRoutes);
-app.use('/api/projekt_x_person', projekt_x_personRoutes);
-app.use('/api/rolle', rolleRoutes);
-//app.use('/api/projektnummer', projektNummerRoutes)
+app.use('/api/mitarbeiter', mitarbeiterRoutes);
+app.use('/api/service-bereich', serviceBereichRoutes);
+app.use('/api/status', statusRoutes);
 
 
 // GET - wenn die Startseite angefragt wird, meldet das backend sich mit hallo

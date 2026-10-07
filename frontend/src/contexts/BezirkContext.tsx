@@ -1,9 +1,10 @@
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import type { ReactNode } from 'react';
 
 interface Bezirk {
     bezirk_id: number;
     name: string;
-    kuerzel: string;
+    kürzel: string;
 }
 
 interface BezirkContextType {

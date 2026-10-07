@@ -7,50 +7,34 @@ const router = express.Router();
 // GET:
 // Alle Aufträge abrufen
 // Einen spezifischen Auftrag abrufen
-// Alle Aufträge nach Projekt-ID abrufen
+// Alle Aufträge nach Bezirk abrufen
 //
 // POST
 // Einen neuen Auftrag speichern
 //
 // PUT
-// Ein Auftrag aktualisieren
+// Einen Auftrag aktualisieren
 //
 // DELETE
 // Einen Auftrag nach ID Löschen
 
-// GET - Alle Aufträge abrufen (mit Projekt-Titel und Bezirk-Name via JOIN)
+// GET - Alle Aufträge abrufen (mit Bezirk-Name, Mitarbeiter-Name, Service-Bereich-Name und Status via JOIN)
 router.get('/', async (_req, res) => {
     try {
         const [rows] = await pool.query(
-            `SELECT a.*, p.titel as titel, b.name as bezirk_name
-                FROM auftrag a
-                LEFT JOIN projekt p ON a.p_id = p.projekt_id
-                LEFT JOIN bezirk b ON a.bez_id = b.bezirk_id
-                ORDER BY a.erstellt_am DESC`
+            `SELECT a.*, 
+                    b.name as bezirk_name, 
+                    m.vorname as mitarbeiter_vorname, 
+                    m.nachname as mitarbeiter_nachname,
+                    sb.name as service_bereich_name,
+                    s.status as status_name
+             FROM auftrag a
+             LEFT JOIN bezirk b ON a.bezirk_id = b.bezirk_id
+             LEFT JOIN mitarbeiter m ON a.mitarbeiter_id = m.mitarbeiter_id
+             LEFT JOIN service_bereich sb ON a.service_bereich_id = sb.service_bereich_id
+             LEFT JOIN status s ON a.status_id = s.status_id
+             ORDER BY a.erstellt_am DESC`
         );
-        res.json(rows);
-    } catch (error) {
-        console.error('Fehler beim Abrufen der Aufträge:', error);
-        res.status(500).json({
-            status: 'error',
-            message: 'Fehler beim Abrufen der Aufträge',
-            error: error instanceof Error ? error.message : 'Unbekannter Fehler'
-        });
-    }
-});
-
-// GET - Aufträge nach Projekt abrufen
-router.get('/projekt/:projektId', async (req, res) => {
-    try {
-        const [rows] = await pool.query(`
-            SELECT a.*, p.titel as titel, b.name as bezirk_name
-            FROM auftrag a
-            LEFT JOIN projekt p ON a.p_id = p.projekt_id
-            LEFT JOIN bezirk b ON a.bez_id = b.bezirk_id
-            WHERE a.p_id = ?
-            ORDER BY a.erstellt_am DESC
-        `, [req.params.projektId]);
-
         res.json(rows);
     } catch (error) {
         console.error('Fehler beim Abrufen der Aufträge:', error);
@@ -65,14 +49,22 @@ router.get('/projekt/:projektId', async (req, res) => {
 // GET - Aufträge nach Bezirk abrufen
 router.get('/bezirk/:bezirkId', async (req, res) => {
     try {
-        const [rows] = await pool.query(`
-            SELECT a.*, p.titel as titel, b.name as bezirk_name
-            FROM auftrag a
-            LEFT JOIN projekt p ON a.p_id = p.projekt_id
-            LEFT JOIN bezirk b ON a.bez_id = b.bezirk_id
-            WHERE a.bez_id = ?
-            ORDER BY a.erstellt_am DESC
-        `, [req.params.bezirkId]);
+        const [rows] = await pool.query(
+            `SELECT a.*, 
+                    b.name as bezirk_name, 
+                    m.vorname as mitarbeiter_vorname, 
+                    m.nachname as mitarbeiter_nachname,
+                    sb.name as service_bereich_name,
+                    s.status as status_name
+             FROM auftrag a
+             LEFT JOIN bezirk b ON a.bezirk_id = b.bezirk_id
+             LEFT JOIN mitarbeiter m ON a.mitarbeiter_id = m.mitarbeiter_id
+             LEFT JOIN service_bereich sb ON a.service_bereich_id = sb.service_bereich_id
+             LEFT JOIN status s ON a.status_id = s.status_id
+             WHERE a.bezirk_id = ?
+             ORDER BY a.erstellt_am DESC`,
+            [req.params.bezirkId]
+        );
 
         res.json(rows);
     } catch (error) {
@@ -85,16 +77,86 @@ router.get('/bezirk/:bezirkId', async (req, res) => {
     }
 });
 
-// GET - einzelnen Auftrag abrufen (mit Projekt-Titel und Bezirk-Name)
+// GET - Aufträge nach Service-Bereich abrufen
+router.get('/service-bereich/:serviceBereichId', async (req, res) => {
+    try {
+        const [rows] = await pool.query(
+            `SELECT a.*, 
+                    b.name as bezirk_name, 
+                    m.vorname as mitarbeiter_vorname, 
+                    m.nachname as mitarbeiter_nachname,
+                    sb.name as service_bereich_name,
+                    s.status as status_name
+             FROM auftrag a
+             LEFT JOIN bezirk b ON a.bezirk_id = b.bezirk_id
+             LEFT JOIN mitarbeiter m ON a.mitarbeiter_id = m.mitarbeiter_id
+             LEFT JOIN service_bereich sb ON a.service_bereich_id = sb.service_bereich_id
+             LEFT JOIN status s ON a.status_id = s.status_id
+             WHERE a.service_bereich_id = ?
+             ORDER BY a.erstellt_am DESC`,
+            [req.params.serviceBereichId]
+        );
+
+        res.json(rows);
+    } catch (error) {
+        console.error('Fehler beim Abrufen der Aufträge:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Fehler beim Abrufen der Aufträge',
+            error: error instanceof Error ? error.message : 'Unbekannter Fehler'
+        });
+    }
+});
+
+// GET - Aufträge nach Status abrufen
+router.get('/status/:statusId', async (req, res) => {
+    try {
+        const [rows] = await pool.query(
+            `SELECT a.*, 
+                    b.name as bezirk_name, 
+                    m.vorname as mitarbeiter_vorname, 
+                    m.nachname as mitarbeiter_nachname,
+                    sb.name as service_bereich_name,
+                    s.status as status_name
+             FROM auftrag a
+             LEFT JOIN bezirk b ON a.bezirk_id = b.bezirk_id
+             LEFT JOIN mitarbeiter m ON a.mitarbeiter_id = m.mitarbeiter_id
+             LEFT JOIN service_bereich sb ON a.service_bereich_id = sb.service_bereich_id
+             LEFT JOIN status s ON a.status_id = s.status_id
+             WHERE a.status_id = ?
+             ORDER BY a.erstellt_am DESC`,
+            [req.params.statusId]
+        );
+
+        res.json(rows);
+    } catch (error) {
+        console.error('Fehler beim Abrufen der Aufträge:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Fehler beim Abrufen der Aufträge',
+            error: error instanceof Error ? error.message : 'Unbekannter Fehler'
+        });
+    }
+});
+
+// GET - Einzelnen Auftrag abrufen (mit Bezirk-Name, Mitarbeiter-Name, Service-Bereich-Name und Status)
 router.get('/:id', async (req, res) => {
     try {
-        const [rows]: any = await pool.query(`
-            SELECT a.*, p.titel as titel, b.name as bezirk_name
-            FROM auftrag a
-            LEFT JOIN projekt p ON a.p_id = p.projekt_id
-            LEFT JOIN bezirk b ON a.bez_id = b.bezirk_id
-            WHERE a.auftrag_id = ?`,
-            [req.params.id]);
+        const [rows]: any = await pool.query(
+            `SELECT a.*, 
+                    b.name as bezirk_name, 
+                    m.vorname as mitarbeiter_vorname, 
+                    m.nachname as mitarbeiter_nachname,
+                    sb.name as service_bereich_name,
+                    s.status as status_name
+             FROM auftrag a
+             LEFT JOIN bezirk b ON a.bezirk_id = b.bezirk_id
+             LEFT JOIN mitarbeiter m ON a.mitarbeiter_id = m.mitarbeiter_id
+             LEFT JOIN service_bereich sb ON a.service_bereich_id = sb.service_bereich_id
+             LEFT JOIN status s ON a.status_id = s.status_id
+             WHERE a.auftrag_id = ?`,
+            [req.params.id]
+        );
 
         if (rows.length === 0) {
             return res.status(404).json({
@@ -116,33 +178,33 @@ router.get('/:id', async (req, res) => {
 // POST - Neuen Auftrag erstellen
 router.post('/', async (req, res) => {
     try {
-        const { p_id, bez_id, daten } = req.body;
+        const { service_bereich_id, bezirk_id, mitarbeiter_id, status_id, titel, beschreibung, erstellt_am, abgeschlossen_am } = req.body;
 
         // Validierung: Pflichtfelder prüfen
-        if (!p_id || !bez_id) {
+        if (!service_bereich_id || !bezirk_id || !mitarbeiter_id || !status_id || !titel) {
             return res.status(400).json({
                 status: 'error',
-                message: 'Projekt-ID (p_id) und Bezirk-ID (bez_id) sind erforderlich'
+                message: 'Service-Bereich-ID, Bezirk-ID, Mitarbeiter-ID, Status-ID und Titel sind erforderlich'
             });
         }
 
-        // Validierung: Prüfe ob Projekt existiert (Fremdschlüssel-Validierung)
-        const [projektExists]: any = await pool.query(
-            'SELECT projekt_id FROM projekt WHERE projekt_id = ?',
-            [p_id]
+        // Validierung: Prüfe ob Service-Bereich existiert (Fremdschlüssel-Validierung)
+        const [serviceBereichExists]: any = await pool.query(
+            'SELECT service_bereich_id FROM service_bereich WHERE service_bereich_id = ?',
+            [service_bereich_id]
         );
 
-        if (projektExists.length === 0) {
+        if (serviceBereichExists.length === 0) {
             return res.status(404).json({
                 status: 'error',
-                message: 'Projekt mit dieser ID existiert nicht'
+                message: 'Service-Bereich mit dieser ID existiert nicht'
             });
         }
 
         // Validierung: Prüfe ob Bezirk existiert (Fremdschlüssel-Validierung)
         const [bezirkExists]: any = await pool.query(
             'SELECT bezirk_id FROM bezirk WHERE bezirk_id = ?',
-            [bez_id]
+            [bezirk_id]
         );
 
         if (bezirkExists.length === 0) {
@@ -152,23 +214,45 @@ router.post('/', async (req, res) => {
             });
         }
 
-        // JSON-Daten validieren und formatieren (falls vorhanden)
-        let jsonDaten = null;
-        if (daten) {
-            try {
-                jsonDaten = typeof daten === 'string' ? daten : JSON.stringify(daten);
-            } catch (e) {
-                return res.status(400).json({
-                    status: 'error',
-                    message: 'Ungültiges JSON-Format für Daten'
-                });
-            }
+        // Validierung: Prüfe ob Mitarbeiter existiert (Fremdschlüssel-Validierung)
+        const [mitarbeiterExists]: any = await pool.query(
+            'SELECT mitarbeiter_id FROM mitarbeiter WHERE mitarbeiter_id = ?',
+            [mitarbeiter_id]
+        );
+
+        if (mitarbeiterExists.length === 0) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Mitarbeiter mit dieser ID existiert nicht'
+            });
+        }
+
+        // Validierung: Prüfe ob Status existiert (Fremdschlüssel-Validierung)
+        const [statusExists]: any = await pool.query(
+            'SELECT status_id FROM status WHERE status_id = ?',
+            [status_id]
+        );
+
+        if (statusExists.length === 0) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Status mit dieser ID existiert nicht'
+            });
         }
 
         // Auftrag erstellen
         const [result]: any = await pool.query(
-            'INSERT INTO auftrag (p_id, bez_id, daten) VALUES (?, ?, ?)',
-            [p_id, bez_id, jsonDaten]
+            'INSERT INTO auftrag (service_bereich_id, bezirk_id, mitarbeiter_id, status_id, titel, beschreibung, erstellt_am, abgeschlossen_am) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+            [
+                service_bereich_id,
+                bezirk_id,
+                mitarbeiter_id,
+                status_id,
+                titel,
+                beschreibung || null,
+                erstellt_am || new Date(),
+                abgeschlossen_am || null
+            ]
         );
 
         res.status(201).json({
@@ -176,9 +260,14 @@ router.post('/', async (req, res) => {
             message: 'Auftrag erfolgreich erstellt',
             data: {
                 auftrag_id: result.insertId,
-                p_id,
-                bez_id,
-                daten: jsonDaten
+                service_bereich_id,
+                bezirk_id,
+                mitarbeiter_id,
+                status_id,
+                titel,
+                beschreibung: beschreibung || null,
+                erstellt_am: erstellt_am || new Date(),
+                abgeschlossen_am: abgeschlossen_am || null
             }
         });
     } catch (error) {
@@ -194,33 +283,33 @@ router.post('/', async (req, res) => {
 // PUT - Auftrag aktualisieren
 router.put('/:id', async (req, res) => {
     try {
-        const { p_id, bez_id, daten } = req.body;
+        const { service_bereich_id, bezirk_id, mitarbeiter_id, status_id, titel, beschreibung, erstellt_am, abgeschlossen_am } = req.body;
 
         // Validierung: Pflichtfelder prüfen
-        if (!p_id || !bez_id) {
+        if (!service_bereich_id || !bezirk_id || !mitarbeiter_id || !status_id || !titel) {
             return res.status(400).json({
                 status: 'error',
-                message: 'Projekt-ID (p_id) und Bezirk-ID (bez_id) sind erforderlich'
+                message: 'Service-Bereich-ID, Bezirk-ID, Mitarbeiter-ID, Status-ID und Titel sind erforderlich'
             });
         }
 
-        // Validierung: Prüfe ob Projekt existiert
-        const [projektExists]: any = await pool.query(
-            'SELECT projekt_id FROM projekt WHERE projekt_id = ?',
-            [p_id]
+        // Validierung: Prüfe ob Service-Bereich existiert
+        const [serviceBereichExists]: any = await pool.query(
+            'SELECT service_bereich_id FROM service_bereich WHERE service_bereich_id = ?',
+            [service_bereich_id]
         );
 
-        if (projektExists.length === 0) {
+        if (serviceBereichExists.length === 0) {
             return res.status(404).json({
                 status: 'error',
-                message: 'Projekt mit dieser ID existiert nicht'
+                message: 'Service-Bereich mit dieser ID existiert nicht'
             });
         }
 
         // Validierung: Prüfe ob Bezirk existiert
         const [bezirkExists]: any = await pool.query(
             'SELECT bezirk_id FROM bezirk WHERE bezirk_id = ?',
-            [bez_id]
+            [bezirk_id]
         );
 
         if (bezirkExists.length === 0) {
@@ -230,23 +319,46 @@ router.put('/:id', async (req, res) => {
             });
         }
 
-        // JSON-Daten validieren
-        let jsonDaten = null;
-        if (daten) {
-            try {
-                jsonDaten = typeof daten === 'string' ? daten : JSON.stringify(daten);
-            } catch (e) {
-                return res.status(400).json({
-                    status: 'error',
-                    message: 'Ungültiges JSON-Format für Daten'
-                });
-            }
+        // Validierung: Prüfe ob Mitarbeiter existiert
+        const [mitarbeiterExists]: any = await pool.query(
+            'SELECT mitarbeiter_id FROM mitarbeiter WHERE mitarbeiter_id = ?',
+            [mitarbeiter_id]
+        );
+
+        if (mitarbeiterExists.length === 0) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Mitarbeiter mit dieser ID existiert nicht'
+            });
+        }
+
+        // Validierung: Prüfe ob Status existiert
+        const [statusExists]: any = await pool.query(
+            'SELECT status_id FROM status WHERE status_id = ?',
+            [status_id]
+        );
+
+        if (statusExists.length === 0) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Status mit dieser ID existiert nicht'
+            });
         }
 
         // Auftrag aktualisieren
         const [result]: any = await pool.query(
-            'UPDATE auftrag SET p_id = ?, bez_id = ?, daten = ? WHERE auftrag_id = ?',
-            [p_id, bez_id, jsonDaten, req.params.id]
+            'UPDATE auftrag SET service_bereich_id = ?, bezirk_id = ?, mitarbeiter_id = ?, status_id = ?, titel = ?, beschreibung = ?, erstellt_am = ?, abgeschlossen_am = ? WHERE auftrag_id = ?',
+            [
+                service_bereich_id,
+                bezirk_id,
+                mitarbeiter_id,
+                status_id,
+                titel,
+                beschreibung || null,
+                erstellt_am || new Date(),
+                abgeschlossen_am || null,
+                req.params.id
+            ]
         );
 
         if (result.affectedRows === 0) {
@@ -261,9 +373,14 @@ router.put('/:id', async (req, res) => {
             message: 'Auftrag erfolgreich aktualisiert',
             data: {
                 auftrag_id: req.params.id,
-                p_id,
-                bez_id,
-                daten: jsonDaten
+                service_bereich_id,
+                bezirk_id,
+                mitarbeiter_id,
+                status_id,
+                titel,
+                beschreibung: beschreibung || null,
+                erstellt_am: erstellt_am || new Date(),
+                abgeschlossen_am: abgeschlossen_am || null
             }
         });
     } catch (error) {

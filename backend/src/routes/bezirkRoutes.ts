@@ -59,10 +59,10 @@ router.get('/:id', async (req, res) => {
 // POST - Neuen Bezirk erstellen
 router.post('/', async (req, res) => {
     try {
-        const { name, kuerzel } = req.body;
+        const { name, kürzel } = req.body;
 
         // Validierung: Pflichtfelder prüfen
-        if (!name || !kuerzel) {
+        if (!name || !kürzel) {
             return res.status(400).json({
                 status: 'error',
                 message: 'Name und Kürzel sind erforderlich'
@@ -70,8 +70,8 @@ router.post('/', async (req, res) => {
         }
 
         const [result]: any = await pool.query(
-            'INSERT INTO bezirk (name, kuerzel) VALUES (?, ?)',
-            [name, kuerzel]
+            'INSERT INTO bezirk (name, `kürzel`) VALUES (?, ?)',
+            [name, kürzel]
         );
 
         res.status(201).json({
@@ -80,7 +80,7 @@ router.post('/', async (req, res) => {
             data: {
                 bezirk_id: result.insertId,
                 name,
-                kuerzel
+                kürzel
             }
         });
     } catch (error) {
@@ -96,10 +96,10 @@ router.post('/', async (req, res) => {
 // PUT - Bezirk aktualisieren
 router.put('/:id', async (req, res) => {
     try {
-        const { name, kuerzel } = req.body;
+        const { name, kürzel } = req.body;
 
         // Validierung: Pflichtfelder prüfen
-        if (!name || !kuerzel) {
+        if (!name || !kürzel) {
             return res.status(400).json({
                 status: 'error',
                 message: 'Name und Kürzel sind erforderlich'
@@ -107,8 +107,8 @@ router.put('/:id', async (req, res) => {
         }
 
         const [result]: any = await pool.query(
-            'UPDATE bezirk SET name = ?, kuerzel = ? WHERE bezirk_id = ?',
-            [name, kuerzel, req.params.id]
+            'UPDATE bezirk SET name = ?, `kürzel` = ? WHERE bezirk_id = ?',
+            [name, kürzel, req.params.id]
         );
 
         if (result.affectedRows === 0) {
@@ -124,7 +124,7 @@ router.put('/:id', async (req, res) => {
             data: {
                 bezirk_id: req.params.id,
                 name,
-                kuerzel
+                kürzel
             }
         });
     } catch (error) {
