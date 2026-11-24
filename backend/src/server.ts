@@ -38,8 +38,14 @@ app.get('/', (_req, res) => {
 });
 
 
+// Exportiere die App für Tests (damit Tests die App ohne Server-Start nutzen können)
+export default app;
+
 // startet den Server auf Port 3001
+// Nur starten, wenn die Datei direkt ausgeführt wird (nicht beim Import für Tests)
 const PORT = 3001
-app.listen(PORT, () => {
-    console.log(`Backend läuft auf Port ${PORT}`)
-})
+if (process.env.NODE_ENV !== 'test') {
+    app.listen(PORT, () => {
+        console.log(`Backend läuft auf Port ${PORT}`)
+    })
+}

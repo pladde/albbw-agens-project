@@ -18,11 +18,14 @@ export const pool = mysql.createPool({
 
 
 // Test der Verbindung
-pool.getConnection()
-    .then((connection: PoolConnection) => {
-        console.log('Verbindung erfolgreich hergestellt')
-        connection.release()
-    })
-    .catch((error: Error) => {
-        console.error('Fehler bei der Verbindung', error);
-    })
+// Wird nur ausgeführt, wenn nicht im Test-Modus (damit Tests ohne Datenbank laufen)
+if (process.env.NODE_ENV !== 'test') {
+    pool.getConnection()
+        .then((connection: PoolConnection) => {
+            console.log('Verbindung erfolgreich hergestellt')
+            connection.release()
+        })
+        .catch((error: Error) => {
+            console.error('Fehler bei der Verbindung', error);
+        })
+}
