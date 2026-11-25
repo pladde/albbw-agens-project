@@ -1,7 +1,14 @@
 import express from 'express';
 import { pool } from '../Datenbankverbindung.ts';
+import { z } from 'zod';
+
 
 const router = express.Router();
+
+const auftragSchema = z.object({
+    bezeichnung: z.string().min(1),
+    menge: z.number().min(0).optional()
+});
 
 // Route für:
 // GET:
@@ -155,18 +162,30 @@ router.post('/', async (req, res) => {
         // JSON-Daten validieren und formatieren (falls vorhanden)
         let jsonDaten = null;
         if (daten) {
+            // Stufe 1: JSON-Syntax prüfen
+            let parsed;
             try {
                 if (typeof daten === 'string') {
                     // Prüfen, ob der String gültiges JSON ist
-                    JSON.parse(daten);
+                    parsed = JSON.parse(daten);
                     jsonDaten = daten;
                 } else {
                     jsonDaten = JSON.stringify(daten);
+                    parsed = daten;
                 }
             } catch (e) {
                 return res.status(400).json({
                     status: 'error',
-                    message: 'Ungültiges JSON-Format für Daten'
+                    message: 'Ungültiges JSON'
+                });
+            }
+            // Stufe 2: JSON-Schema prüfen
+            const result = auftragSchema.safeParse(parsed);
+            if (!result.success) {
+                return res.status(400).json({
+                    status: 'error',
+                    message: 'Validierungsfehler',
+                    details: result.error.issues
                 });
             }
         }
