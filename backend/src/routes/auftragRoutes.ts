@@ -156,7 +156,13 @@ router.post('/', async (req, res) => {
         let jsonDaten = null;
         if (daten) {
             try {
-                jsonDaten = typeof daten === 'string' ? daten : JSON.stringify(daten);
+                if (typeof daten === 'string') {
+                    // Prüfen, ob der String gültiges JSON ist
+                    JSON.parse(daten);
+                    jsonDaten = daten;
+                } else {
+                    jsonDaten = JSON.stringify(daten);
+                }
             } catch (e) {
                 return res.status(400).json({
                     status: 'error',
@@ -234,7 +240,13 @@ router.put('/:id', async (req, res) => {
         let jsonDaten = null;
         if (daten) {
             try {
-                jsonDaten = typeof daten === 'string' ? daten : JSON.stringify(daten);
+                if (typeof daten === 'string') {
+                    // Prüfen, ob der String gültiges JSON ist
+                    JSON.parse(daten);
+                    jsonDaten = daten;
+                } else {
+                    jsonDaten = JSON.stringify(daten);
+                }
             } catch (e) {
                 return res.status(400).json({
                     status: 'error',
